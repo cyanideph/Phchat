@@ -23,7 +23,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PhchatTheme {
+            var darkTheme by remember { mutableStateOf(false) }
+
+            PhchatTheme(darkTheme = darkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -63,6 +65,14 @@ class MainActivity : ComponentActivity() {
                             ProfileScreen(
                                 profileId = screen.profileId,
                                 viewModel = viewModel,
+                                onNavigateBack = { viewModel.navigateBack() }
+                            )
+                        }
+                        is Screen.Settings -> {
+                            SettingsScreen(
+                                viewModel = viewModel,
+                                darkTheme = darkTheme,
+                                onThemeChange = { darkTheme = it },
                                 onNavigateBack = { viewModel.navigateBack() }
                             )
                         }
