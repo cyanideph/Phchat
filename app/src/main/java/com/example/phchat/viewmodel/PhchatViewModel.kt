@@ -58,7 +58,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     private val _conversations = MutableStateFlow<List<Conversation>>(emptyList())
     val conversations: StateFlow<List<Conversation>> = _conversations.asStateFlow()
 
-    private val realtimeClient = com.example.phchat.data.SupabaseRealtimeClient()
+    private val realtimeClient = com.example.phchat.data.SupabaseRealtimeClient(accessTokenProvider = { authManager.getAccessToken() })
     private val _blockedUserIds = MutableStateFlow<Set<String>>(emptySet())
     val blockedUserIds: StateFlow<Set<String>> = _blockedUserIds.asStateFlow()
 
@@ -160,9 +160,13 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             val contentsResult = repository.getContents()
-            if (contentsResult.isSuccess) {
-                _communityPosts.value = contentsResult.getOrNull().orEmpty()
-            }
+            if (contentsResult.isSuccess) _communityPosts.value = contentsResult.getOrNull().orEmpty()
+
+            val conversationsResult = repository.getConversations()
+            if (conversationsResult.isSuccess) _conversations.value = conversationsResult.getOrNull().orEmpty()
+
+            val notificationsResult = repository.getNotifications()
+            if (notificationsResult.isSuccess) _notifications.value = notificationsResult.getOrNull().orEmpty()
 
             _isLoading.value = false
         }
@@ -264,6 +268,30 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun openDirectChat(conversationId: String) {
         navigateTo(Screen.DirectChat(conversationId))
+        loadDirectMessages(conversationId)
+        realtimeClient.connectAndSubscribeConversation(conversationId) { newMsg ->
+            viewModelScope.launch(Dispatchers.Main) {
+                if (newMsg.senderId in _blockedUserIds.value) return@launch
+                val currentMap = _directMessages.value.toMutableMap()
+                val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
+                if (list.none { it.id == newMsg.id }) {
+                    list.add(newMsg)
+                    currentMap[conversationId] = list
+                    _directMessages.value = currentMap
+                }
+            }
+        }
+    }
+
+    fun loadDirectMessages(conversationId: String) {
+        viewModelScope.launch {
+            val res = repository.getDirectMessages(conversationId)
+            if (res.isSuccess) {
+                val map = _directMessages.value.toMutableMap()
+                map[conversationId] = res.getOrNull().orEmpty()
+                _directMessages.value = map
+            }
+        }
     }
 
     fun openProfile(profileId: String) {
@@ -329,7 +357,13 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                 MessageKind.SYSTEM -> "system"
                 else -> "text"
             }
-            repository.sendRoomMessage(roomId, body, kindStr, replyTo?.id)
+            val result = repository.sendRoomMessage(roomId, body, kindStr, replyTo?.id)
+            if (result.isFailure) {
+                val map = _roomMessages.value.toMutableMap()
+                map[roomId] = (map[roomId] ?: emptyList()).filterNot { it.id == tempMsg.id }
+                _roomMessages.value = map
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+            } else loadRoomMessages(roomId)
         }
     }
 
@@ -369,32 +403,42 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun toggleRoomLock(roomId: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(isLocked = !r.isLocked) else r
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val locked = !room.isLocked
+        _rooms.value = _rooms.value.map { if (it.id == roomId) it.copy(isLocked = locked) else it }
+        viewModelScope.launch {
+            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("is_locked", locked) })
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun updateRoomAnnouncement(roomId: String, announcement: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(announcement = announcement) else r
+        _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(announcement = announcement) else r }
+        viewModelScope.launch {
+            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("announcement", announcement) })
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun toggleRoomPinned(roomId: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(isPinned = !r.isPinned) else r
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val pinned = !room.isPinned
+        _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(isPinned = pinned) else r }
+        viewModelScope.launch {
+            val result = repository.setRoomPinned(roomId, pinned)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun toggleJoinRoom(roomId: String) {
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val newJoined = !room.isJoined
         _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) {
-                val newJoined = !r.isJoined
-                r.copy(
-                    isJoined = newJoined,
-                    memberCount = if (newJoined) r.memberCount + 1 else (r.memberCount - 1).coerceAtLeast(1)
-                )
-            } else r
+            if (r.id == roomId) r.copy(isJoined = newJoined, memberCount = if (newJoined) r.memberCount + 1 else (r.memberCount - 1).coerceAtLeast(0)) else r
+        }
+        viewModelScope.launch {
+            val result = repository.toggleRoomMembership(roomId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
@@ -423,35 +467,43 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun sendDirectMessage(conversationId: String, body: String) {
-        val me = _currentUser.value
-        val msg = DirectMessage(
-            id = "dm_${System.currentTimeMillis()}",
-            conversationId = conversationId,
-            senderId = me.id,
-            body = body,
-            timestamp = "Just now"
-        )
-        val currentMap = _directMessages.value.toMutableMap()
-        val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
-        list.add(msg)
-        currentMap[conversationId] = list
-        _directMessages.value = currentMap
+        val trimmed = body.trim()
+        if (trimmed.isBlank()) return
+        viewModelScope.launch {
+            val result = repository.sendDirectMessage(conversationId, trimmed)
+            if (result.isSuccess) {
+                val msg = result.getOrNull() ?: return@launch
+                val currentMap = _directMessages.value.toMutableMap()
+                val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
+                if (list.none { it.id == msg.id }) {
+                    list.add(msg)
+                    currentMap[conversationId] = list
+                    _directMessages.value = currentMap
+                }
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage ?: "Failed to send message"
+            }
+        }
     }
 
     fun startConversationWithUser(user: Profile) {
-        val existing = _conversations.value.firstOrNull { it.participant.id == user.id }
-        if (existing != null) {
-            openDirectChat(existing.id)
-        } else {
-            val newConv = Conversation(
-                id = "conv_${user.id}",
-                participant = user,
-                lastMessage = "Started a conversation",
-                lastMessageTime = "Just now",
-                unreadCount = 0
-            )
-            _conversations.value = listOf(newConv) + _conversations.value
-            openDirectChat(newConv.id)
+        viewModelScope.launch {
+            val existing = _conversations.value.firstOrNull { it.participant.id == user.id }
+            val conversationId = if (existing != null) {
+                existing.id
+            } else {
+                val result = repository.createDirectConversation(user.id)
+                if (result.isFailure) {
+                    _errorMessage.value = result.exceptionOrNull()?.localizedMessage ?: "Failed to create conversation"
+                    return@launch
+                }
+                result.getOrNull() ?: return@launch
+            }
+            val refreshed = repository.getConversations()
+            if (refreshed.isSuccess) {
+                _conversations.value = refreshed.getOrNull().orEmpty()
+            }
+            openDirectChat(conversationId)
         }
     }
 
@@ -478,7 +530,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         )
         _communityPosts.value = listOf(post) + _communityPosts.value
         viewModelScope.launch {
-            repository.createContent(title, body)
+            val result = repository.createContent(title, body)
+            if (result.isSuccess) loadSupabaseData()
+            else _errorMessage.value = result.exceptionOrNull()?.localizedMessage
         }
     }
 
@@ -501,6 +555,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             )
             posts[index] = post.copy(poll = updatedPoll)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.votePoll(postId, optionId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
@@ -513,6 +571,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             val newCount = if (newLiked) post.likesCount + 1 else (post.likesCount - 1).coerceAtLeast(0)
             posts[index] = post.copy(isLiked = newLiked, likesCount = newCount)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.toggleContentReaction(postId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
@@ -523,17 +585,23 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             val post = posts[index]
             posts[index] = post.copy(isSaved = !post.isSaved)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.toggleContentSave(postId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
     fun checkIn() {
         if (hasCheckedInToday.value) return
-        hasCheckedInToday.value = true
-        val user = _currentUser.value
-        _currentUser.value = user.copy(
-            streak = user.streak + 1,
-            points = user.points + 50
-        )
+        viewModelScope.launch {
+            val result = repository.checkInToday()
+            if (result.isSuccess && result.getOrNull() == true) {
+                hasCheckedInToday.value = true
+                val user = _currentUser.value
+                _currentUser.value = user.copy(streak = user.streak + 1, points = user.points + 50)
+            } else if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun updateStatus(status: String) {
@@ -543,23 +611,30 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun updateProfile(displayName: String, statusText: String, bio: String, province: String) {
         val u = _currentUser.value
-        _currentUser.value = u.copy(
-            displayName = displayName,
-            statusText = statusText,
-            bio = bio,
-            province = province
-        )
+        _currentUser.value = u.copy(displayName = displayName, statusText = statusText, bio = bio, province = province)
+        viewModelScope.launch {
+            val result = repository.updateProfile(displayName, statusText, bio)
+            if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun toggleFollowUser(userId: String) {
         _profiles.value = _profiles.value.map { p ->
             if (p.id == userId) p.copy(isFollowed = !p.isFollowed) else p
         }
+        viewModelScope.launch {
+            val result = repository.toggleFollow(userId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+        }
     }
 
     fun toggleBlockUser(userId: String) {
         _profiles.value = _profiles.value.map { p ->
             if (p.id == userId) p.copy(isBlocked = !p.isBlocked) else p
+        }
+        viewModelScope.launch {
+            val result = repository.toggleBlock(userId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
@@ -576,6 +651,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         list.add(0, newComment)
         currentComments[profileId] = list
         _profileComments.value = currentComments
+        viewModelScope.launch {
+            val result = repository.addProfileComment(profileId, body)
+            if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun voteProfileComment(profileId: String, commentId: String, delta: Int) {
@@ -592,6 +671,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun markAllNotificationsRead() {
-        _notifications.value = _notifications.value.map { it.copy(isRead = true) }
+        viewModelScope.launch {
+            val result = repository.markNotificationsRead()
+            if (result.isSuccess) _notifications.value = _notifications.value.map { it.copy(isRead = true) }
+            else _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 }
