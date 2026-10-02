@@ -7,19 +7,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF78C7AE),
-    onPrimary = Color(0xFF07352B),
-    primaryContainer = Color(0xFF174D40),
-    onPrimaryContainer = Color(0xFFC6EBDD),
-    secondary = Color(0xFFE78C87),
-    onSecondary = Color(0xFF4A1010),
-    secondaryContainer = Color(0xFF642522),
-    onSecondaryContainer = Color(0xFFFFDAD6),
+    primary = PhBlueLight,
+    onPrimary = Color(0xFF00210E),
+    primaryContainer = Color(0xFF006B35),
+    onPrimaryContainer = Color(0xFFB5FFD0),
+    secondary = Color(0xFF78DFA4),
+    onSecondary = Color(0xFF00391B),
+    secondaryContainer = Color(0xFF0E4328),
+    onSecondaryContainer = Color(0xFFBFFFCF),
     tertiary = PhYellowSun,
     onTertiary = PhOnGoldContainer,
+    background = SurfaceDark,
+    onBackground = OnSurfaceDark,
     surface = SurfaceDark,
-    surfaceVariant = SurfaceVariantDark,
     onSurface = OnSurfaceDark,
+    surfaceVariant = SurfaceVariantDark,
+    onSurfaceVariant = Color(0xFFB6C8CF),
     outline = OutlineDark
 )
 
@@ -28,29 +31,33 @@ private val LightColorScheme = lightColorScheme(
     onPrimary = Color.White,
     primaryContainer = PhBlueContainer,
     onPrimaryContainer = PhOnBlueContainer,
-    secondary = PhRedSecondary,
+    secondary = Color(0xFF16834A),
     onSecondary = Color.White,
-    secondaryContainer = PhRedContainer,
-    onSecondaryContainer = PhOnRedContainer,
+    secondaryContainer = Color(0xFFE1F5E9),
+    onSecondaryContainer = Color(0xFF0A3B21),
     tertiary = PhYellowSun,
     onTertiary = PhOnGoldContainer,
     background = SurfaceLight,
     onBackground = OnSurfaceLight,
-    surface = Color(0xFFF9FCFB),
+    surface = Color.White,
     onSurface = OnSurfaceLight,
     surfaceVariant = SurfaceVariantLight,
-    onSurfaceVariant = Color(0xFF5D716A),
-    outline = OutlineLight
+    onSurfaceVariant = Color(0xFF60757E),
+    outline = OutlineLight,
+    error = PhRedSecondary,
+    onError = Color.White,
+    errorContainer = PhRedContainer,
+    onErrorContainer = PhOnRedContainer
 )
 
 @Composable
 fun PhchatTheme(
-    darkTheme: Boolean = false,
+    darkTheme: Boolean = androidx.compose.foundation.isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    // PHchat deliberately does not use Android dynamic colors so the brand palette
-    // remains consistent across devices.
+    // Dynamic Android colors stay disabled so the Soft Pro palette remains identical
+    // across phones and does not get replaced by OEM wallpaper colors.
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
