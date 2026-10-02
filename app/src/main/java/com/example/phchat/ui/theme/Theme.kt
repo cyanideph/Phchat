@@ -1,25 +1,20 @@
 package com.example.phchat.ui.theme
 
-import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 
 private val DarkColorScheme = darkColorScheme(
-    primary = PhBlueLight,
-    onPrimary = Color.White,
-    primaryContainer = PhBlueDark,
-    onPrimaryContainer = PhBlueContainer,
-    secondary = PhRedSecondary,
-    onSecondary = Color.White,
-    secondaryContainer = PhRedContainer,
-    onSecondaryContainer = PhOnRedContainer,
+    primary = Color(0xFF78C7AE),
+    onPrimary = Color(0xFF07352B),
+    primaryContainer = Color(0xFF174D40),
+    onPrimaryContainer = Color(0xFFC6EBDD),
+    secondary = Color(0xFFE78C87),
+    onSecondary = Color(0xFF4A1010),
+    secondaryContainer = Color(0xFF642522),
+    onSecondaryContainer = Color(0xFFFFDAD6),
     tertiary = PhYellowSun,
     onTertiary = PhOnGoldContainer,
     surface = SurfaceDark,
@@ -39,26 +34,24 @@ private val LightColorScheme = lightColorScheme(
     onSecondaryContainer = PhOnRedContainer,
     tertiary = PhYellowSun,
     onTertiary = PhOnGoldContainer,
-    surface = SurfaceLight,
-    surfaceVariant = SurfaceVariantLight,
+    background = SurfaceLight,
+    onBackground = OnSurfaceLight,
+    surface = Color(0xFFF9FCFB),
     onSurface = OnSurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = Color(0xFF5D716A),
     outline = OutlineLight
 )
 
 @Composable
 fun PhchatTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Keep distinctive Philippine palette intact
+    darkTheme: Boolean = false,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    // PHchat deliberately does not use Android dynamic colors so the brand palette
+    // remains consistent across devices.
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
