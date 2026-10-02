@@ -851,7 +851,7 @@ class SupabaseRepository(
     suspend fun uploadMedia(
         context: android.content.Context,
         uri: android.net.Uri,
-        bucket: String = "chat-media",
+        bucket: String = "room-media",
         relation: JSONObject = JSONObject()
     ): Result<String> = withContext(Dispatchers.IO) {
         try {
