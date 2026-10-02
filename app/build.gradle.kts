@@ -9,7 +9,7 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.aistudio.phchat.xqzrpk"
+        applicationId = "com.cyanideph.phchat"
         minSdk = 26
         targetSdk = 36
         versionCode = 1
