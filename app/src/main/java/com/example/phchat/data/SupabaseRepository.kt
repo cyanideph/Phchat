@@ -259,22 +259,25 @@ class SupabaseRepository(
                     )
                 } else null
 
+                val author = obj.optJSONObject("author")?.let { profileToModel(it) }
+                    ?: Profile(
+                        id = userId,
+                        username = "tambay",
+                        displayName = "Tambay",
+                        avatarInitial = "T",
+                        avatarColorHex = 0xFF0038A8,
+                        bio = "",
+                        statusText = "",
+                        province = "Philippines"
+                    )
+                val metadata = obj.optJSONObject("metadata")
                 list.add(
                     ContentPost(
                         id = id,
-                        author = Profile(
-                            id = userId,
-                            username = "tambay_${userId.take(4)}",
-                            displayName = "Tambay",
-                            avatarInitial = "T",
-                            avatarColorHex = 0xFF0038A8,
-                            bio = "Tambay",
-                            statusText = "Active",
-                            province = "NCR"
-                        ),
+                        author = author,
                         title = title,
                         body = bodyText,
-                        category = "General",
+                        category = metadata?.optString("category", "General")?.ifBlank { "General" } ?: "General",
                         poll = poll,
                         createdAt = if (createdAt.length >= 10) createdAt.substring(0, 10) else "Recent",
                         likesCount = 0,
