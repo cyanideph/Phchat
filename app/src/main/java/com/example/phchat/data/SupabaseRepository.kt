@@ -97,7 +97,7 @@ class SupabaseRepository(
             val request = buildRequest(url)
                 .header("Prefer", "return=representation")
                 .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
+                .patch(payload.toRequestBody(jsonMediaType))
                 .build()
 
             val response = client.newCall(request).execute()
