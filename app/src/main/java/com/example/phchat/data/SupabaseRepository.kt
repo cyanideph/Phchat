@@ -304,72 +304,26 @@ class SupabaseRepository(
 
     suspend fun submitReport(targetId: String, reason: String, details: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: "anonymous"
-            val payload = JSONObject().apply {
-                put("reporter_id", userId)
-                put("target_id", targetId)
-                put("reason", reason)
-                put("details", details)
-            }.toString()
-
-            val url = "${SupabaseConfig.url}/rest/v1/reports"
-            val request = buildRequest(url)
-                .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
-                .build()
-
-            val response = client.newCall(request).execute()
-            Result.success(response.isSuccessful)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun blockUser(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.success(true)
-            val payload = JSONObject().apply {
-                put("user_id", userId)
-                put("target_user_id", targetUserId)
-                put("status", "blocked")
-            }.toString()
-
-            val url = "${SupabaseConfig.url}/rest/v1/relationships"
-            val request = buildRequest(url)
-                .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
-                .build()
-
-            val response = client.newCall(request).execute()
-            Result.success(response.isSuccessful)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
-    }
-
-    suspend fun addBuddy(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
             val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
             val payload = JSONObject().apply {
-                put("user_id", userId)
-                put("target_user_id", targetUserId)
-                put("status", "accepted")
+                put("reporter_id", userId); put("target_id", targetId); put("reason", reason); put("details", details)
             }.toString()
-
-            val url = "${SupabaseConfig.url}/rest/v1/relationships"
-            val request = buildRequest(url)
+            val response = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/reports")
                 .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
-                .build()
-
-            val response = client.newCall(request).execute()
-            Result.success(response.isSuccessful)
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+                .post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            if (response.isSuccessful) Result.success(true) else Result.failure(Exception("Report failed: ${response.code}"))
+        } catch (e: Exception) { Result.failure(e) }
     }
 
-    suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatchers.IO) {
+suspend fun blockUser(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("toggle_block", JSONObject().apply { put("p_target_user_id", targetUserId) }).map { true }
+    }
+
+suspend fun addBuddy(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("toggle_follow", JSONObject().apply { put("p_target_user_id", targetUserId) }).map { true }
+    }
+
+suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatchers.IO) {
         try {
             val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
             val url = "${SupabaseConfig.url}/rest/v1/conversation_members?user_id=eq.$userId&select=conversation_id,conversations(id,title,kind,updated_at,conversation_members(user_id,profiles(*)))&order=joined_at.desc"
