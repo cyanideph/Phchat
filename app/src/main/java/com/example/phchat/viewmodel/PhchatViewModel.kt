@@ -268,6 +268,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun openDirectChat(conversationId: String) {
         navigateTo(Screen.DirectChat(conversationId))
+        markConversationRead(conversationId)
         loadDirectMessages(conversationId)
         realtimeClient.connectAndSubscribeConversation(conversationId) { newMsg ->
             viewModelScope.launch(Dispatchers.Main) {
@@ -279,6 +280,19 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                     currentMap[conversationId] = list
                     _directMessages.value = currentMap
                 }
+            }
+        }
+    }
+
+    fun markConversationRead(conversationId: String) {
+        viewModelScope.launch {
+            val result = repository.markConversationRead(conversationId)
+            if (result.isSuccess) {
+                _conversations.value = _conversations.value.map {
+                    if (it.id == conversationId) it.copy(unreadCount = 0) else it
+                }
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
             }
         }
     }
@@ -446,22 +460,26 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun createRoom(name: String, provinceCode: String, provinceName: String, announcement: String): Room {
-        val newRoom = Room(
-            id = "room_${System.currentTimeMillis()}",
-            name = name,
-            slug = name.lowercase().replace(" ", "-"),
-            provinceCode = provinceCode,
-            provinceName = provinceName,
-            announcement = announcement,
-            memberCount = 1,
-            onlineCount = 1
-        )
-        _rooms.value = listOf(newRoom) + _rooms.value
+    fun createRoom(
+        name: String,
+        provinceCode: String,
+        provinceName: String,
+        announcement: String,
+        onCreated: (Room?) -> Unit = {}
+    ) {
         viewModelScope.launch {
-            repository.createRoom(name, provinceCode, announcement)
+            val result = repository.createRoom(name, provinceCode, announcement)
+            if (result.isSuccess) {
+                val room = result.getOrNull()
+                if (room != null) {
+                    _rooms.value = listOf(room) + _rooms.value.filterNot { it.id == room.id }
+                }
+                onCreated(room)
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+                onCreated(null)
+            }
         }
-        return newRoom
     }
 
     fun sendDirectMessage(conversationId: String, body: String) {

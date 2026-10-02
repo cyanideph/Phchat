@@ -199,9 +199,10 @@ fun HomeScreen(
         CreateRoomDialog(
             onDismiss = { showCreateRoomDialog = false },
             onCreate = { name, code, provName, announcement ->
-                val newRoom = viewModel.createRoom(name, code, provName, announcement)
-                showCreateRoomDialog = false
-                viewModel.openRoom(newRoom.id)
+                viewModel.createRoom(name, code, provName, announcement) { newRoom ->
+                    showCreateRoomDialog = false
+                    if (newRoom != null) viewModel.openRoom(newRoom.id)
+                }
             }
         )
     }
