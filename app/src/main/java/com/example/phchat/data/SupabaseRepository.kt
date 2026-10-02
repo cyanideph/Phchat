@@ -97,7 +97,7 @@ class SupabaseRepository(
             val request = buildRequest(url)
                 .header("Prefer", "return=representation")
                 .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
+                .patch(payload.toRequestBody(jsonMediaType))
                 .build()
 
             val response = client.newCall(request).execute()
@@ -760,4 +760,64 @@ class SupabaseRepository(
             else -> "Philippines"
         }
     }
+
+    suspend fun getNotificationPreferences(): Result<NotificationPreferences> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/notification_preferences?user_id=eq.$userId&select=*"
+            val resp = client.newCall(buildRequest(url).get().build()).execute()
+            val body = resp.body?.string().orEmpty()
+            if (!resp.isSuccessful) return@withContext Result.failure(Exception("Failed to load notification preferences: ${resp.code}"))
+            if (JSONArray(body).length() == 0) {
+                return@withContext Result.success(NotificationPreferences(userId = userId))
+            }
+            val o = JSONArray(body).getJSONObject(0)
+            Result.success(NotificationPreferences(
+                userId = userId,
+                followEnabled = o.optBoolean("follow_enabled", true),
+                blockEnabled = o.optBoolean("block_enabled", true),
+                contentCommentEnabled = o.optBoolean("content_comment_enabled", true),
+                commentReplyEnabled = o.optBoolean("comment_reply_enabled", true),
+                contentReactionEnabled = o.optBoolean("content_reaction_enabled", true),
+                roomMessageReactionEnabled = o.optBoolean("room_message_reaction_enabled", true),
+                profileCommentEnabled = o.optBoolean("profile_comment_enabled", true),
+                mentionEnabled = o.optBoolean("mention_enabled", true),
+                roomInviteEnabled = o.optBoolean("room_invite_enabled", true),
+                conversationInviteEnabled = o.optBoolean("conversation_invite_enabled", true)
+            ))
+        } catch (e: Exception) {
+            Log.e(tag, "getNotificationPreferences error", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun updateNotificationPreference(column: String, enabled: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val allowed = setOf(
+                "follow_enabled", "block_enabled", "content_comment_enabled", "comment_reply_enabled",
+                "content_reaction_enabled", "room_message_reaction_enabled", "profile_comment_enabled",
+                "mention_enabled", "room_invite_enabled", "conversation_invite_enabled"
+            )
+            if (column !in allowed) return@withContext Result.failure(Exception("Invalid notification preference"))
+            val payload = JSONObject().apply {
+                put("user_id", userId)
+                put(column, enabled)
+                put("updated_at", java.time.Instant.now().toString())
+            }.toString()
+            val url = "${SupabaseConfig.url}/rest/v1/notification_preferences?user_id=eq.$userId"
+            val patch = client.newCall(
+                buildRequest(url)
+                    .header("Content-Type", "application/json")
+                    .header("Prefer", "return=representation")
+                    .patch(payload.toRequestBody(jsonMediaType))
+                    .build()
+            ).execute()
+            Result.success(patch.isSuccessful)
+        } catch (e: Exception) {
+            Log.e(tag, "updateNotificationPreference error", e)
+            Result.failure(e)
+        }
+    }
+
 }

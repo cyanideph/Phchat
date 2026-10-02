@@ -17,6 +17,7 @@ sealed class Screen {
     data class DirectChat(val conversationId: String) : Screen()
     data class ProfileDetail(val profileId: String) : Screen()
     object Auth : Screen()
+    object Settings : Screen()
 }
 
 class PhchatViewModel(application: Application) : AndroidViewModel(application) {
@@ -81,6 +82,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     private val _notifications = MutableStateFlow<List<NotificationItem>>(emptyList())
     val notifications: StateFlow<List<NotificationItem>> = _notifications.asStateFlow()
 
+    private val _notificationPreferences = MutableStateFlow(NotificationPreferences())
+    val notificationPreferences: StateFlow<NotificationPreferences> = _notificationPreferences.asStateFlow()
+
     private val _profileComments = MutableStateFlow<Map<String, List<ProfileComment>>>(emptyMap())
     val profileComments: StateFlow<Map<String, List<ProfileComment>>> = _profileComments.asStateFlow()
 
@@ -129,7 +133,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                         }
                     }
                     is AuthState.Unauthenticated -> {
-                        loadSupabaseData()
+                        if (_currentScreen.value !is Screen.Auth) {
+                            _currentScreen.value = Screen.Auth
+                        }
                     }
                     else -> Unit
                 }
@@ -677,4 +683,23 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             else _errorMessage.value = result.exceptionOrNull()?.localizedMessage
         }
     }
+
+    fun loadNotificationPreferences() {
+        viewModelScope.launch {
+            val result = repository.getNotificationPreferences()
+            if (result.isSuccess) {
+                _notificationPreferences.value = result.getOrNull() ?: NotificationPreferences()
+            }
+        }
+    }
+
+    fun updateNotificationPreference(column: String, enabled: Boolean) {
+        viewModelScope.launch {
+            val result = repository.updateNotificationPreference(column, enabled)
+            if (result.isSuccess) {
+                loadNotificationPreferences()
+            }
+        }
+    }
+
 }

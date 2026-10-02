@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import android.content.Context
 import androidx.compose.ui.Modifier
 import com.example.phchat.ui.screens.*
 import com.example.phchat.ui.theme.PhchatTheme
@@ -23,7 +24,18 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            PhchatTheme {
+            val prefs = remember {
+                getSharedPreferences("phchat_preferences", Context.MODE_PRIVATE)
+            }
+            val systemDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+            var darkTheme by remember {
+                mutableStateOf(
+                    if (prefs.contains("dark_theme")) prefs.getBoolean("dark_theme", false)
+                    else systemDarkTheme
+                )
+            }
+
+            PhchatTheme(darkTheme = darkTheme) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -63,6 +75,17 @@ class MainActivity : ComponentActivity() {
                             ProfileScreen(
                                 profileId = screen.profileId,
                                 viewModel = viewModel,
+                                onNavigateBack = { viewModel.navigateBack() }
+                            )
+                        }
+                        is Screen.Settings -> {
+                            SettingsScreen(
+                                viewModel = viewModel,
+                                darkTheme = darkTheme,
+                                onThemeChange = { enabled ->
+                                    darkTheme = enabled
+                                    prefs.edit().putBoolean("dark_theme", enabled).apply()
+                                },
                                 onNavigateBack = { viewModel.navigateBack() }
                             )
                         }
