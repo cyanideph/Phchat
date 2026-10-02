@@ -665,6 +665,37 @@ class SupabaseRepository(
         } catch (e: Exception) { Result.failure(e) }
     }
 
+    suspend fun getNotifications(): Result<List<NotificationItem>> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/notifications?user_id=eq.$userId&select=*&order=created_at.desc"
+            val resp = client.newCall(buildRequest(url).get().build()).execute()
+            val body = resp.body?.string().orEmpty()
+            if (!resp.isSuccessful) return@withContext Result.failure(Exception("Failed to load notifications: ${resp.code}"))
+            val arr = JSONArray(body)
+            val out = mutableListOf<NotificationItem>()
+            for (i in 0 until arr.length()) {
+                val o = arr.getJSONObject(i); val payload = o.optJSONObject("payload") ?: JSONObject()
+                out.add(NotificationItem(
+                    id=o.optString("id"), type=o.optString("type"), title=payload.optString("title", o.optString("type")),
+                    message=payload.optString("message", payload.optString("body","")), timestamp=o.optString("created_at"),
+                    isRead=!o.isNull("read_at"), targetRoomId=payload.optString("room_id").takeIf { it.isNotBlank() }
+                ))
+            }
+            Result.success(out)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun markNotificationsRead(): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val payload = JSONObject().apply { put("read_at", java.time.Instant.now().toString()) }.toString()
+            val url = "${SupabaseConfig.url}/rest/v1/notifications?user_id=eq.$userId&read_at=is.null"
+            val resp = client.newCall(buildRequest(url).header("Content-Type","application/json").patch(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
     private fun profileToModel(obj: JSONObject): Profile {
         val displayName = obj.optString("display_name").ifBlank { obj.optString("username", "Tambay") }
         return Profile(
