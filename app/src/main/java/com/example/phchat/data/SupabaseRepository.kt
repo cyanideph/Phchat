@@ -642,6 +642,34 @@ class SupabaseRepository(
         } catch (e: Exception) { Result.failure(e) }
     }
 
+    suspend fun updateRoomMessageDeleted(messageId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val payload = JSONObject().apply { put("deleted_at", java.time.Instant.now().toString()) }.toString()
+            val req = buildRequest("${SupabaseConfig.url}/rest/v1/room_messages?id=eq.$messageId")
+                .header("Content-Type", "application/json")
+                .patch(payload.toRequestBody(jsonMediaType)).build()
+            val resp = client.newCall(req).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun toggleRoomMembership(roomId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId"
+            val existing = client.newCall(buildRequest(url).get().build()).execute()
+            val body = existing.body?.string().orEmpty()
+            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Membership lookup failed: ${existing.code}"))
+            if (JSONArray(body).length() > 0) {
+                val del = client.newCall(buildRequest(url).delete().build()).execute()
+                return@withContext Result.success(!del.isSuccessful.not())
+            }
+            val payload = JSONObject().apply { put("room_id", roomId); put("user_id", userId); put("role", "member") }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/room_members").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
     suspend fun updateRoom(roomId: String, fields: JSONObject): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val req = buildRequest("${SupabaseConfig.url}/rest/v1/rooms?id=eq.$roomId").header("Content-Type","application/json").patch(fields.toString().toRequestBody(jsonMediaType)).build()
