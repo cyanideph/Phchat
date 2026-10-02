@@ -157,13 +157,6 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             if (profilesResult.isSuccess) {
                 val list = profilesResult.getOrNull().orEmpty()
                 _profiles.value = list
-                _profileVisits.value = list.take(5).map {
-                    ProfileVisit(
-                        id = "visit_${it.id}",
-                        profileId = _currentUser.value.id,
-                        visitor = it
-                    )
-                }
             }
 
             val contentsResult = repository.getContents()
@@ -391,22 +384,20 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun toggleMessageReaction(roomId: String, messageId: String, emoji: String) {
-        val currentMap = _roomMessages.value.toMutableMap()
-        val list = (currentMap[roomId] ?: emptyList()).map { msg ->
-            if (msg.id == messageId) {
-                val currentCount = msg.reactions[emoji] ?: 0
-                val updatedReactions = msg.reactions.toMutableMap()
-                if (msg.myReaction == emoji) {
-                    if (currentCount > 1) updatedReactions[emoji] = currentCount - 1 else updatedReactions.remove(emoji)
-                    msg.copy(reactions = updatedReactions, myReaction = null)
-                } else {
-                    updatedReactions[emoji] = currentCount + 1
-                    msg.copy(reactions = updatedReactions, myReaction = emoji)
+        viewModelScope.launch {
+            val result = repository.callRpc(
+                "toggle_room_message_reaction",
+                org.json.JSONObject().apply {
+                    put("p_message_id", messageId)
+                    put("p_reaction", emoji)
                 }
-            } else msg
+            )
+            if (result.isFailure) {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+                return@launch
+            }
+            loadRoomMessages(roomId)
         }
-        currentMap[roomId] = list
-        _roomMessages.value = currentMap
     }
 
     fun toggleRoomLock(roomId: String) {
@@ -605,8 +596,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             val result = repository.checkInToday()
             if (result.isSuccess && result.getOrNull() == true) {
                 hasCheckedInToday.value = true
-                val user = _currentUser.value
-                _currentUser.value = user.copy(streak = user.streak + 1, points = user.points + 50)
+                loadSupabaseData()
             } else if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
         }
     }
