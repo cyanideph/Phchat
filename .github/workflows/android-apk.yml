@@ -34,9 +34,9 @@ jobs:
       - name: Ensure debug keystore exists
         shell: bash
         run: |
-          if [ ! -f app/debug.keystore ]; then
+          if [ ! -f debug.keystore ]; then
             keytool -genkeypair \
-              -keystore app/debug.keystore \
+              -keystore debug.keystore \
               -storepass android \
               -keypass android \
               -alias androiddebugkey \
