@@ -360,24 +360,79 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
 
     suspend fun getDirectMessages(conversationId: String): Result<List<DirectMessage>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/conversation_messages?conversation_id=eq.$conversationId&select=*&order=created_at.asc"
-            val response = client.newCall(buildRequest(url).get().build()).execute()
-            val body = response.body?.string().orEmpty()
-            if (!response.isSuccessful) return@withContext Result.failure(Exception("Failed to load DM: ${response.code}"))
-            val array = JSONArray(body)
+            val result = callRpc("list_conversation_messages", JSONObject().apply {
+                put("p_conversation_id", conversationId)
+                put("p_before_created_at", JSONObject.NULL)
+                put("p_before_id", JSONObject.NULL)
+                put("p_limit", 100)
+            })
+            if (result.isFailure) return@withContext Result.failure(result.exceptionOrNull()!!)
+            val root = JSONObject(result.getOrNull().orEmpty())
+            val items = root.optJSONArray("items") ?: JSONArray()
             val out = mutableListOf<DirectMessage>()
-            for (i in 0 until array.length()) {
-                val o = array.getJSONObject(i)
-                out.add(DirectMessage(o.optString("id"), conversationId, o.optString("sender_id"),
+            for (i in items.length() - 1 downTo 0) {
+                val o = items.getJSONObject(i)
+                val metadata = o.optJSONObject("metadata")
+                out.add(DirectMessage(
+                    o.optString("id"), conversationId, o.optString("sender_id"),
                     o.optString("body", ""), when (o.optString("kind")) {
                         "sticker" -> MessageKind.STICKER
                         "system" -> MessageKind.SYSTEM
                         "media" -> MessageKind.MEDIA
                         "reply" -> MessageKind.REPLY
                         else -> MessageKind.TEXT
-                    }, o.optJSONObject("metadata")?.optString("sticker_emoji"), o.optString("created_at", "")))
+                    },
+                    metadata?.optString("sticker_emoji"),
+                    o.optString("created_at", "")
+                ))
             }
             Result.success(out)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun markConversationRead(conversationId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("mark_conversation_read", JSONObject().apply {
+            put("p_conversation_id", conversationId)
+            put("p_read_at", java.time.Instant.now().toString())
+        }).map { true }
+    }
+
+    suspend fun markMessageRead(messageId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("mark_message_read", JSONObject().apply {
+            put("p_message_id", messageId)
+        }).map { true }
+    }
+
+    suspend fun editDirectMessage(messageId: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("edit_conversation_message", JSONObject().apply {
+            put("p_message_id", messageId)
+            put("p_body", body)
+        }).map { true }
+    }
+
+    suspend fun deleteDirectMessage(messageId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("delete_conversation_message", JSONObject().apply {
+            put("p_message_id", messageId)
+        }).map { true }
+    }
+
+    suspend fun replyToDirectMessage(conversationId: String, replyToId: String, body: String): Result<DirectMessage> = withContext(Dispatchers.IO) {
+        try {
+            val result = callRpc("reply_to_conversation_message", JSONObject().apply {
+                put("p_conversation_id", conversationId)
+                put("p_reply_to_id", replyToId)
+                put("p_body", body)
+                put("p_metadata", JSONObject())
+            })
+            if (result.isFailure) return@withContext Result.failure(result.exceptionOrNull()!!)
+            val o = JSONObject(result.getOrNull().orEmpty())
+            Result.success(DirectMessage(
+                o.optString("id"), conversationId, o.optString("sender_id"),
+                o.optString("body", body),
+                MessageKind.REPLY,
+                null,
+                o.optString("created_at", "")
+            ))
         } catch (e: Exception) { Result.failure(e) }
     }
 
@@ -549,19 +604,26 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
 
     suspend fun getNotifications(): Result<List<NotificationItem>> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val url = "${SupabaseConfig.url}/rest/v1/notifications?user_id=eq.$userId&select=*&order=created_at.desc"
-            val resp = client.newCall(buildRequest(url).get().build()).execute()
-            val body = resp.body?.string().orEmpty()
-            if (!resp.isSuccessful) return@withContext Result.failure(Exception("Failed to load notifications: ${resp.code}"))
-            val arr = JSONArray(body)
+            val result = callRpc("list_notifications", JSONObject().apply {
+                put("p_before_created_at", JSONObject.NULL)
+                put("p_before_id", JSONObject.NULL)
+                put("p_limit", 100)
+            })
+            if (result.isFailure) return@withContext Result.failure(result.exceptionOrNull()!!)
+            val root = JSONObject(result.getOrNull().orEmpty())
+            val arr = root.optJSONArray("items") ?: JSONArray()
             val out = mutableListOf<NotificationItem>()
             for (i in 0 until arr.length()) {
-                val o = arr.getJSONObject(i); val payload = o.optJSONObject("payload") ?: JSONObject()
+                val o = arr.getJSONObject(i)
+                val payload = o.optJSONObject("payload") ?: JSONObject()
                 out.add(NotificationItem(
-                    id=o.optString("id"), type=o.optString("type"), title=payload.optString("title", o.optString("type")),
-                    message=payload.optString("message", payload.optString("body","")), timestamp=o.optString("created_at"),
-                    isRead=!o.isNull("read_at"), targetRoomId=payload.optString("room_id").takeIf { it.isNotBlank() }
+                    id = o.optString("id"),
+                    type = o.optString("type"),
+                    title = payload.optString("title", o.optString("type")),
+                    message = payload.optString("message", payload.optString("body", "")),
+                    timestamp = o.optString("created_at"),
+                    isRead = !o.isNull("read_at"),
+                    targetRoomId = payload.optString("room_id").takeIf { it.isNotBlank() }
                 ))
             }
             Result.success(out)
@@ -569,13 +631,11 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
     }
 
     suspend fun markNotificationsRead(): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val payload = JSONObject().apply { put("read_at", java.time.Instant.now().toString()) }.toString()
-            val url = "${SupabaseConfig.url}/rest/v1/notifications?user_id=eq.$userId&read_at=is.null"
-            val resp = client.newCall(buildRequest(url).header("Content-Type","application/json").patch(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(resp.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("mark_all_notifications_read").map { true }
+    }
+
+    suspend fun clearNotifications(): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("clear_notifications").map { true }
     }
 
     private fun profileToModel(obj: JSONObject): Profile {
