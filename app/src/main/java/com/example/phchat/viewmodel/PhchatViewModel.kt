@@ -413,7 +413,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         val pinned = !room.isPinned
         _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(isPinned = pinned) else r }
         viewModelScope.launch {
-            val result = repository.updateRoomMembership(roomId, pinned)
+            val result = repository.setRoomPinned(roomId, pinned)
             if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
