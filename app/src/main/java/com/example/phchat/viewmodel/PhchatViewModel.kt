@@ -58,7 +58,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     private val _conversations = MutableStateFlow<List<Conversation>>(emptyList())
     val conversations: StateFlow<List<Conversation>> = _conversations.asStateFlow()
 
-    private val realtimeClient = com.example.phchat.data.SupabaseRealtimeClient()
+    private val realtimeClient = com.example.phchat.data.SupabaseRealtimeClient(accessTokenProvider = { authManager.getAccessToken() })
     private val _blockedUserIds = MutableStateFlow<Set<String>>(emptySet())
     val blockedUserIds: StateFlow<Set<String>> = _blockedUserIds.asStateFlow()
 
