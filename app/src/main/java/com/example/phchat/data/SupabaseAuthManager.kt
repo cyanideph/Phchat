@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,7 +23,8 @@ data class AuthUser(
     val username: String = "",
     val displayName: String = "",
     val accessToken: String,
-    val refreshToken: String = ""
+    val refreshToken: String = "",
+    val expiresAt: Long = 0L
 )
 
 sealed class AuthState {
@@ -57,6 +60,7 @@ class SupabaseAuthManager(
         val username = prefs.getString("username", "") ?: ""
         val displayName = prefs.getString("display_name", "") ?: ""
         val refreshToken = prefs.getString("refresh_token", "") ?: ""
+        val expiresAt = prefs.getLong("expires_at", 0L)
 
         if (!token.isNullOrBlank() && !userId.isNullOrBlank() && !email.isNullOrBlank()) {
             val user = AuthUser(
@@ -65,9 +69,14 @@ class SupabaseAuthManager(
                 username = username,
                 displayName = if (displayName.isNotBlank()) displayName else email.substringBefore("@"),
                 accessToken = token,
-                refreshToken = refreshToken
+                refreshToken = refreshToken,
+                expiresAt = expiresAt
             )
-            _authState.value = AuthState.Authenticated(user)
+            if (expiresAt > 0L && expiresAt <= System.currentTimeMillis() / 1000L + 60L && refreshToken.isNotBlank()) {
+                CoroutineScope(SupervisorJob() + Dispatchers.IO).launch { refreshSession() }
+            } else {
+                _authState.value = AuthState.Authenticated(user)
+            }
         } else {
             _authState.value = AuthState.Unauthenticated
         }
@@ -92,12 +101,7 @@ class SupabaseAuthManager(
             val body = response.body?.string().orEmpty()
 
             if (!response.isSuccessful) {
-                val errorMsg = try {
-                    val errJson = JSONObject(body)
-                    errJson.optString("error_description", errJson.optString("msg", "Sign-in failed (HTTP ${response.code})"))
-                } catch (e: Exception) {
-                    "Sign-in failed: ${response.code}"
-                }
+                val errorMsg = parseAuthError(response.code, body, "Sign-in failed")
                 _authState.value = AuthState.Error(errorMsg)
                 return@withContext Result.failure(Exception(errorMsg))
             }
@@ -105,6 +109,7 @@ class SupabaseAuthManager(
             val json = JSONObject(body)
             val accessToken = json.getString("access_token")
             val refreshToken = json.optString("refresh_token", "")
+            val expiresAt = (System.currentTimeMillis() / 1000L) + json.optLong("expires_in", 3600L)
             val userJson = json.getJSONObject("user")
             val userId = userJson.getString("id")
             val userEmail = userJson.getString("email")
@@ -118,7 +123,8 @@ class SupabaseAuthManager(
                 username = username,
                 displayName = displayName,
                 accessToken = accessToken,
-                refreshToken = refreshToken
+                refreshToken = refreshToken,
+                expiresAt = expiresAt
             )
 
             saveSession(user)
@@ -157,12 +163,7 @@ class SupabaseAuthManager(
             val body = response.body?.string().orEmpty()
 
             if (!response.isSuccessful) {
-                val errorMsg = try {
-                    val errJson = JSONObject(body)
-                    errJson.optString("msg", errJson.optString("error_description", "Sign-up failed"))
-                } catch (e: Exception) {
-                    "Sign-up failed: ${response.code}"
-                }
+                val errorMsg = parseAuthError(response.code, body, "Sign-up failed")
                 _authState.value = AuthState.Error(errorMsg)
                 return@withContext Result.failure(Exception(errorMsg))
             }
@@ -193,15 +194,67 @@ class SupabaseAuthManager(
         }
     }
 
+    suspend fun refreshSession(): Result<AuthUser> = withContext(Dispatchers.IO) {
+        val refreshToken = prefs.getString("refresh_token", null)
+        if (refreshToken.isNullOrBlank()) return@withContext Result.failure(Exception("No refresh token available"))
+        try {
+            val payload = JSONObject().apply { put("refresh_token", refreshToken) }.toString()
+            val request = Request.Builder()
+                .url("${SupabaseConfig.url}/auth/v1/token?grant_type=refresh_token")
+                .header("apikey", SupabaseConfig.publishableKey)
+                .header("Content-Type", "application/json")
+                .post(payload.toRequestBody(jsonMediaType))
+                .build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                prefs.edit().clear().apply()
+                _authState.value = AuthState.Unauthenticated
+                return@withContext Result.failure(Exception(parseAuthError(response.code, body, "Session refresh failed")))
+            }
+            val json = JSONObject(body)
+            val userJson = json.getJSONObject("user")
+            val accessToken = json.getString("access_token")
+            val newRefreshToken = json.optString("refresh_token", refreshToken)
+            val user = AuthUser(
+                id = userJson.getString("id"),
+                email = userJson.getString("email"),
+                username = prefs.getString("username", "") ?: "",
+                displayName = prefs.getString("display_name", "") ?: userJson.getString("email").substringBefore("@"),
+                accessToken = accessToken,
+                refreshToken = newRefreshToken,
+                expiresAt = (System.currentTimeMillis() / 1000L) + json.optLong("expires_in", 3600L)
+            )
+            saveSession(user)
+            _authState.value = AuthState.Authenticated(user)
+            Result.success(user)
+        } catch (e: Exception) {
+            _authState.value = AuthState.Error(e.localizedMessage ?: "Session refresh failed")
+            Result.failure(e)
+        }
+    }
     fun signOut() {
         prefs.edit().clear().apply()
         _authState.value = AuthState.Unauthenticated
     }
 
+    private fun parseAuthError(code: Int, body: String, fallback: String): String {
+        return try {
+            val json = JSONObject(body)
+            json.optString("msg").ifBlank {
+                json.optString("error_description").ifBlank {
+                    json.optString("message").ifBlank { "$fallback (HTTP $code)" }
+                }
+            }
+        } catch (_: Exception) {
+            "$fallback (HTTP $code)"
+        }
+    }
     private fun saveSession(user: AuthUser) {
         prefs.edit()
             .putString("access_token", user.accessToken)
             .putString("refresh_token", user.refreshToken)
+            .putLong("expires_at", user.expiresAt)
             .putString("user_id", user.id)
             .putString("email", user.email)
             .putString("username", user.username)
