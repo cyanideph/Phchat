@@ -133,7 +133,7 @@ fun UzzapRetroTicker(
 ) {
     Surface(
         color = PhBlueDark,
-        shape = RoundedCornerShape(10.dp),
+        shape = RoundedCornerShape(14.dp),
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
