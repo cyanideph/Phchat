@@ -86,6 +86,13 @@ class MainActivity : ComponentActivity() {
                                     darkTheme = enabled
                                     prefs.edit().putBoolean("dark_theme", enabled).apply()
                                 },
+                                onNavigateBack = { viewModel.navigateBack() },
+                                onOpenFeatureCenter = { viewModel.navigateTo(Screen.FeatureCenter) }
+                            )
+                        }
+                        is Screen.FeatureCenter -> {
+                            FeatureCenterScreen(
+                                viewModel = viewModel,
                                 onNavigateBack = { viewModel.navigateBack() }
                             )
                         }
