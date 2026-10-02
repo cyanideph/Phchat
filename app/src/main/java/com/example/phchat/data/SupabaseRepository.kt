@@ -23,7 +23,7 @@ class SupabaseRepository(
     private val tag = "SupabaseRepo"
 
     private fun getAuthToken(): String {
-        return authManager.getAccessToken() ?: SupabaseConfig.publishableKey
+        return authManager.getAccessToken() ?: throw IllegalStateException("Authentication required")
     }
 
     private fun buildRequest(url: String): Request.Builder {
@@ -68,9 +68,9 @@ class SupabaseRepository(
                         provinceName = mapProvinceToRegion(provinceCode),
                         isLocked = isLocked,
                         announcement = announcement,
-                        memberCount = 1,
-                        onlineCount = 1,
-                        isJoined = true
+                        memberCount = 0,
+                        onlineCount = 0,
+                        isJoined = false
                     )
                 )
             }
@@ -329,7 +329,10 @@ class SupabaseRepository(
                 put("body", body)
                 put("author_id", userId)
                 put("kind", "post")
+                put("metadata", JSONObject())
                 put("is_published", true)
+                put("is_featured", false)
+                put("is_hidden", false)
             }.toString()
 
             val url = "${SupabaseConfig.url}/rest/v1/contents"
@@ -414,6 +417,263 @@ class SupabaseRepository(
         } catch (e: Exception) {
             Result.failure(e)
         }
+    }
+
+    suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/conversation_members?user_id=eq.$userId&select=conversation_id,conversations(id,title,kind,updated_at,conversation_members(user_id,profiles(*)))&order=joined_at.desc"
+            val response = client.newCall(buildRequest(url).get().build()).execute()
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) return@withContext Result.failure(Exception("Failed to fetch conversations: ${response.code}"))
+            val array = JSONArray(body)
+            val out = mutableListOf<Conversation>()
+            for (i in 0 until array.length()) {
+                val row = array.getJSONObject(i)
+                val conv = row.optJSONObject("conversations") ?: continue
+                val members = conv.optJSONArray("conversation_members") ?: continue
+                var participant: Profile? = null
+                for (j in 0 until members.length()) {
+                    val member = members.optJSONObject(j) ?: continue
+                    if (member.optString("user_id") != userId) {
+                        val profile = member.optJSONObject("profiles")
+                        if (profile != null) participant = profileToModel(profile)
+                    }
+                }
+                if (participant != null) {
+                    out.add(Conversation(
+                        id = conv.optString("id"),
+                        participant = participant,
+                        lastMessage = "",
+                        lastMessageTime = conv.optString("updated_at", ""),
+                        unreadCount = 0
+                    ))
+                }
+            }
+            Result.success(out.distinctBy { it.id })
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun getDirectMessages(conversationId: String): Result<List<DirectMessage>> = withContext(Dispatchers.IO) {
+        try {
+            val url = "${SupabaseConfig.url}/rest/v1/conversation_messages?conversation_id=eq.$conversationId&select=*&order=created_at.asc"
+            val response = client.newCall(buildRequest(url).get().build()).execute()
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) return@withContext Result.failure(Exception("Failed to load DM: ${response.code}"))
+            val array = JSONArray(body)
+            val out = mutableListOf<DirectMessage>()
+            for (i in 0 until array.length()) {
+                val o = array.getJSONObject(i)
+                out.add(DirectMessage(o.optString("id"), conversationId, o.optString("sender_id"),
+                    o.optString("body", ""), when (o.optString("kind")) {
+                        "sticker" -> MessageKind.STICKER
+                        "system" -> MessageKind.SYSTEM
+                        "media" -> MessageKind.MEDIA
+                        "reply" -> MessageKind.REPLY
+                        else -> MessageKind.TEXT
+                    }, o.optJSONObject("metadata")?.optString("sticker_emoji"), o.optString("created_at", "")))
+            }
+            Result.success(out)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun createDirectConversation(targetUserId: String): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            if (userId == targetUserId) return@withContext Result.failure(Exception("Cannot message yourself"))
+            val existingUrl = "${SupabaseConfig.url}/rest/v1/conversation_members?user_id=eq.$userId&select=conversation_id,conversations(id,kind,conversation_members(user_id))"
+            val existingResponse = client.newCall(buildRequest(existingUrl).get().build()).execute()
+            val existingBody = existingResponse.body?.string().orEmpty()
+            if (existingResponse.isSuccessful) {
+                val rows = JSONArray(existingBody)
+                for (i in 0 until rows.length()) {
+                    val conv = rows.optJSONObject(i)?.optJSONObject("conversations") ?: continue
+                    if (conv.optString("kind") == "private") {
+                        val members = conv.optJSONArray("conversation_members") ?: continue
+                        if (members.length() == 2 && (0 until members.length()).any { members.optJSONObject(it)?.optString("user_id") == targetUserId }) {
+                            return@withContext Result.success(conv.optString("id"))
+                        }
+                    }
+                }
+            }
+            val convPayload = JSONObject().apply {
+                put("kind", "private")
+                put("created_by", userId)
+            }.toString()
+            val convReq = buildRequest("${SupabaseConfig.url}/rest/v1/conversations")
+                .header("Prefer", "return=representation")
+                .header("Content-Type", "application/json")
+                .post(convPayload.toRequestBody(jsonMediaType)).build()
+            val convResp = client.newCall(convReq).execute()
+            val convBody = convResp.body?.string().orEmpty()
+            if (!convResp.isSuccessful) return@withContext Result.failure(Exception("Failed to create conversation: ${convResp.code} $convBody"))
+            val convId = JSONArray(convBody).getJSONObject(0).getString("id")
+            val memberPayload = JSONArray().apply {
+                put(JSONObject().apply { put("conversation_id", convId); put("user_id", userId); put("role", "owner") })
+                put(JSONObject().apply { put("conversation_id", convId); put("user_id", targetUserId); put("role", "member") })
+            }.toString()
+            val memberReq = buildRequest("${SupabaseConfig.url}/rest/v1/conversation_members")
+                .header("Content-Type", "application/json")
+                .post(memberPayload.toRequestBody(jsonMediaType)).build()
+            val memberResp = client.newCall(memberReq).execute()
+            if (!memberResp.isSuccessful) return@withContext Result.failure(Exception("Failed to add conversation members: ${memberResp.code}"))
+            Result.success(convId)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun sendDirectMessage(conversationId: String, body: String, kind: String = "text", stickerEmoji: String? = null, replyToId: String? = null): Result<DirectMessage> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val payload = JSONObject().apply {
+                put("conversation_id", conversationId); put("sender_id", userId); put("kind", kind); put("body", body); put("metadata", JSONObject())
+                if (stickerEmoji != null) put("metadata", JSONObject().apply { put("sticker_emoji", stickerEmoji) })
+                if (replyToId != null) put("reply_to_id", replyToId)
+            }.toString()
+            val req = buildRequest("${SupabaseConfig.url}/rest/v1/conversation_messages")
+                .header("Prefer", "return=representation").header("Content-Type", "application/json")
+                .post(payload.toRequestBody(jsonMediaType)).build()
+            val resp = client.newCall(req).execute()
+            val responseBody = resp.body?.string().orEmpty()
+            if (!resp.isSuccessful) return@withContext Result.failure(Exception("Failed to send DM: ${resp.code}"))
+            val o = JSONArray(responseBody).getJSONObject(0)
+            Result.success(DirectMessage(o.getString("id"), conversationId, userId, body,
+                if (kind == "sticker") MessageKind.STICKER else MessageKind.TEXT, stickerEmoji, o.optString("created_at")))
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun toggleContentReaction(contentId: String, reaction: String = "like"): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val base = "${SupabaseConfig.url}/rest/v1/content_reactions?content_id=eq.$contentId&user_id=eq.$userId"
+            val existing = client.newCall(buildRequest(base).get().build()).execute()
+            val existingBody = existing.body?.string().orEmpty()
+            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Reaction lookup failed: ${existing.code}"))
+            if (JSONArray(existingBody).length() > 0) {
+                val del = client.newCall(buildRequest(base).delete().build()).execute()
+                return@withContext Result.success(del.isSuccessful.not().not())
+            }
+            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId); put("reaction", reaction) }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_reactions").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun toggleContentSave(contentId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val base = "${SupabaseConfig.url}/rest/v1/content_saves?content_id=eq.$contentId&user_id=eq.$userId"
+            val existing = client.newCall(buildRequest(base).get().build()).execute()
+            val body = existing.body?.string().orEmpty()
+            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Save lookup failed: ${existing.code}"))
+            if (JSONArray(body).length() > 0) {
+                val del = client.newCall(buildRequest(base).delete().build()).execute()
+                return@withContext Result.success(del.isSuccessful)
+            }
+            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId) }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_saves").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun votePoll(contentId: String, optionId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val checkUrl = "${SupabaseConfig.url}/rest/v1/poll_votes?content_id=eq.$contentId&user_id=eq.$userId"
+            val check = client.newCall(buildRequest(checkUrl).get().build()).execute()
+            val checkBody = check.body?.string().orEmpty()
+            if (!check.isSuccessful) return@withContext Result.failure(Exception("Vote lookup failed: ${check.code}"))
+            if (JSONArray(checkBody).length() > 0) return@withContext Result.success(false)
+            val payload = JSONObject().apply { put("content_id", contentId); put("option_id", optionId); put("user_id", userId) }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/poll_votes").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun addProfileComment(profileId: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val payload = JSONObject().apply { put("profile_id", profileId); put("author_id", userId); put("body", body) }.toString()
+            val resp = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/profile_comments").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun toggleFollow(targetUserId: String): Result<Boolean> = toggleRelationship(targetUserId, "follow")
+    suspend fun toggleBlock(targetUserId: String): Result<Boolean> = toggleRelationship(targetUserId, "block")
+
+    private suspend fun toggleRelationship(targetUserId: String, kind: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val base = "${SupabaseConfig.url}/rest/v1/relationships?user_id=eq.$userId&target_user_id=eq.$targetUserId&kind=eq.$kind"
+            val existing = client.newCall(buildRequest(base).get().build()).execute()
+            val body = existing.body?.string().orEmpty()
+            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Relationship lookup failed: ${existing.code}"))
+            if (JSONArray(body).length() > 0) {
+                val del = client.newCall(buildRequest(base).delete().build()).execute()
+                return@withContext Result.success(del.isSuccessful)
+            }
+            val payload = JSONObject().apply { put("user_id", userId); put("target_user_id", targetUserId); put("kind", kind) }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/relationships").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun checkInToday(): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/user_check_ins?user_id=eq.$userId&checkin_date=eq.${java.time.LocalDate.now()}"
+            val existing = client.newCall(buildRequest(url).get().build()).execute()
+            val body = existing.body?.string().orEmpty()
+            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Check-in lookup failed: ${existing.code}"))
+            if (JSONArray(body).length() > 0) return@withContext Result.success(false)
+            val payload = JSONObject().apply { put("user_id", userId); put("checkin_date", java.time.LocalDate.now().toString()); put("streak", 1); put("points", 50) }.toString()
+            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/user_check_ins").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+            Result.success(add.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun updateProfile(displayName: String, statusText: String, bio: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val payload = JSONObject().apply { put("display_name", displayName); put("status_text", statusText); put("bio", bio); put("updated_at", java.time.Instant.now().toString()) }.toString()
+            val req = buildRequest("${SupabaseConfig.url}/rest/v1/profiles?id=eq.$userId").header("Content-Type","application/json").patch(payload.toRequestBody(jsonMediaType)).build()
+            val resp = client.newCall(req).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun updateRoom(roomId: String, fields: JSONObject): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val req = buildRequest("${SupabaseConfig.url}/rest/v1/rooms?id=eq.$roomId").header("Content-Type","application/json").patch(fields.toString().toRequestBody(jsonMediaType)).build()
+            val resp = client.newCall(req).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    suspend fun updateRoomMembership(roomId: String, joined: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val url = "${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId"
+            if (joined) {
+                val payload = JSONObject().apply { put("room_id", roomId); put("user_id", userId); put("role", "member") }.toString()
+                val resp = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/room_members").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
+                Result.success(resp.isSuccessful)
+            } else {
+                val resp = client.newCall(buildRequest(url).delete().build()).execute()
+                Result.success(resp.isSuccessful)
+            }
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
+    private fun profileToModel(obj: JSONObject): Profile {
+        val displayName = obj.optString("display_name").ifBlank { obj.optString("username", "Tambay") }
+        return Profile(
+            id = obj.optString("id"), username = obj.optString("username", "tambay"),
+            displayName = displayName, avatarInitial = displayName.take(1).uppercase(),
+            avatarColorHex = 0xFF0038A8, bio = obj.optString("bio", ""),
+            statusText = obj.optString("status_text", ""), province = "NCR",
+            isActive = obj.optBoolean("is_active", true), lastSeenAt = obj.optString("last_seen_at", "")
+        )
     }
 
     private fun mapProvinceToRegion(code: String): String {
