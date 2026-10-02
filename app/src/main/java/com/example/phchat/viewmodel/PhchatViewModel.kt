@@ -391,32 +391,42 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun toggleRoomLock(roomId: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(isLocked = !r.isLocked) else r
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val locked = !room.isLocked
+        _rooms.value = _rooms.value.map { if (it.id == roomId) it.copy(isLocked = locked) else it }
+        viewModelScope.launch {
+            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("is_locked", locked) })
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun updateRoomAnnouncement(roomId: String, announcement: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(announcement = announcement) else r
+        _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(announcement = announcement) else r }
+        viewModelScope.launch {
+            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("announcement", announcement) })
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun toggleRoomPinned(roomId: String) {
-        _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) r.copy(isPinned = !r.isPinned) else r
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val pinned = !room.isPinned
+        _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(isPinned = pinned) else r }
+        viewModelScope.launch {
+            val result = repository.updateRoomMembership(roomId, pinned)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
     fun toggleJoinRoom(roomId: String) {
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
+        val newJoined = !room.isJoined
         _rooms.value = _rooms.value.map { r ->
-            if (r.id == roomId) {
-                val newJoined = !r.isJoined
-                r.copy(
-                    isJoined = newJoined,
-                    memberCount = if (newJoined) r.memberCount + 1 else (r.memberCount - 1).coerceAtLeast(1)
-                )
-            } else r
+            if (r.id == roomId) r.copy(isJoined = newJoined, memberCount = if (newJoined) r.memberCount + 1 else (r.memberCount - 1).coerceAtLeast(0)) else r
+        }
+        viewModelScope.launch {
+            val result = repository.toggleRoomMembership(roomId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
