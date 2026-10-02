@@ -11,7 +11,8 @@ import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 
 class SupabaseRealtimeClient(
-    private val anonKey: String = SupabaseConfig.publishableKey
+    private val anonKey: String = SupabaseConfig.publishableKey,
+    private val accessTokenProvider: (() -> String?)? = null
 ) {
     private val tag = "SupabaseRealtime"
     private val client = OkHttpClient.Builder()
@@ -31,7 +32,7 @@ class SupabaseRealtimeClient(
         currentRoomId = roomId
         onNewMessageCallback = onNewMessage
 
-        val wsUrl = "wss://mauhdrdnlrvjkekxencu.supabase.co/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
+        val wsUrl = "${SupabaseConfig.url.replaceFirst("https://", "wss://")}/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
         val request = Request.Builder().url(wsUrl).build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
@@ -63,6 +64,7 @@ class SupabaseRealtimeClient(
             put("topic", topic)
             put("event", "phx_join")
             put("payload", JSONObject().apply {
+                accessTokenProvider?.invoke()?.takeIf { it.isNotBlank() }?.let { put("access_token", it) }
                 put("config", JSONObject().apply {
                     put("postgres_changes", org.json.JSONArray().apply {
                         put(JSONObject().apply {
