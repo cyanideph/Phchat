@@ -8,6 +8,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.phchat.viewmodel.PhchatViewModel
@@ -30,8 +31,9 @@ fun FeatureCenterScreen(viewModel: PhchatViewModel, onNavigateBack: () -> Unit) 
     var commentBody by remember { mutableStateOf("") }
     val results by viewModel.featureResults.collectAsState()
 
+    val context = LocalContext.current
     val mediaPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel.uploadFeatureMedia(it.contextOrNull(), it) }
+        uri?.let { viewModel.uploadFeatureMedia(context, it) }
     }
 
     fun submit(action: () -> Unit) { action() }
