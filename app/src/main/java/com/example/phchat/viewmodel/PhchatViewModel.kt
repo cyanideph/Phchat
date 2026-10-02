@@ -715,7 +715,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun runFeatureRpc(label: String, functionName: String, payload: org.json.JSONObject = org.json.JSONObject()) {
         viewModelScope.launch {
-            featureResult(label, repository.advancedRpc(functionName, payload))
+            featureResult(label, repository.callRpc(functionName, payload))
         }
     }
 
