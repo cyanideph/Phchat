@@ -541,14 +541,9 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
     }
 
     suspend fun updateRoomMessageDeleted(messageId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val payload = JSONObject().apply { put("deleted_at", java.time.Instant.now().toString()) }.toString()
-            val req = buildRequest("${SupabaseConfig.url}/rest/v1/room_messages?id=eq.$messageId")
-                .header("Content-Type", "application/json")
-                .patch(payload.toRequestBody(jsonMediaType)).build()
-            val resp = client.newCall(req).execute()
-            Result.success(resp.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("delete_room_message", JSONObject().apply {
+            put("p_message_id", messageId)
+        }).map { true }
     }
 
     suspend fun setRoomPinned(roomId: String, pinned: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -696,27 +691,35 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
 
     suspend fun updateNotificationPreference(column: String, enabled: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val allowed = setOf(
-                "follow_enabled", "block_enabled", "content_comment_enabled", "comment_reply_enabled",
-                "content_reaction_enabled", "room_message_reaction_enabled", "profile_comment_enabled",
-                "mention_enabled", "room_invite_enabled", "conversation_invite_enabled"
-            )
-            if (column !in allowed) return@withContext Result.failure(Exception("Invalid notification preference"))
-            val payload = JSONObject().apply {
-                put("user_id", userId)
-                put(column, enabled)
-                put("updated_at", java.time.Instant.now().toString())
-            }.toString()
-            val url = "${SupabaseConfig.url}/rest/v1/notification_preferences?user_id=eq.$userId"
-            val patch = client.newCall(
-                buildRequest(url)
-                    .header("Content-Type", "application/json")
-                    .header("Prefer", "return=representation")
-                    .patch(payload.toRequestBody(jsonMediaType))
-                    .build()
-            ).execute()
-            Result.success(patch.isSuccessful)
+            val current = getNotificationPreferences()
+            if (current.isFailure) return@withContext Result.failure(current.exceptionOrNull()!!)
+            val p = current.getOrNull() ?: NotificationPreferences()
+            val values = mapOf(
+                "follow_enabled" to p.followEnabled,
+                "block_enabled" to p.blockEnabled,
+                "content_comment_enabled" to p.contentCommentEnabled,
+                "comment_reply_enabled" to p.commentReplyEnabled,
+                "content_reaction_enabled" to p.contentReactionEnabled,
+                "room_message_reaction_enabled" to p.roomMessageReactionEnabled,
+                "profile_comment_enabled" to p.profileCommentEnabled,
+                "mention_enabled" to p.mentionEnabled,
+                "room_invite_enabled" to p.roomInviteEnabled,
+                "conversation_invite_enabled" to p.conversationInviteEnabled
+            ).toMutableMap()
+            if (!values.containsKey(column)) return@withContext Result.failure(Exception("Invalid notification preference"))
+            values[column] = enabled
+            callRpc("set_notification_preferences", JSONObject().apply {
+                put("p_follow_enabled", values["follow_enabled"]!!)
+                put("p_block_enabled", values["block_enabled"]!!)
+                put("p_content_comment_enabled", values["content_comment_enabled"]!!)
+                put("p_comment_reply_enabled", values["comment_reply_enabled"]!!)
+                put("p_content_reaction_enabled", values["content_reaction_enabled"]!!)
+                put("p_room_message_reaction_enabled", values["room_message_reaction_enabled"]!!)
+                put("p_profile_comment_enabled", values["profile_comment_enabled"]!!)
+                put("p_mention_enabled", values["mention_enabled"]!!)
+                put("p_room_invite_enabled", values["room_invite_enabled"]!!)
+                put("p_conversation_invite_enabled", values["conversation_invite_enabled"]!!)
+            }).map { true }
         } catch (e: Exception) {
             Log.e(tag, "updateNotificationPreference error", e)
             Result.failure(e)
