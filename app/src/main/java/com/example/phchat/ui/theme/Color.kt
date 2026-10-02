@@ -2,45 +2,47 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// PHchat light-mode palette: mint/ivory surfaces, deep Philippine emerald and warm gold.
-// Targets the supplied reference UI while keeping PHchat's own visual identity.
-val PhBluePrimary = Color(0xFF0C4033)      // Deep emerald brand primary
-val PhBlueDark = Color(0xFF07352B)         // Deep emerald / header
-val PhBlueLight = Color(0xFF245B87)        // Restrained Philippine blue accent
-val PhBlueContainer = Color(0xFFDCEDE7)    // Soft mint container
-val PhOnBlueContainer = Color(0xFF12352D)
+// PHchat "Soft Pro" theme inspired by the supplied Uzzap showcase.
+// Both modes share one brand language: deep blue-black surfaces, vivid community green,
+// white/mist surfaces, restrained blue/red accents, and soft borders.
 
-val PhRedSecondary = Color(0xFFB83A3A)     // Restrained warm red accent
-val PhRedContainer = Color(0xFFF5DFDD)
-val PhOnRedContainer = Color(0xFF5A1717)
+val PhBluePrimary = Color(0xFF00A94F)      // Soft Pro community green
+val PhBlueDark = Color(0xFF06161E)         // Deep blue-black header / dark background
+val PhBlueLight = Color(0xFF16C96A)        // Brighter active green
+val PhBlueContainer = Color(0xFFE7F7EE)    // Light green selection surface
+val PhOnBlueContainer = Color(0xFF07351F)
 
-val PhYellowSun = Color(0xFFF4C928)        // Warm reference gold
-val PhGoldContainer = Color(0xFFFFF3B8)    // Soft warm gold
-val PhOnGoldContainer = Color(0xFF4D3C00)
+val PhRedSecondary = Color(0xFFD84B4B)     // Restrained alert/red accent
+val PhRedContainer = Color(0xFFFBE9E9)
+val PhOnRedContainer = Color(0xFF641B1B)
 
-val SurfaceLight = Color(0xFFE9F4F0)       // Main mint/ivory background
-val SurfaceVariantLight = Color(0xFFDCEDE7)
-val OnSurfaceLight = Color(0xFF17332C)     // Deep green-black text
-val OutlineLight = Color(0xFFC9D9D4)       // Soft gray-green border
+val PhYellowSun = Color(0xFFF4C84B)        // Warm secondary highlight
+val PhGoldContainer = Color(0xFFFFF5CF)
+val PhOnGoldContainer = Color(0xFF4D3B00)
 
-val SurfaceDark = Color(0xFF091713)
-val SurfaceVariantDark = Color(0xFF12241E)
-val OnSurfaceDark = Color(0xFFE4F1EC)
-val OutlineDark = Color(0xFF61766E)
+val SurfaceLight = Color(0xFFF3F7F8)       // Soft cool-white app background
+val SurfaceVariantLight = Color(0xFFE8EFF2) // Soft input/chip surface
+val OnSurfaceLight = Color(0xFF14252D)     // Deep blue-black text
+val OutlineLight = Color(0xFFD4E0E5)       // Soft Pro border
 
-val StatusOnline = Color(0xFF45A56F)
-val StatusBusy = Color(0xFFB83A3A)
-val StatusAway = Color(0xFFE2A92B)
+val SurfaceDark = Color(0xFF06161E)        // Screenshot-style navy/black background
+val SurfaceVariantDark = Color(0xFF0C222D) // Elevated dark cards
+val OnSurfaceDark = Color(0xFFF2F7F8)      // Primary dark-mode text
+val OutlineDark = Color(0xFF24404B)        // Subtle dark border
 
-// Regional accents stay intentionally restrained so the core emerald/gold identity dominates.
-val RegionNcr = Color(0xFF245B87)
-val RegionVisayas = Color(0xFFB97821)
-val RegionMindanao = Color(0xFF0E7B68)
-val RegionLuzon = Color(0xFF76558E)
-val RegionBicol = Color(0xFFB83A3A)
+val StatusOnline = Color(0xFF20D56F)       // Bright online indicator
+val StatusBusy = Color(0xFFD84B4B)
+val StatusAway = Color(0xFFF0B83D)
+
+// Regional accents remain secondary to the green Soft Pro brand.
+val RegionNcr = Color(0xFF2476A8)
+val RegionVisayas = Color(0xFFB87924)
+val RegionMindanao = Color(0xFF008C68)
+val RegionLuzon = Color(0xFF765A91)
+val RegionBicol = Color(0xFFD84B4B)
 
 // Roles
-val RoleOwner = Color(0xFFB83A3A)
-val RoleAdmin = Color(0xFF0C4033)
-val RoleMod = Color(0xFF0E7B68)
-val RoleMember = Color(0xFF5D716A)
+val RoleOwner = Color(0xFFD84B4B)
+val RoleAdmin = Color(0xFF00A94F)
+val RoleMod = Color(0xFF008C68)
+val RoleMember = Color(0xFF60757E)
