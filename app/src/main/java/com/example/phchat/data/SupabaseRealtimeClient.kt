@@ -118,8 +118,8 @@ class SupabaseRealtimeClient(
                 val senderId = record.optString("sender_id", "")
                 val body = record.optString("body", "")
                 val kindStr = record.optString("kind", "text")
-                val stickerEmoji = record.optString("sticker_emoji", null)
-                val replyToId = record.optString("reply_to_id", null)
+                val stickerEmoji = if (record.isNull("sticker_emoji")) null else record.optString("sticker_emoji")
+                val replyToId = if (record.isNull("reply_to_id")) null else record.optString("reply_to_id")
                 val createdAt = record.optString("created_at", "")
 
                 val kind = when (kindStr.lowercase()) {
