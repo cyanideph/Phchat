@@ -131,7 +131,7 @@ class SupabaseRepository(
 
     suspend fun getRoomMessages(roomId: String): Result<List<RoomMessage>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*&order=created_at.asc"
+            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*,sender:profiles!room_messages_sender_id_fkey(*)&order=created_at.asc"
             val request = buildRequest(url).get().build()
             val response = client.newCall(request).execute()
             val body = response.body?.string().orEmpty()
@@ -149,6 +149,8 @@ class SupabaseRepository(
                 val msgBody = obj.optString("body", "")
                 val kindStr = obj.optString("kind", "text")
                 val createdAt = obj.optString("created_at", "")
+                val sender = obj.optJSONObject("sender")
+                val senderName = sender?.optString("display_name")?.ifBlank { sender.optString("username") }?.ifBlank { "Tambay" } ?: if (kindStr == "system") "PHChat" else "Tambay"
 
                 val kind = when (kindStr) {
                     "system" -> MessageKind.SYSTEM
@@ -161,7 +163,7 @@ class SupabaseRepository(
                         id = id,
                         roomId = roomId,
                         senderId = senderId,
-                        senderName = if (kind == MessageKind.SYSTEM) "uzzapbot" else "User ${senderId.take(4)}",
+                        senderName = senderName,
                         senderAvatarHex = 0xFF0038A8,
                         senderRole = if (kind == MessageKind.SYSTEM) MemberRole.ADMIN else MemberRole.MEMBER,
                         body = msgBody,
