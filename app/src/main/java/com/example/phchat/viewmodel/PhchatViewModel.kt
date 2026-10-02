@@ -133,7 +133,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                         }
                     }
                     is AuthState.Unauthenticated -> {
-                        loadSupabaseData()
+                        if (_currentScreen.value !is Screen.Auth) {
+                            _currentScreen.value = Screen.Auth
+                        }
                     }
                     else -> Unit
                 }
