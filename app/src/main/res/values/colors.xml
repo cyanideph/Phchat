@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="ph_blue">#0038A8</color>
+    <color name="ph_red">#CE1126</color>
+    <color name="ph_yellow">#FCD116</color>
+    <color name="ph_navy">#0A192F</color>
+    <color name="ph_surface">#F8FAFC</color>
+</resources>

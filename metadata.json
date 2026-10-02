@@ -1,0 +1,8 @@
+{
+  "name": "Phchat",
+  "description": "Philippine mobile chat & community network featuring provincial rooms, direct messaging, profile walls, daily check-in streaks, polls, and announcements.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
