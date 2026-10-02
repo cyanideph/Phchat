@@ -162,8 +162,8 @@ fun HomeScreen(
                         onClick = { showCreateRoomDialog = true },
                         icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
                         text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
-                        containerColor = PhRedSecondary,
-                        contentColor = Color.White,
+                        containerColor = PhYellowSun,
+                        contentColor = PhOnGoldContainer,
                         modifier = Modifier.testTag("create_room_fab")
                     )
                 }
@@ -269,8 +269,8 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                                 Brush.verticalGradient(
                                     colors = listOf(
                                         Color.Transparent,
-                                        Color(0x8800193D),
-                                        Color(0xF500193D)
+                                        Color(0x6607352B),
+                                        Color(0xF207352B)
                                     )
                                 )
                             )
@@ -287,7 +287,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         ) {
                             Text(
                                 text = "☀️ PAMBANSANG TAMBAYAN",
-                                color = Color(0xFF4A3800),
+                                color = PhOnGoldContainer,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
