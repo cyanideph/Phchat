@@ -106,7 +106,7 @@ class SupabaseRepository(
                         isLocked = detail?.optBoolean("is_locked", false) ?: false,
                         viewOnly = detail?.optBoolean("view_only", false) ?: false,
                         membersCanInvite = detail?.optBoolean("members_can_invite", true) ?: true,
-                        announcement = detail?.optString("announcement", detail.optString("description", "")) ?: "",
+                        announcement = detail?.optString("announcement") ?: detail?.optString("description") ?: "",
                         memberCount = summary.optLong("member_count", 0).toInt(),
                         onlineCount = summary.optLong("online_count", 0).toInt(),
                         isJoined = membership != null,
