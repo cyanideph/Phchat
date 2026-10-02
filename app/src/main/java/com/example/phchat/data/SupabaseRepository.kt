@@ -809,8 +809,8 @@ class SupabaseRepository(
             val patch = client.newCall(
                 buildRequest(url)
                     .header("Content-Type", "application/json")
-                    .header("Prefer", "resolution=merge-duplicates")
-                    .post(payload.toRequestBody(jsonMediaType))
+                    .header("Prefer", "return=representation")
+                    .patch(payload.toRequestBody(jsonMediaType))
                     .build()
             ).execute()
             Result.success(patch.isSuccessful)
