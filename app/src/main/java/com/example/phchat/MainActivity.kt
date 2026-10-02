@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
+import android.content.Context
 import androidx.compose.ui.Modifier
 import com.example.phchat.ui.screens.*
 import com.example.phchat.ui.theme.PhchatTheme
@@ -23,7 +24,15 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            var darkTheme by remember { mutableStateOf(false) }
+            val prefs = remember {
+                getSharedPreferences("phchat_preferences", Context.MODE_PRIVATE)
+            }
+            var darkTheme by remember {
+                mutableStateOf(
+                    if (prefs.contains("dark_theme")) prefs.getBoolean("dark_theme", false)
+                    else androidx.compose.foundation.isSystemInDarkTheme()
+                )
+            }
 
             PhchatTheme(darkTheme = darkTheme) {
                 Surface(
@@ -72,7 +81,10 @@ class MainActivity : ComponentActivity() {
                             SettingsScreen(
                                 viewModel = viewModel,
                                 darkTheme = darkTheme,
-                                onThemeChange = { darkTheme = it },
+                                onThemeChange = { enabled ->
+                                    darkTheme = enabled
+                                    prefs.edit().putBoolean("dark_theme", enabled).apply()
+                                },
                                 onNavigateBack = { viewModel.navigateBack() }
                             )
                         }
