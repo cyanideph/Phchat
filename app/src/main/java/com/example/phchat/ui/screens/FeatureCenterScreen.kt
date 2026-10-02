@@ -33,7 +33,7 @@ fun FeatureCenterScreen(viewModel: PhchatViewModel, onNavigateBack: () -> Unit) 
 
     val context = LocalContext.current
     val mediaPicker = rememberLauncherForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { viewModel.uploadFeatureMedia(context, it) }
+        uri?.let { viewModel.uploadFeatureMedia(context, it, roomId = roomId.takeIf { value -> value.isNotBlank() }) }
     }
 
     fun submit(action: () -> Unit) { action() }
