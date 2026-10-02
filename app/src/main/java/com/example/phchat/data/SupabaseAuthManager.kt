@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -41,6 +42,8 @@ class SupabaseAuthManager(
         .readTimeout(20, TimeUnit.SECONDS)
         .build()
 ) {
+    private val authScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     private val prefs: SharedPreferences =
         context.getSharedPreferences("phchat_supabase_auth", Context.MODE_PRIVATE)
 
@@ -73,7 +76,7 @@ class SupabaseAuthManager(
                 expiresAt = expiresAt
             )
             if (expiresAt > 0L && expiresAt <= System.currentTimeMillis() / 1000L + 60L && refreshToken.isNotBlank()) {
-                CoroutineScope(SupervisorJob() + Dispatchers.IO).launch { refreshSession() }
+                authScope.launch { refreshSession() }
             } else {
                 _authState.value = AuthState.Authenticated(user)
             }
