@@ -17,6 +17,7 @@ sealed class Screen {
     data class DirectChat(val conversationId: String) : Screen()
     data class ProfileDetail(val profileId: String) : Screen()
     object Auth : Screen()
+    object Settings : Screen()
 }
 
 class PhchatViewModel(application: Application) : AndroidViewModel(application) {
