@@ -160,9 +160,13 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             }
 
             val contentsResult = repository.getContents()
-            if (contentsResult.isSuccess) {
-                _communityPosts.value = contentsResult.getOrNull().orEmpty()
-            }
+            if (contentsResult.isSuccess) _communityPosts.value = contentsResult.getOrNull().orEmpty()
+
+            val conversationsResult = repository.getConversations()
+            if (conversationsResult.isSuccess) _conversations.value = conversationsResult.getOrNull().orEmpty()
+
+            val notificationsResult = repository.getNotifications()
+            if (notificationsResult.isSuccess) _notifications.value = notificationsResult.getOrNull().orEmpty()
 
             _isLoading.value = false
         }
@@ -264,6 +268,18 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun openDirectChat(conversationId: String) {
         navigateTo(Screen.DirectChat(conversationId))
+        loadDirectMessages(conversationId)
+    }
+
+    fun loadDirectMessages(conversationId: String) {
+        viewModelScope.launch {
+            val res = repository.getDirectMessages(conversationId)
+            if (res.isSuccess) {
+                val map = _directMessages.value.toMutableMap()
+                map[conversationId] = res.getOrNull().orEmpty()
+                _directMessages.value = map
+            }
+        }
     }
 
     fun openProfile(profileId: String) {
@@ -329,7 +345,13 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                 MessageKind.SYSTEM -> "system"
                 else -> "text"
             }
-            repository.sendRoomMessage(roomId, body, kindStr, replyTo?.id)
+            val result = repository.sendRoomMessage(roomId, body, kindStr, replyTo?.id)
+            if (result.isFailure) {
+                val map = _roomMessages.value.toMutableMap()
+                map[roomId] = (map[roomId] ?: emptyList()).filterNot { it.id == tempMsg.id }
+                _roomMessages.value = map
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+            } else loadRoomMessages(roomId)
         }
     }
 
@@ -478,7 +500,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         )
         _communityPosts.value = listOf(post) + _communityPosts.value
         viewModelScope.launch {
-            repository.createContent(title, body)
+            val result = repository.createContent(title, body)
+            if (result.isSuccess) loadSupabaseData()
+            else _errorMessage.value = result.exceptionOrNull()?.localizedMessage
         }
     }
 
@@ -501,6 +525,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             )
             posts[index] = post.copy(poll = updatedPoll)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.votePoll(postId, optionId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
@@ -513,6 +541,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             val newCount = if (newLiked) post.likesCount + 1 else (post.likesCount - 1).coerceAtLeast(0)
             posts[index] = post.copy(isLiked = newLiked, likesCount = newCount)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.toggleContentReaction(postId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
@@ -523,17 +555,23 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
             val post = posts[index]
             posts[index] = post.copy(isSaved = !post.isSaved)
             _communityPosts.value = posts
+            viewModelScope.launch {
+                val result = repository.toggleContentSave(postId)
+                if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            }
         }
     }
 
     fun checkIn() {
         if (hasCheckedInToday.value) return
-        hasCheckedInToday.value = true
-        val user = _currentUser.value
-        _currentUser.value = user.copy(
-            streak = user.streak + 1,
-            points = user.points + 50
-        )
+        viewModelScope.launch {
+            val result = repository.checkInToday()
+            if (result.isSuccess && result.getOrNull() == true) {
+                hasCheckedInToday.value = true
+                val user = _currentUser.value
+                _currentUser.value = user.copy(streak = user.streak + 1, points = user.points + 50)
+            } else if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun updateStatus(status: String) {
@@ -543,23 +581,30 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun updateProfile(displayName: String, statusText: String, bio: String, province: String) {
         val u = _currentUser.value
-        _currentUser.value = u.copy(
-            displayName = displayName,
-            statusText = statusText,
-            bio = bio,
-            province = province
-        )
+        _currentUser.value = u.copy(displayName = displayName, statusText = statusText, bio = bio, province = province)
+        viewModelScope.launch {
+            val result = repository.updateProfile(displayName, statusText, bio)
+            if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun toggleFollowUser(userId: String) {
         _profiles.value = _profiles.value.map { p ->
             if (p.id == userId) p.copy(isFollowed = !p.isFollowed) else p
         }
+        viewModelScope.launch {
+            val result = repository.toggleFollow(userId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+        }
     }
 
     fun toggleBlockUser(userId: String) {
         _profiles.value = _profiles.value.map { p ->
             if (p.id == userId) p.copy(isBlocked = !p.isBlocked) else p
+        }
+        viewModelScope.launch {
+            val result = repository.toggleBlock(userId)
+            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
         }
     }
 
@@ -576,6 +621,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         list.add(0, newComment)
         currentComments[profileId] = list
         _profileComments.value = currentComments
+        viewModelScope.launch {
+            val result = repository.addProfileComment(profileId, body)
+            if (result.isFailure) _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 
     fun voteProfileComment(profileId: String, commentId: String, delta: Int) {
@@ -592,6 +641,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun markAllNotificationsRead() {
-        _notifications.value = _notifications.value.map { it.copy(isRead = true) }
+        viewModelScope.launch {
+            val result = repository.markNotificationsRead()
+            if (result.isSuccess) _notifications.value = _notifications.value.map { it.copy(isRead = true) }
+            else _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+        }
     }
 }
