@@ -653,6 +653,17 @@ class SupabaseRepository(
         } catch (e: Exception) { Result.failure(e) }
     }
 
+    suspend fun setRoomPinned(roomId: String, pinned: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val payload = JSONObject().apply { put("is_pinned", pinned) }.toString()
+            val req = buildRequest("${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId")
+                .header("Content-Type", "application/json").patch(payload.toRequestBody(jsonMediaType)).build()
+            val resp = client.newCall(req).execute()
+            Result.success(resp.isSuccessful)
+        } catch (e: Exception) { Result.failure(e) }
+    }
+
     suspend fun toggleRoomMembership(roomId: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
