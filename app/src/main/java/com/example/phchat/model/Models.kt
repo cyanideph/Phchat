@@ -198,6 +198,21 @@ data class ChatSticker(
     val category: String
 )
 
+
+data class NotificationPreferences(
+    val userId: String = "",
+    val followEnabled: Boolean = true,
+    val blockEnabled: Boolean = true,
+    val contentCommentEnabled: Boolean = true,
+    val commentReplyEnabled: Boolean = true,
+    val contentReactionEnabled: Boolean = true,
+    val roomMessageReactionEnabled: Boolean = true,
+    val profileCommentEnabled: Boolean = true,
+    val mentionEnabled: Boolean = true,
+    val roomInviteEnabled: Boolean = true,
+    val conversationInviteEnabled: Boolean = true
+)
+
 object StickerPacks {
     val pinoyStickers = listOf(
         ChatSticker("stk_1", "Kumusta", "👋", "Kumusta Ka!", "Greetings"),
