@@ -38,8 +38,8 @@ data class Profile(
     val province: String,
     val isActive: Boolean = true,
     val lastSeenAt: String = "Just now",
-    val points: Int = 120,
-    val streak: Int = 3,
+    val points: Int = 0,
+    val streak: Int = 0,
     val isFeatured: Boolean = false,
     val isFollowed: Boolean = false,
     val isBlocked: Boolean = false,
@@ -58,9 +58,9 @@ data class Room(
     val membersCanInvite: Boolean = true,
     val announcement: String = "",
     val pinnedMessage: RoomMessage? = null,
-    val memberCount: Int = 24,
-    val onlineCount: Int = 12,
-    val isJoined: Boolean = true,
+    val memberCount: Int = 0,
+    val onlineCount: Int = 0,
+    val isJoined: Boolean = false,
     val isPinned: Boolean = false,
     val myRole: MemberRole = MemberRole.MEMBER,
     val colorHex: Long = 0xFF0038A8
@@ -146,10 +146,10 @@ data class ContentPost(
     val category: String, // General, Provincial Buzz, Food & Travel, Gaming, Chismis
     val kind: ContentKind = ContentKind.POST,
     val poll: PollData? = null,
-    val likesCount: Int = 15,
+    val likesCount: Int = 0,
     val isLiked: Boolean = false,
     val isSaved: Boolean = false,
-    val commentsCount: Int = 3,
+    val commentsCount: Int = 0,
     val createdAt: String = "2h ago"
 )
 
