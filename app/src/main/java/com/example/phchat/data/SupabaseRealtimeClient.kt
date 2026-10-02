@@ -28,13 +28,19 @@ class SupabaseRealtimeClient(
     private var currentConversationId: String? = null
     private var onNewMessageCallback: ((RoomMessage) -> Unit)? = null
     private var onNewDirectMessageCallback: ((com.example.phchat.model.DirectMessage) -> Unit)? = null
+    private var onDataChangedCallback: ((table: String, id: String?) -> Unit)? = null
 
-    fun connectAndSubscribeRoom(roomId: String, onNewMessage: (RoomMessage) -> Unit) {
+    fun connectAndSubscribeRoom(
+        roomId: String,
+        onNewMessage: (RoomMessage) -> Unit,
+        onDataChanged: ((table: String, id: String?) -> Unit)? = null
+    ) {
         disconnect()
         currentRoomId = roomId
         currentConversationId = null
         onNewDirectMessageCallback = null
         onNewMessageCallback = onNewMessage
+        onDataChangedCallback = onDataChanged
 
         val wsUrl = "${SupabaseConfig.url.replaceFirst("https://", "wss://")}/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
         val request = Request.Builder().url(wsUrl).build()
@@ -62,13 +68,15 @@ class SupabaseRealtimeClient(
 
     fun connectAndSubscribeConversation(
         conversationId: String,
-        onNewMessage: (com.example.phchat.model.DirectMessage) -> Unit
+        onNewMessage: (com.example.phchat.model.DirectMessage) -> Unit,
+        onDataChanged: ((table: String, id: String?) -> Unit)? = null
     ) {
         disconnect()
         currentConversationId = conversationId
         currentRoomId = null
         onNewDirectMessageCallback = onNewMessage
         onNewMessageCallback = null
+        onDataChangedCallback = onDataChanged
 
         val wsUrl = "${SupabaseConfig.url.replaceFirst("https://", "wss://")}/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
         val request = Request.Builder().url(wsUrl).build()
@@ -94,20 +102,26 @@ class SupabaseRealtimeClient(
     private fun joinConversationChannel(conversationId: String) {
         val ref = refCounter.getAndIncrement().toString()
         val topic = "realtime:public:conversation_messages:conversation_id=eq.$conversationId"
+        val postgresChanges = org.json.JSONArray().apply {
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "conversation_messages")
+                put("filter", "conversation_id=eq.$conversationId")
+            })
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "notifications")
+            })
+        }
         val joinPayload = JSONObject().apply {
             put("topic", topic)
             put("event", "phx_join")
             put("payload", JSONObject().apply {
                 accessTokenProvider?.invoke()?.takeIf { it.isNotBlank() }?.let { put("access_token", it) }
                 put("config", JSONObject().apply {
-                    put("postgres_changes", org.json.JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("event", "INSERT")
-                            put("schema", "public")
-                            put("table", "conversation_messages")
-                            put("filter", "conversation_id=eq.$conversationId")
-                        })
-                    })
+                    put("postgres_changes", postgresChanges)
                 })
             })
             put("ref", ref)
@@ -118,26 +132,41 @@ class SupabaseRealtimeClient(
     private fun joinRoomChannel(roomId: String) {
         val ref = refCounter.getAndIncrement().toString()
         val topic = "realtime:public:room_messages:room_id=eq.$roomId"
-
+        val postgresChanges = org.json.JSONArray().apply {
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "room_messages")
+                put("filter", "room_id=eq.$roomId")
+            })
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "room_message_reactions")
+            })
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "room_members")
+                put("filter", "room_id=eq.$roomId")
+            })
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "notifications")
+            })
+        }
         val joinPayload = JSONObject().apply {
             put("topic", topic)
             put("event", "phx_join")
             put("payload", JSONObject().apply {
                 accessTokenProvider?.invoke()?.takeIf { it.isNotBlank() }?.let { put("access_token", it) }
                 put("config", JSONObject().apply {
-                    put("postgres_changes", org.json.JSONArray().apply {
-                        put(JSONObject().apply {
-                            put("event", "INSERT")
-                            put("schema", "public")
-                            put("table", "room_messages")
-                            put("filter", "room_id=eq.$roomId")
-                        })
-                    })
+                    put("postgres_changes", postgresChanges)
                 })
             })
             put("ref", ref)
         }
-
         webSocket?.send(joinPayload.toString())
         Log.d(tag, "Joined realtime channel for room $roomId")
     }
@@ -165,61 +194,68 @@ class SupabaseRealtimeClient(
     private fun handleMessage(jsonString: String) {
         try {
             val json = JSONObject(jsonString)
-            val event = json.optString("event")
+            if (json.optString("event") != "postgres_changes") return
+            val payload = json.optJSONObject("payload") ?: return
+            val data = payload.optJSONObject("data") ?: return
+            val table = data.optString("table", "")
+            val record = data.optJSONObject("record")
+            val oldRecord = data.optJSONObject("old_record")
+            val id = record?.optString("id")?.takeIf { it.isNotBlank() }
+                ?: oldRecord?.optString("id")?.takeIf { it.isNotBlank() }
 
-            if (event == "postgres_changes") {
-                val payload = json.optJSONObject("payload") ?: return
-                val data = payload.optJSONObject("data") ?: return
-                val record = data.optJSONObject("record") ?: return
+            onDataChangedCallback?.invoke(table, id)
 
-                val id = record.optString("id", "")
-                val roomId = record.optString("room_id", "")
-                val conversationId = record.optString("conversation_id", "")
-                val senderId = record.optString("sender_id", "")
-                val body = record.optString("body", "")
-                val kindStr = record.optString("kind", "text")
-                val stickerEmoji = if (record.isNull("sticker_emoji")) null else record.optString("sticker_emoji")
-                val replyToId = if (record.isNull("reply_to_id")) null else record.optString("reply_to_id")
-                val createdAt = record.optString("created_at", "")
+            if (table == "notifications") return
+            val eventType = data.optString("type", "INSERT")
+            if (eventType != "INSERT" || record == null) return
 
-                val kind = when (kindStr.lowercase()) {
-                    "sticker" -> MessageKind.STICKER
-                    "system" -> MessageKind.SYSTEM
-                    "media" -> MessageKind.MEDIA
-                    "reply" -> MessageKind.REPLY
-                    else -> MessageKind.TEXT
-                }
+            val roomId = record.optString("room_id", "")
+            val conversationId = record.optString("conversation_id", "")
+            val senderId = record.optString("sender_id", "")
+            val body = record.optString("body", "")
+            val kindStr = record.optString("kind", "text")
+            val stickerEmoji = record.optJSONObject("metadata")?.optString("sticker_emoji")
+            val replyToId = record.optString("reply_to_id").takeIf { it.isNotBlank() }
+            val createdAt = record.optString("created_at", "")
 
-                if (conversationId.isNotBlank()) {
-                    val sticker = record.optJSONObject("metadata")?.optString("sticker_emoji")
-                    onNewDirectMessageCallback?.invoke(
-                        com.example.phchat.model.DirectMessage(
-                            id = id,
-                            conversationId = conversationId,
-                            senderId = senderId,
-                            body = body,
-                            kind = kind,
-                            stickerEmoji = sticker,
-                            timestamp = createdAt
-                        )
+            val kind = when (kindStr.lowercase()) {
+                "sticker" -> MessageKind.STICKER
+                "system" -> MessageKind.SYSTEM
+                "media" -> MessageKind.MEDIA
+                "reply" -> MessageKind.REPLY
+                else -> MessageKind.TEXT
+            }
+
+            if (conversationId.isNotBlank() && table == "conversation_messages") {
+                onNewDirectMessageCallback?.invoke(
+                    com.example.phchat.model.DirectMessage(
+                        id = id.orEmpty(),
+                        conversationId = conversationId,
+                        senderId = senderId,
+                        body = body,
+                        kind = kind,
+                        stickerEmoji = stickerEmoji,
+                        timestamp = createdAt
                     )
-                    return
-                }
-
-                val roomMessage = RoomMessage(
-                    id = id,
-                    roomId = roomId,
-                    senderId = senderId,
-                    senderName = if (senderId == "uzzapbot") "uzzapbot" else "Tambay",
-                    senderAvatarHex = 0xFF002F6C,
-                    body = body,
-                    kind = kind,
-                    stickerEmoji = stickerEmoji,
-                    replyTo = if (replyToId != null) ReplySummary(replyToId, "Kasama", "") else null,
-                    timestamp = "Live"
                 )
+                return
+            }
 
-                onNewMessageCallback?.invoke(roomMessage)
+            if (roomId.isNotBlank() && table == "room_messages") {
+                onNewMessageCallback?.invoke(
+                    RoomMessage(
+                        id = id.orEmpty(),
+                        roomId = roomId,
+                        senderId = senderId,
+                        senderName = "Tambay",
+                        senderAvatarHex = 0xFF00A94F,
+                        body = body,
+                        kind = kind,
+                        stickerEmoji = stickerEmoji,
+                        replyTo = replyToId?.let { ReplySummary(it, "Kasama", "") },
+                        timestamp = "Live"
+                    )
+                )
             }
         } catch (e: Exception) {
             Log.e(tag, "Error parsing realtime message: ${e.message}")
@@ -239,5 +275,6 @@ class SupabaseRealtimeClient(
         currentConversationId = null
         onNewDirectMessageCallback = null
         onNewMessageCallback = null
+        onDataChangedCallback = null
     }
 }
