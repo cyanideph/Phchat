@@ -699,7 +699,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     private fun featureResult(label: String, result: Result<String>) {
         _featureResults.value = listOf(
-            if (result.isSuccess) "✓ $label" else "✕ $label: ${result.exceptionOrNull()?.localizedMessage ?: "failed"}
+            if (result.isSuccess) "✓ $label" else "✕ $label: ${result.exceptionOrNull()?.localizedMessage ?: \"failed\"}
         ) + _featureResults.value.take(19)
     }
 
