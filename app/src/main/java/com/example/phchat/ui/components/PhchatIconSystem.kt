@@ -20,6 +20,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +46,7 @@ data class PhchatIconSpec(
 
 @Composable
 fun phchatIconSpec(icon: PhchatIcon): PhchatIconSpec {
-    val scheme = androidx.compose.material3.MaterialTheme.colorScheme
+    val scheme = MaterialTheme.colorScheme
     return when (icon) {
         PhchatIcon.HOME -> PhchatIconSpec(Icons.Filled.Home, "Home", scheme.onSurface)
         PhchatIcon.CHATS -> PhchatIconSpec(Icons.Filled.ChatBubble, "Chats", PhBlueLight)
