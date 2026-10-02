@@ -48,7 +48,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun PhchatTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = false, // Use branded Philippine palette by default
+    dynamicColor: Boolean = false, // Keep distinctive Philippine palette intact
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

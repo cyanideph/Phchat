@@ -32,6 +32,12 @@ class MainActivity : ComponentActivity() {
                     var showNotificationsSheet by remember { mutableStateOf(false) }
 
                     when (val screen = currentScreen) {
+                        is Screen.Auth -> {
+                            AuthScreen(
+                                viewModel = viewModel,
+                                onSuccess = { viewModel.navigateTo(Screen.Home(0)) }
+                            )
+                        }
                         is Screen.Home -> {
                             HomeScreen(
                                 viewModel = viewModel,

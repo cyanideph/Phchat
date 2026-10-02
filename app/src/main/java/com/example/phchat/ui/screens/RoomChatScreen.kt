@@ -1,10 +1,14 @@
 package com.example.phchat.ui.screens
 
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
@@ -28,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.model.*
 import com.example.phchat.ui.components.*
+import com.example.phchat.ui.dialogs.*
 import com.example.phchat.ui.theme.*
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
@@ -58,9 +63,22 @@ fun RoomChatScreen(
     var inputText by remember { mutableStateOf("") }
     var replyingTo by remember { mutableStateOf<ReplySummary?>(null) }
     var showStickerSheet by remember { mutableStateOf(false) }
+    var showMembersSheet by remember { mutableStateOf(false) }
+    var reportingUser by remember { mutableStateOf<Profile?>(null) }
+    var blockingUser by remember { mutableStateOf<Profile?>(null) }
     var selectedMessageForMenu by remember { mutableStateOf<RoomMessage?>(null) }
     var showRoomSettingsMenu by remember { mutableStateOf(false) }
     var showAnnouncementDialog by remember { mutableStateOf(false) }
+
+    val profiles by viewModel.profiles.collectAsState()
+
+    val photoPicker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        if (uri != null) {
+            viewModel.sendRoomMessage(room.id, "📷 Nag-padala ng larawan: $uri")
+        }
+    }
 
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -115,6 +133,25 @@ fun RoomChatScreen(
                     }
                 },
                 actions = {
+                    IconButton(
+                        onClick = { viewModel.sendKalabit(room.id) },
+                        modifier = Modifier.testTag("kalabit_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Vibration,
+                            contentDescription = "Kalabit / Buzz",
+                            tint = PhYellowSun
+                        )
+                    }
+                    IconButton(
+                        onClick = { showMembersSheet = true },
+                        modifier = Modifier.testTag("members_directory_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.People,
+                            contentDescription = "Mga Tambay sa Loob"
+                        )
+                    }
                     IconButton(onClick = { viewModel.toggleRoomPinned(room.id) }) {
                         Icon(
                             imageVector = if (room.isPinned) Icons.Default.PushPin else Icons.Default.BookmarkBorder,
@@ -210,6 +247,42 @@ fun RoomChatScreen(
                     }
                 }
 
+                // Quick Pinoy Expression Pills
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 10.dp, vertical = 3.dp),
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    val quickPills = listOf(
+                        "☕ Kape Muna",
+                        "🚀 Tara G!",
+                        "🙏 Salamat Lodi",
+                        "✨ Sana All",
+                        "👏 Edi Wow",
+                        "👋 Kumusta",
+                        "💖 Lablab"
+                    )
+                    items(quickPills) { phrase ->
+                        Surface(
+                            shape = RoundedCornerShape(14.dp),
+                            color = PhBlueContainer,
+                            modifier = Modifier.clickable {
+                                viewModel.sendRoomMessage(room.id, phrase, replyingTo)
+                                replyingTo = null
+                            }
+                        ) {
+                            Text(
+                                text = phrase,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = PhOnBlueContainer,
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+                            )
+                        }
+                    }
+                }
+
                 // Chat Input Row
                 Row(
                     modifier = Modifier
@@ -222,6 +295,21 @@ fun RoomChatScreen(
                         modifier = Modifier.testTag("sticker_button")
                     ) {
                         Text(text = "🇵🇭", fontSize = 22.sp)
+                    }
+
+                    IconButton(
+                        onClick = {
+                            photoPicker.launch(
+                                PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                            )
+                        },
+                        modifier = Modifier.testTag("attach_photo_button")
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Image,
+                            contentDescription = "Photo",
+                            tint = PhBluePrimary
+                        )
                     }
 
                     OutlinedTextField(
@@ -435,6 +523,63 @@ fun RoomChatScreen(
                 TextButton(onClick = { showAnnouncementDialog = false }) {
                     Text("Cancel")
                 }
+            }
+        )
+    }
+
+    if (showMembersSheet) {
+        RoomMemberDirectorySheet(
+            roomName = room.name,
+            members = profiles,
+            currentUserId = currentUser.id,
+            currentUserRole = room.myRole,
+            onDismiss = { showMembersSheet = false },
+            onWhisper = { member ->
+                inputText = "@${member.username} "
+            },
+            onViewProfile = { member ->
+                viewModel.openProfile(member.id)
+            },
+            onAddBuddy = { member ->
+                viewModel.addBuddy(member.id) { _, _ -> }
+            },
+            onReportUser = { member ->
+                reportingUser = member
+            },
+            onBlockUser = { member ->
+                blockingUser = member
+            },
+            onStrikeUser = { member ->
+                viewModel.sendRoomMessage(
+                    room.id,
+                    "⚠️ [MOD STRIKE] Nakatanggap si @${member.username} ng babala mula sa pamunuan!",
+                    kind = MessageKind.SYSTEM
+                )
+            }
+        )
+    }
+
+    val repUser = reportingUser
+    if (repUser != null) {
+        ReportDialog(
+            targetName = repUser.displayName,
+            onDismiss = { reportingUser = null },
+            onSubmitReport = { reason, details ->
+                viewModel.submitReport(repUser.id, reason, details) {
+                    reportingUser = null
+                }
+            }
+        )
+    }
+
+    val blkUser = blockingUser
+    if (blkUser != null) {
+        BlockUserDialog(
+            userName = blkUser.displayName,
+            onDismiss = { blockingUser = null },
+            onConfirmBlock = {
+                viewModel.blockUser(blkUser.id)
+                blockingUser = null
             }
         )
     }

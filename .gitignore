@@ -1,0 +1,6 @@
+# Local environment and secret files
+.env
+.gradle/
+build/
+app/build/
+*.hprof

@@ -1,5 +1,6 @@
 package com.example.phchat.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,12 +19,17 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.phchat.R
 import com.example.phchat.model.*
 import com.example.phchat.ui.components.*
 import com.example.phchat.ui.theme.*
@@ -71,6 +77,18 @@ fun HomeScreen(
                 },
                 actions = {
                     IconButton(
+                        onClick = { viewModel.loadSupabaseData() },
+                        modifier = Modifier.testTag("refresh_button")
+                    ) {
+                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                    }
+                    IconButton(
+                        onClick = { viewModel.openAuthScreen() },
+                        modifier = Modifier.testTag("account_button")
+                    ) {
+                        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Account")
+                    }
+                    IconButton(
                         onClick = onOpenNotifications,
                         modifier = Modifier.testTag("notifications_button")
                     ) {
@@ -98,41 +116,41 @@ fun HomeScreen(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 6.dp
+                tonalElevation = 8.dp
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Tambayan") },
-                    label = { Text("Tambayan") },
+                    label = { Text("Tambayan", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("tab_tambayan")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.Forum, contentDescription = "Chika") },
-                    label = { Text("Chika") },
+                    icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Chika") },
+                    label = { Text("Chika", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("tab_chika")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.AutoMirrored.Filled.Feed, contentDescription = "Community") },
-                    label = { Text("Community") },
-                    modifier = Modifier.testTag("tab_community")
+                    icon = { Icon(Icons.Default.Campaign, contentDescription = "Plaza") },
+                    label = { Text("Plaza", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_plaza")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
-                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Hall") },
-                    label = { Text("Tambay Hall") },
-                    modifier = Modifier.testTag("tab_hall")
+                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Dangal") },
+                    label = { Text("Dangal", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_dangal")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 4,
                     onClick = { selectedTab = 4 },
-                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Profile") },
-                    label = { Text("Profile") },
+                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Ako") },
+                    label = { Text("Ako", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("tab_profile")
                 )
             }
@@ -142,9 +160,9 @@ fun HomeScreen(
                 0 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreateRoomDialog = true },
-                        icon = { Icon(Icons.Default.Add, contentDescription = "New Room") },
-                        text = { Text("New Room") },
-                        containerColor = PhBluePrimary,
+                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
+                        text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
+                        containerColor = PhRedSecondary,
                         contentColor = Color.White,
                         modifier = Modifier.testTag("create_room_fab")
                     )
@@ -152,8 +170,8 @@ fun HomeScreen(
                 2 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreatePostDialog = true },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post") },
-                        text = { Text("Post / Poll") },
+                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Plaza") },
+                        text = { Text("Mag-Post sa Plaza", fontWeight = FontWeight.Bold) },
                         containerColor = PhBluePrimary,
                         contentColor = Color.White,
                         modifier = Modifier.testTag("create_post_fab")
@@ -205,20 +223,123 @@ fun TambayanTab(viewModel: PhchatViewModel) {
     val rooms by viewModel.filteredRooms.collectAsState()
     val selectedProvince by viewModel.selectedProvinceFilter.collectAsState()
     var searchInput by remember { mutableStateOf("") }
+    var showRegionExplorer by remember { mutableStateOf(false) }
 
     val provinces = listOf(
-        "ALL" to "All Philippines 🇵🇭",
-        "NCR" to "Metro Manila",
-        "CEB" to "Cebu",
-        "DVO" to "Davao",
-        "PAM" to "Pampanga"
+        "ALL" to "🇵🇭 Lahat ng Probinsya",
+        "NCR" to "🏙️ Metro Manila (NCR)",
+        "CEB" to "🏝️ Cebu (Sugbo)",
+        "DVO" to "🦅 Davao Region",
+        "PAM" to "🍲 Pampanga",
+        "ILO" to "⛵ Iloilo (Panay)",
+        "BAG" to "🌲 Baguio Benguet",
+        "ALB" to "🌶️ Bicol Albay"
     )
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
+        // Hero Banner Art
+        item {
+            Card(
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("hero_banner_card"),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(160.dp)
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.img_tambayan_hero),
+                        contentDescription = "Pambansang Tambayan Banner",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color(0x8800193D),
+                                        Color(0xF500193D)
+                                    )
+                                )
+                            )
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Bottom
+                    ) {
+                        Surface(
+                            color = PhYellowSun,
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "☀️ PAMBANSANG TAMBAYAN",
+                                color = Color(0xFF4A3800),
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Usapang Pinoy, Bawat Probinsya",
+                            color = Color.White,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Black
+                        )
+                        Text(
+                            text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
+                            color = Color(0xFFDCE6F5),
+                            fontSize = 11.sp
+                        )
+                    }
+                }
+            }
+        }
+
+        // Live Ticker Ribbon
+        item {
+            UzzapRetroTicker(
+                roomCount = rooms.size,
+                onlineCount = 28
+            )
+        }
+
+        // 3-Tier Regional Explorer Button
+        item {
+            FilledTonalButton(
+                onClick = { showRegionExplorer = true },
+                shape = RoundedCornerShape(14.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("open_region_explorer_btn"),
+                colors = ButtonDefaults.filledTonalButtonColors(
+                    containerColor = PhBlueContainer,
+                    contentColor = PhOnBlueContainer
+                )
+            ) {
+                Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = "🗺️ 17 Rehiyon & 81 Lalawigan Explorer ➜",
+                    fontWeight = FontWeight.Black,
+                    fontSize = 13.sp
+                )
+            }
+        }
+
         item {
             // Search field
             OutlinedTextField(
@@ -227,12 +348,12 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     searchInput = it
                     viewModel.searchQuery.value = it
                 },
-                placeholder = { Text("Search rooms by name, province, topic...") },
+                placeholder = { Text("Hanapin ang tambayan, probinsya, o paksa...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("search_rooms_input"),
-                shape = RoundedCornerShape(12.dp),
+                shape = RoundedCornerShape(14.dp),
                 singleLine = true
             )
         }
@@ -247,7 +368,12 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     FilterChip(
                         selected = selectedProvince == code,
                         onClick = { viewModel.selectedProvinceFilter.value = code },
-                        label = { Text(label) },
+                        label = {
+                            Text(
+                                text = label,
+                                fontWeight = if (selectedProvince == code) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
                         leadingIcon = if (selectedProvince == code) {
                             { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
                         } else null
@@ -263,9 +389,15 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active Tambayan Rooms (${rooms.size})",
+                    text = "Mga Aktibong Tambayan (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Black,
+                    color = PhBluePrimary
+                )
+                Text(
+                    text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -275,25 +407,29 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 24.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        .padding(vertical = 16.dp),
+                    shape = RoundedCornerShape(20.dp),
+                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp),
+                            .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "🏝️", fontSize = 40.sp)
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(text = "🇵🇭", fontSize = 48.sp)
+                        Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "Walang nahanap na room",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
+                            text = "Walang tambayan pa rito!",
+                            fontWeight = FontWeight.Black,
+                            fontSize = 17.sp,
+                            color = PhBluePrimary
                         )
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Mag-create ng bagong room para sa iyong probinsya o barkada!",
+                            text = "Ikaw ang unang mag-bukas ng tambayan sa probinsyang ito para sa iyong mga kababayan.",
                             fontSize = 13.sp,
+                            textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
@@ -310,6 +446,26 @@ fun TambayanTab(viewModel: PhchatViewModel) {
             }
         }
     }
+
+    if (showRegionExplorer) {
+        RegionProvinceExplorerSheet(
+            rooms = rooms,
+            onDismiss = { showRegionExplorer = false },
+            onSelectRoom = { room ->
+                viewModel.openRoom(room.id)
+                showRegionExplorer = false
+            },
+            onCreateRoomInProvince = { prov ->
+                viewModel.createRoom(
+                    name = "${prov.name} Tambayan",
+                    provinceCode = prov.code,
+                    provinceName = prov.name,
+                    announcement = "Maligayang pagdating sa tambayan ng mga taga-${prov.name}!"
+                )
+                showRegionExplorer = false
+            }
+        )
+    }
 }
 
 @Composable
@@ -319,271 +475,359 @@ fun RoomCard(
     onTogglePin: () -> Unit,
     onToggleJoin: () -> Unit
 ) {
+    val regionalAccent = when (room.provinceCode.uppercase()) {
+        "NCR", "MNL" -> RegionNcr
+        "CEB", "ILO" -> RegionVisayas
+        "DVO" -> RegionMindanao
+        "PAM", "BAG" -> RegionLuzon
+        "ALB" -> RegionBicol
+        else -> PhBluePrimary
+    }
+
     Card(
         onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .testTag("room_card_${room.id}"),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.5.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+        Row(modifier = Modifier.fillMaxWidth()) {
+            // Regional vertical accent stripe
+            Box(
+                modifier = Modifier
+                    .width(7.dp)
+                    .fillMaxHeight()
+                    .background(regionalAccent)
+            )
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(14.dp)
             ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color(room.colorHex)),
-                        contentAlignment = Alignment.Center
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
                     ) {
-                        Text(
-                            text = room.name.take(2),
-                            color = Color.White,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column {
-                        Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(46.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                                .background(regionalAccent),
+                            contentAlignment = Alignment.Center
+                        ) {
                             Text(
-                                text = room.name,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
+                                text = room.name.take(2).uppercase(),
+                                color = Color.White,
+                                fontWeight = FontWeight.Black,
+                                fontSize = 16.sp
                             )
-                            if (room.isLocked) {
-                                Spacer(modifier = Modifier.width(4.dp))
-                                Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = "Locked",
-                                    tint = PhRedSecondary,
-                                    modifier = Modifier.size(14.dp)
+                        }
+                        Spacer(modifier = Modifier.width(12.dp))
+                        Column {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                Text(
+                                    text = room.name,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 16.sp,
+                                    color = PhBluePrimary,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
                                 )
+                                if (room.isLocked) {
+                                    Spacer(modifier = Modifier.width(4.dp))
+                                    Icon(
+                                        imageVector = Icons.Default.Lock,
+                                        contentDescription = "Locked",
+                                        tint = PhRedSecondary,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                ProvinceBadge(code = room.provinceCode, name = room.provinceName)
+                                RoleBadge(role = room.myRole)
                             }
                         }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(6.dp)
-                        ) {
-                            ProvinceBadge(code = room.provinceCode, name = room.provinceName)
-                            RoleBadge(role = room.myRole)
-                        }
+                    }
+
+                    IconButton(onClick = onTogglePin) {
+                        Icon(
+                            imageVector = if (room.isPinned) Icons.Default.PushPin else Icons.Default.BookmarkBorder,
+                            contentDescription = "Pin Room",
+                            tint = if (room.isPinned) PhRedSecondary else MaterialTheme.colorScheme.outline
+                        )
                     }
                 }
 
-                IconButton(onClick = onTogglePin) {
-                    Icon(
-                        imageVector = if (room.isPinned) Icons.Default.PushPin else Icons.Default.BookmarkBorder,
-                        contentDescription = "Pin Room",
-                        tint = if (room.isPinned) PhRedSecondary else MaterialTheme.colorScheme.outline
-                    )
+                if (room.announcement.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Surface(
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                        shape = RoundedCornerShape(10.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Text(
+                            text = "📢 " + room.announcement,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 2,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.padding(10.dp)
+                        )
+                    }
                 }
-            }
 
-            if (room.announcement.isNotBlank()) {
-                Spacer(modifier = Modifier.height(8.dp))
-                Surface(
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f),
-                    shape = RoundedCornerShape(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text(
-                        text = "📢 " + room.announcement,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(8.dp)
-                    )
-                }
-            }
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .clip(CircleShape)
+                                .background(StatusOnline)
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "${room.onlineCount} Tambay Online",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = StatusOnline
+                        )
+                    }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(StatusOnline)
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = "${room.onlineCount} online",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = StatusOnline
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "${room.memberCount} members",
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                }
-
-                FilledTonalButton(
-                    onClick = onToggleJoin,
-                    shape = RoundedCornerShape(16.dp),
-                    contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = if (room.isJoined) PhBlueContainer else MaterialTheme.colorScheme.primary,
-                        contentColor = if (room.isJoined) PhOnBlueContainer else Color.White
-                    )
-                ) {
-                    Text(
-                        text = if (room.isJoined) "Joined ✓" else "Join",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                    Button(
+                        onClick = onClick,
+                        shape = RoundedCornerShape(16.dp),
+                        contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = PhBluePrimary,
+                            contentColor = Color.White
+                        )
+                    ) {
+                        Text(
+                            text = "Pumasok ➜",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.ExtraBold
+                        )
+                    }
                 }
             }
         }
     }
 }
 
-// ---------------- TAB 1: Chika (DMs) ----------------
+// ---------------- TAB 1: Chika (DMs & Barkada) ----------------
 @Composable
 fun ChikaTab(viewModel: PhchatViewModel) {
     val conversations by viewModel.conversations.collectAsState()
     val profiles by viewModel.profiles.collectAsState()
+    var selectedSubTab by remember { mutableStateOf(0) } // 0: Usapan, 1: Barkada
 
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        item {
-            Text(
-                text = "Online Tambay Buddies",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+    Column(modifier = Modifier.fillMaxSize()) {
+        TabRow(
+            selectedTabIndex = selectedSubTab,
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = PhBluePrimary
+        ) {
+            Tab(
+                selected = selectedSubTab == 0,
+                onClick = { selectedSubTab = 0 },
+                text = { Text("💬 Mga Usapan (${conversations.size})", fontWeight = FontWeight.Bold) }
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            LazyRow(
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            Tab(
+                selected = selectedSubTab == 1,
+                onClick = { selectedSubTab = 1 },
+                text = { Text("👥 Talaan ng Barkada", fontWeight = FontWeight.Bold) }
+            )
+        }
+
+        if (selectedSubTab == 0) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(14.dp)
             ) {
-                items(profiles.filter { it.id != "usr_me" }) { user ->
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier
-                            .clickable { viewModel.startConversationWithUser(user) }
-                            .width(64.dp)
+                item {
+                    Text(
+                        text = "Aktibong Tambay Ngayon",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = PhBluePrimary
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        UserAvatar(
-                            initial = user.avatarInitial,
-                            colorHex = user.avatarColorHex,
-                            size = 52.dp,
-                            isActive = user.isActive
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = user.displayName.split(" ").first(),
-                            fontSize = 12.sp,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
-                        )
+                        items(profiles.filter { it.id != "usr_me" }) { user ->
+                            Column(
+                                horizontalAlignment = Alignment.CenterHorizontally,
+                                modifier = Modifier
+                                    .clickable { viewModel.startConversationWithUser(user) }
+                                    .width(64.dp)
+                            ) {
+                                UserAvatar(
+                                    initial = user.avatarInitial,
+                                    colorHex = user.avatarColorHex,
+                                    size = 52.dp,
+                                    isActive = user.isActive
+                                )
+                                Spacer(modifier = Modifier.height(4.dp))
+                                Text(
+                                    text = user.displayName.split(" ").first(),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
+                            }
+                        }
+                    }
+                }
+
+                item {
+                    Text(
+                        text = "Pribadong Mensahe",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = PhBluePrimary
+                    )
+                }
+
+                if (conversations.isEmpty()) {
+                    item {
+                        Card(
+                            modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
+                            shape = RoundedCornerShape(16.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+                        ) {
+                            Column(
+                                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                                horizontalAlignment = Alignment.CenterHorizontally
+                            ) {
+                                Text(text = "💬", fontSize = 36.sp)
+                                Spacer(modifier = Modifier.height(6.dp))
+                                Text("Walang usapan pa", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                Text("Pumili ng tambay sa itaas upang mag-umpisa ng pribadong chika!", fontSize = 12.sp, color = MaterialTheme.colorScheme.outline)
+                            }
+                        }
+                    }
+                } else {
+                    items(conversations) { conv ->
+                        Card(
+                            onClick = { viewModel.openDirectChat(conv.id) },
+                            shape = RoundedCornerShape(14.dp),
+                            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                            elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth().padding(14.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                UserAvatar(
+                                    initial = conv.participant.displayName,
+                                    colorHex = conv.participant.avatarColorHex,
+                                    size = 46.dp,
+                                    isActive = conv.participant.isActive
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Row(
+                                        modifier = Modifier.fillMaxWidth(),
+                                        horizontalArrangement = Arrangement.SpaceBetween,
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(conv.participant.displayName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                        Text(conv.lastMessageTime, fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                                    }
+                                    Text(conv.lastMessage, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                }
+                            }
+                        }
                     }
                 }
             }
-        }
-
-        item {
-            Text(
-                text = "Direct Messages",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        items(conversations) { conv ->
-            Card(
-                onClick = { viewModel.openDirectChat(conv.id) },
-                shape = RoundedCornerShape(14.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                modifier = Modifier.fillMaxWidth().testTag("conv_${conv.id}")
+        } else {
+            // Barkada (Classic Buddy List)
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(14.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    UserAvatar(
-                        initial = conv.participant.avatarInitial,
-                        colorHex = conv.participant.avatarColorHex,
-                        size = 46.dp,
-                        isActive = conv.participant.isActive
-                    )
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Column(modifier = Modifier.weight(1f)) {
+                item {
+                    Surface(
+                        color = PhGoldContainer,
+                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = conv.participant.displayName,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 15.sp
-                            )
-                            Text(
-                                text = conv.lastMessageTime,
-                                fontSize = 11.sp,
-                                color = MaterialTheme.colorScheme.outline
-                            )
+                            Text("☀️", fontSize = 24.sp)
+                            Spacer(modifier = Modifier.width(10.dp))
+                            Column {
+                                Text("Talaan ng Barkada (Uzzap Buddies)", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = PhOnGoldContainer)
+                                Text("Maaari mong kausapin ang iyong mga barkada anumang oras.", fontSize = 11.sp, color = PhOnGoldContainer.copy(alpha = 0.8f))
+                            }
                         }
-                        Spacer(modifier = Modifier.height(4.dp))
+                    }
+                }
+
+                items(profiles) { buddy ->
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp)
+                    ) {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth().padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = conv.lastMessage,
-                                fontSize = 13.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
-                            if (conv.unreadCount > 0) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(20.dp)
-                                        .clip(CircleShape)
-                                        .background(PhRedSecondary),
-                                    contentAlignment = Alignment.Center
-                                ) {
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                UserAvatar(
+                                    initial = buddy.displayName,
+                                    colorHex = buddy.avatarColorHex,
+                                    size = 44.dp,
+                                    isActive = buddy.isActive
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(buddy.displayName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                                     Text(
-                                        text = "${conv.unreadCount}",
-                                        color = Color.White,
+                                        text = if (buddy.statusText.isNotBlank()) buddy.statusText else "Online sa tambayan",
                                         fontSize = 11.sp,
-                                        fontWeight = FontWeight.Bold
+                                        color = if (buddy.isActive) StatusOnline else MaterialTheme.colorScheme.outline
                                     )
                                 }
+                            }
+
+                            Button(
+                                onClick = { viewModel.startConversationWithUser(buddy) },
+                                shape = RoundedCornerShape(16.dp),
+                                contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
+                                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary)
+                            ) {
+                                Text("Bulong ➜", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -951,10 +1195,9 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
 fun MyProfileTab(viewModel: PhchatViewModel) {
     val currentUser by viewModel.currentUser.collectAsState()
     val commentsMap by viewModel.profileComments.collectAsState()
-    val visitsMap by viewModel.profileVisits.collectAsState()
+    val myVisits by viewModel.profileVisits.collectAsState()
 
     val myComments = commentsMap[currentUser.id] ?: emptyList()
-    val myVisits = visitsMap[currentUser.id] ?: emptyList()
 
     var showEditStatusDialog by remember { mutableStateOf(false) }
     var newCommentText by remember { mutableStateOf("") }

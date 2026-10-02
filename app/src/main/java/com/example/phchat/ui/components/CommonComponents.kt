@@ -1,6 +1,7 @@
 package com.example.phchat.ui.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
@@ -57,7 +58,7 @@ fun UserAvatar(
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .size(size * 0.3f)
+                    .size(size * 0.32f)
                     .clip(CircleShape)
                     .background(Color.White)
                     .padding(1.5.dp)
@@ -71,22 +72,22 @@ fun UserAvatar(
 @Composable
 fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
     val (label, bg, fg) = when (role) {
-        MemberRole.OWNER -> Triple("Owner", RoleOwner.copy(alpha = 0.15f), RoleOwner)
-        MemberRole.ADMIN -> Triple("Admin", RoleAdmin.copy(alpha = 0.15f), RoleAdmin)
-        MemberRole.MODERATOR -> Triple("Mod", RoleMod.copy(alpha = 0.15f), RoleMod)
+        MemberRole.OWNER -> Triple("👑 OWNER", RoleOwner.copy(alpha = 0.15f), RoleOwner)
+        MemberRole.ADMIN -> Triple("🛡️ ADMIN", RoleAdmin.copy(alpha = 0.15f), RoleAdmin)
+        MemberRole.MODERATOR -> Triple("⭐ MOD", RoleMod.copy(alpha = 0.15f), RoleMod)
         MemberRole.MEMBER -> return
     }
 
     Surface(
         color = bg,
-        shape = RoundedCornerShape(4.dp),
+        shape = RoundedCornerShape(6.dp),
         modifier = modifier
     ) {
         Text(
             text = label,
             color = fg,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 9.sp,
+            fontWeight = FontWeight.Black,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
         )
     }
@@ -94,19 +95,81 @@ fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
 
 @Composable
 fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
+    val (glyph, bg, fg) = when (code.uppercase()) {
+        "NCR", "MNL" -> Triple("🏙️", RegionNcr.copy(alpha = 0.12f), RegionNcr)
+        "CEB" -> Triple("🏝️", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
+        "DVO" -> Triple("🦅", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
+        "PAM", "BUL" -> Triple("🍲", RegionLuzon.copy(alpha = 0.15f), RegionLuzon)
+        "ILO", "NEG" -> Triple("⛵", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
+        "BAG", "BEN" -> Triple("🌲", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
+        "ALB", "CAM" -> Triple("🌶️", RegionBicol.copy(alpha = 0.15f), RegionBicol)
+        else -> Triple("📍", PhBlueContainer, PhOnBlueContainer)
+    }
+
     Surface(
-        color = PhBlueContainer,
-        shape = RoundedCornerShape(12.dp),
+        color = bg,
+        shape = RoundedCornerShape(8.dp),
         modifier = modifier
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
         ) {
             Text(
-                text = "📍 $code",
-                color = PhOnBlueContainer,
+                text = "$glyph $code",
+                color = fg,
                 fontSize = 11.sp,
+                fontWeight = FontWeight.ExtraBold
+            )
+        }
+    }
+}
+
+@Composable
+fun UzzapRetroTicker(
+    roomCount: Int,
+    onlineCount: Int = 18,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        color = PhBlueDark,
+        shape = RoundedCornerShape(10.dp),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 6.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .clip(CircleShape)
+                        .background(StatusOnline)
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "PILIPINAS LIVE",
+                    color = PhYellowSun,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Black
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = "• $roomCount Rooms",
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Text(
+                text = "⚡ $onlineCount Tambay Online",
+                color = Color.White.copy(alpha = 0.85f),
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -125,10 +188,11 @@ fun StreakPointsCard(
         modifier = modifier
             .fillMaxWidth()
             .testTag("streak_card"),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
-        )
+            containerColor = PhBluePrimary
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
         Row(
             modifier = Modifier
@@ -140,7 +204,7 @@ fun StreakPointsCard(
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(50.dp)
                         .clip(CircleShape)
                         .background(PhYellowSun),
                     contentAlignment = Alignment.Center
@@ -149,31 +213,30 @@ fun StreakPointsCard(
                         imageVector = Icons.Default.LocalFireDepartment,
                         contentDescription = "Streak",
                         tint = PhRedSecondary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(30.dp)
                     )
                 }
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "$streak-Day Streak!",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 16.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
+                    Text(
+                        text = "🔥 $streak-Araw na Tambay!",
+                        fontWeight = FontWeight.Black,
+                        fontSize = 16.sp,
+                        color = Color.White
+                    )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
                             imageVector = Icons.Default.Stars,
                             contentDescription = "Points",
                             tint = PhYellowSun,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "$points Tambay Points",
                             fontSize = 13.sp,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.85f)
+                            color = PhGoldContainer,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
@@ -183,16 +246,18 @@ fun StreakPointsCard(
                 onClick = onCheckInClick,
                 enabled = !hasCheckedIn,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PhRedSecondary,
-                    contentColor = Color.White
+                    containerColor = PhYellowSun,
+                    contentColor = Color(0xFF4A3800),
+                    disabledContainerColor = Color.White.copy(alpha = 0.25f),
+                    disabledContentColor = Color.White.copy(alpha = 0.7f)
                 ),
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.testTag("checkin_button")
             ) {
                 Text(
-                    text = if (hasCheckedIn) "Checked In ✓" else "Check In +50",
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 12.sp
+                    text = if (hasCheckedIn) "Naka-Check In ✓" else "Mag-Tambay +50",
+                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 11.sp
                 )
             }
         }
@@ -200,28 +265,74 @@ fun StreakPointsCard(
 }
 
 @Composable
-fun QuickReactionRow(
-    onSelectEmoji: (String) -> Unit,
-    modifier: Modifier = Modifier
+fun PinoyStickerDrawer(
+    onStickerSelected: (ChatSticker) -> Unit,
+    onDismiss: () -> Unit
 ) {
-    val emojis = listOf("👍", "❤️", "😂", "🔥", "🇵🇭", "☕", "🎉")
     Surface(
-        color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = RoundedCornerShape(24.dp),
-        shadowElevation = 4.dp,
-        modifier = modifier
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(280.dp)
+            .testTag("sticker_drawer"),
+        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        color = MaterialTheme.colorScheme.surface,
+        tonalElevation = 8.dp
     ) {
-        Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
-        ) {
-            emojis.forEach { emoji ->
-                TextButton(
-                    onClick = { onSelectEmoji(emoji) },
-                    contentPadding = PaddingValues(4.dp),
-                    modifier = Modifier.size(38.dp)
-                ) {
-                    Text(text = emoji, fontSize = 20.sp)
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "🇵🇭 Pinoy Retro Chat Stickers",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp,
+                        color = PhBluePrimary
+                    )
+                }
+                IconButton(onClick = onDismiss) {
+                    Icon(Icons.Default.Close, contentDescription = "Close Stickers")
+                }
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier.fillMaxSize()
+            ) {
+                items(StickerPacks.pinoyStickers) { sticker ->
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onStickerSelected(sticker) }
+                            .testTag("sticker_${sticker.id}"),
+                        shape = RoundedCornerShape(12.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        )
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = sticker.emoji, fontSize = 28.sp)
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Text(
+                                text = sticker.title,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 11.sp,
+                                textAlign = TextAlign.Center,
+                                maxLines = 1
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -235,75 +346,40 @@ fun StickerPickerSheet(
     onSelectSticker: (ChatSticker) -> Unit
 ) {
     ModalBottomSheet(
-        onDismissRequest = onDismiss,
-        sheetState = rememberModalBottomSheetState()
+        onDismissRequest = onDismiss
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+        PinoyStickerDrawer(
+            onStickerSelected = {
+                onSelectSticker(it)
+                onDismiss()
+            },
+            onDismiss = onDismiss
+        )
+    }
+}
+
+@Composable
+fun QuickReactionRow(
+    onSelectEmoji: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val emojis = listOf("👍", "❤️", "🔥", "😂", "🇵🇭", "🙏")
+    Row(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
+        emojis.forEach { emoji ->
+            Surface(
+                shape = CircleShape,
+                color = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier
+                    .size(40.dp)
+                    .clickable { onSelectEmoji(emoji) }
             ) {
-                Text(
-                    text = "🇵🇭 Pinoy Chat Stickers",
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
-                )
-                IconButton(onClick = onDismiss) {
-                    Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = emoji, fontSize = 20.sp)
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                items(StickerPacks.pinoyStickers) { sticker ->
-                    Card(
-                        onClick = {
-                            onSelectSticker(sticker)
-                            onDismiss()
-                        },
-                        shape = RoundedCornerShape(12.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        ),
-                        modifier = Modifier.testTag("sticker_${sticker.id}")
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(12.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            Text(text = sticker.emoji, fontSize = 32.sp)
-                            Spacer(modifier = Modifier.height(6.dp))
-                            Text(
-                                text = sticker.title,
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
-                                textAlign = TextAlign.Center
-                            )
-                            Text(
-                                text = sticker.tagalogPhrase,
-                                fontSize = 10.sp,
-                                maxLines = 2,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f),
-                                textAlign = TextAlign.Center
-                            )
-                        }
-                    }
-                }
-            }
-            Spacer(modifier = Modifier.height(24.dp))
         }
     }
 }
