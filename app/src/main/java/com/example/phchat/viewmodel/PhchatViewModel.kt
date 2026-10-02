@@ -18,6 +18,7 @@ sealed class Screen {
     data class ProfileDetail(val profileId: String) : Screen()
     object Auth : Screen()
     object Settings : Screen()
+    object FeatureCenter : Screen()
 }
 
 class PhchatViewModel(application: Application) : AndroidViewModel(application) {
