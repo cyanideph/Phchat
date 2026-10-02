@@ -269,6 +269,18 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     fun openDirectChat(conversationId: String) {
         navigateTo(Screen.DirectChat(conversationId))
         loadDirectMessages(conversationId)
+        realtimeClient.connectAndSubscribeConversation(conversationId) { newMsg ->
+            viewModelScope.launch(Dispatchers.Main) {
+                if (newMsg.senderId in _blockedUserIds.value) return@launch
+                val currentMap = _directMessages.value.toMutableMap()
+                val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
+                if (list.none { it.id == newMsg.id }) {
+                    list.add(newMsg)
+                    currentMap[conversationId] = list
+                    _directMessages.value = currentMap
+                }
+            }
+        }
     }
 
     fun loadDirectMessages(conversationId: String) {
@@ -455,35 +467,43 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun sendDirectMessage(conversationId: String, body: String) {
-        val me = _currentUser.value
-        val msg = DirectMessage(
-            id = "dm_${System.currentTimeMillis()}",
-            conversationId = conversationId,
-            senderId = me.id,
-            body = body,
-            timestamp = "Just now"
-        )
-        val currentMap = _directMessages.value.toMutableMap()
-        val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
-        list.add(msg)
-        currentMap[conversationId] = list
-        _directMessages.value = currentMap
+        val trimmed = body.trim()
+        if (trimmed.isBlank()) return
+        viewModelScope.launch {
+            val result = repository.sendDirectMessage(conversationId, trimmed)
+            if (result.isSuccess) {
+                val msg = result.getOrNull() ?: return@launch
+                val currentMap = _directMessages.value.toMutableMap()
+                val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
+                if (list.none { it.id == msg.id }) {
+                    list.add(msg)
+                    currentMap[conversationId] = list
+                    _directMessages.value = currentMap
+                }
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage ?: "Failed to send message"
+            }
+        }
     }
 
     fun startConversationWithUser(user: Profile) {
-        val existing = _conversations.value.firstOrNull { it.participant.id == user.id }
-        if (existing != null) {
-            openDirectChat(existing.id)
-        } else {
-            val newConv = Conversation(
-                id = "conv_${user.id}",
-                participant = user,
-                lastMessage = "Started a conversation",
-                lastMessageTime = "Just now",
-                unreadCount = 0
-            )
-            _conversations.value = listOf(newConv) + _conversations.value
-            openDirectChat(newConv.id)
+        viewModelScope.launch {
+            val existing = _conversations.value.firstOrNull { it.participant.id == user.id }
+            val conversationId = if (existing != null) {
+                existing.id
+            } else {
+                val result = repository.createDirectConversation(user.id)
+                if (result.isFailure) {
+                    _errorMessage.value = result.exceptionOrNull()?.localizedMessage ?: "Failed to create conversation"
+                    return@launch
+                }
+                result.getOrNull() ?: return@launch
+            }
+            val refreshed = repository.getConversations()
+            if (refreshed.isSuccess) {
+                _conversations.value = refreshed.getOrNull().orEmpty()
+            }
+            openDirectChat(conversationId)
         }
     }
 
