@@ -37,40 +37,82 @@ class SupabaseRepository(
 
     suspend fun getRooms(): Result<List<Room>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/rooms?select=*&order=created_at.desc"
-            val request = buildRequest(url).get().build()
-            val response = client.newCall(request).execute()
-            val body = response.body?.string().orEmpty()
+            val rpcResult = callRpc("list_public_chats", JSONObject().apply {
+                put("p_limit", 100)
+                put("p_offset", 0)
+            })
+            if (rpcResult.isFailure) return@withContext Result.failure(rpcResult.exceptionOrNull()!!)
 
-            if (!response.isSuccessful) {
-                return@withContext Result.failure(Exception("Failed to fetch rooms: ${response.code}"))
+            val publicRooms = JSONArray(rpcResult.getOrNull().orEmpty())
+            if (publicRooms.length() == 0) return@withContext Result.success(emptyList())
+
+            val ids = buildList {
+                for (i in 0 until publicRooms.length()) {
+                    publicRooms.getJSONObject(i).optString("id").takeIf { it.isNotBlank() }?.let(::add)
+                }
+            }
+            val idFilter = ids.joinToString(",")
+            val detailUrl = "${SupabaseConfig.url}/rest/v1/rooms?select=id,slug,name,description,kind,province_code,is_locked,announcement,view_only,members_can_invite,pinned_message_id&id=in.($idFilter)"
+            val detailResponse = client.newCall(buildRequest(detailUrl).get().build()).execute()
+            val detailBody = detailResponse.body?.string().orEmpty()
+            if (!detailResponse.isSuccessful) {
+                return@withContext Result.failure(Exception("Failed to fetch room details: ${detailResponse.code}"))
+            }
+            val details = mutableMapOf<String, JSONObject>()
+            val detailArray = JSONArray(detailBody)
+            for (i in 0 until detailArray.length()) {
+                val obj = detailArray.getJSONObject(i)
+                details[obj.optString("id")] = obj
             }
 
-            val array = JSONArray(body)
-            val list = mutableListOf<Room>()
-            for (i in 0 until array.length()) {
-                val obj = array.getJSONObject(i)
-                val id = obj.optString("id", "")
-                val name = obj.optString("name", obj.optString("slug", "Room"))
-                val slug = obj.optString("slug", id)
-                val provinceCode = obj.optString("province_code", "NCR")
-                val isLocked = obj.optBoolean("is_locked", false)
-                val announcement = obj.optString("announcement", "")
-                val kindStr = obj.optString("kind", "public")
+            val userId = authManager.getCurrentUserId()
+            val memberships = mutableMapOf<String, JSONObject>()
+            if (!userId.isNullOrBlank()) {
+                val memberUrl = "${SupabaseConfig.url}/rest/v1/room_members?user_id=eq.$userId&room_id=in.($idFilter)&select=room_id,role,is_pinned"
+                val memberResponse = client.newCall(buildRequest(memberUrl).get().build()).execute()
+                val memberBody = memberResponse.body?.string().orEmpty()
+                if (!memberResponse.isSuccessful) {
+                    return@withContext Result.failure(Exception("Failed to fetch room membership: ${memberResponse.code}"))
+                }
+                val memberArray = JSONArray(memberBody)
+                for (i in 0 until memberArray.length()) {
+                    val obj = memberArray.getJSONObject(i)
+                    memberships[obj.optString("room_id")] = obj
+                }
+            }
 
+            val list = mutableListOf<Room>()
+            for (i in 0 until publicRooms.length()) {
+                val summary = publicRooms.getJSONObject(i)
+                val id = summary.optString("id", "")
+                if (id.isBlank()) continue
+                val detail = details[id]
+                val membership = memberships[id]
+                val role = when (membership?.optString("role", "member")?.lowercase()) {
+                    "owner" -> MemberRole.OWNER
+                    "admin" -> MemberRole.ADMIN
+                    "moderator", "mod" -> MemberRole.MODERATOR
+                    else -> MemberRole.MEMBER
+                }
+                val provinceCode = summary.optString("province_code", detail?.optString("province_code", "ALL") ?: "ALL")
                 list.add(
                     Room(
                         id = id,
-                        name = name,
-                        slug = slug,
-                        kind = if (kindStr == "group") RoomKind.GROUP else RoomKind.PUBLIC,
+                        name = summary.optString("name", detail?.optString("name", "Room") ?: "Room"),
+                        slug = summary.optString("slug", detail?.optString("slug", id) ?: id),
+                        kind = RoomKind.PUBLIC,
                         provinceCode = provinceCode,
                         provinceName = mapProvinceToRegion(provinceCode),
-                        isLocked = isLocked,
-                        announcement = announcement,
-                        memberCount = obj.optInt("member_count", 0),
-                        onlineCount = obj.optInt("online_count", 0),
-                        isJoined = obj.optBoolean("is_joined", false)
+                        isLocked = detail?.optBoolean("is_locked", false) ?: false,
+                        viewOnly = detail?.optBoolean("view_only", false) ?: false,
+                        membersCanInvite = detail?.optBoolean("members_can_invite", true) ?: true,
+                        announcement = detail?.optString("announcement") ?: detail?.optString("description") ?: "",
+                        memberCount = summary.optLong("member_count", 0).toInt(),
+                        onlineCount = summary.optLong("online_count", 0).toInt(),
+                        isJoined = membership != null,
+                        isPinned = membership?.optBoolean("is_pinned", false) ?: false,
+                        myRole = role,
+                        colorHex = 0xFF00A94F
                     )
                 )
             }
@@ -116,7 +158,7 @@ class SupabaseRepository(
 
     suspend fun getRoomMessages(roomId: String): Result<List<RoomMessage>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*,sender:profiles!room_messages_sender_id_fkey(*)&order=created_at.asc"
+            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*,sender:profiles!room_messages_sender_id_fkey(*),reactions:room_message_reactions(*)&order=created_at.asc"
             val request = buildRequest(url).get().build()
             val response = client.newCall(request).execute()
             val body = response.body?.string().orEmpty()
@@ -127,20 +169,38 @@ class SupabaseRepository(
 
             val array = JSONArray(body)
             val list = mutableListOf<RoomMessage>()
+            val currentUserId = authManager.getCurrentUserId()
             for (i in 0 until array.length()) {
                 val obj = array.getJSONObject(i)
                 val id = obj.optString("id", "")
-                val senderId = obj.optString("sender_id", obj.optString("user_id", ""))
+                val senderId = obj.optString("sender_id", "")
                 val msgBody = obj.optString("body", "")
-                val kindStr = obj.optString("kind", "text")
+                val kindStr = obj.optString("kind", "text").lowercase()
                 val createdAt = obj.optString("created_at", "")
+                val deleted = !obj.isNull("deleted_at")
                 val sender = obj.optJSONObject("sender")
-                val senderName = sender?.optString("display_name")?.ifBlank { sender.optString("username") }?.ifBlank { "Tambay" } ?: if (kindStr == "system") "PHChat" else "Tambay"
+                val senderName = sender?.optString("display_name")?.ifBlank { sender.optString("username") }?.ifBlank { "Tambay" }
+                    ?: if (kindStr == "system") "PHChat" else "Tambay"
 
                 val kind = when (kindStr) {
                     "system" -> MessageKind.SYSTEM
                     "sticker" -> MessageKind.STICKER
+                    "media" -> MessageKind.MEDIA
+                    "reply" -> MessageKind.REPLY
                     else -> MessageKind.TEXT
+                }
+
+                val reactions = mutableMapOf<String, Int>()
+                var myReaction: String? = null
+                val reactionArray = obj.optJSONArray("reactions")
+                if (reactionArray != null) {
+                    for (j in 0 until reactionArray.length()) {
+                        val reaction = reactionArray.getJSONObject(j)
+                        val emoji = reaction.optString("reaction", "")
+                        if (emoji.isBlank()) continue
+                        reactions[emoji] = (reactions[emoji] ?: 0) + 1
+                        if (reaction.optString("user_id") == currentUserId) myReaction = emoji
+                    }
                 }
 
                 list.add(
@@ -149,11 +209,16 @@ class SupabaseRepository(
                         roomId = roomId,
                         senderId = senderId,
                         senderName = senderName,
-                        senderAvatarHex = 0xFF0038A8,
+                        senderAvatarHex = 0xFF00A94F,
                         senderRole = if (kind == MessageKind.SYSTEM) MemberRole.ADMIN else MemberRole.MEMBER,
-                        body = msgBody,
+                        body = if (deleted) "[Message deleted]" else msgBody,
                         kind = kind,
-                        timestamp = if (createdAt.length >= 16) createdAt.substring(11, 16) else "Now"
+                        stickerEmoji = obj.optJSONObject("metadata")?.optString("sticker_emoji"),
+                        reactions = reactions,
+                        myReaction = myReaction,
+                        timestamp = if (createdAt.length >= 16) createdAt.substring(11, 16) else "Now",
+                        isEdited = !obj.isNull("edited_at"),
+                        isDeleted = deleted
                     )
                 )
             }
@@ -219,16 +284,17 @@ class SupabaseRepository(
 
     suspend fun getContents(): Result<List<ContentPost>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/contents?select=*,author:profiles!contents_author_id_fkey(*),poll_options(*)&order=created_at.desc"
-            val request = buildRequest(url).get().build()
-            val response = client.newCall(request).execute()
-            val body = response.body?.string().orEmpty()
+            val result = callRpc("list_content_feed", JSONObject().apply {
+                put("p_room_id", JSONObject.NULL)
+                put("p_author_id", JSONObject.NULL)
+                put("p_before_created_at", JSONObject.NULL)
+                put("p_before_id", JSONObject.NULL)
+                put("p_limit", 50)
+            })
+            if (result.isFailure) return@withContext Result.failure(result.exceptionOrNull()!!)
 
-            if (!response.isSuccessful) {
-                return@withContext Result.failure(Exception("Failed to fetch contents: ${response.code}"))
-            }
-
-            val array = JSONArray(body)
+            val root = JSONObject(result.getOrNull().orEmpty())
+            val array = root.optJSONArray("items") ?: JSONArray()
             val list = mutableListOf<ContentPost>()
             for (i in 0 until array.length()) {
                 val obj = array.getJSONObject(i)
@@ -236,18 +302,32 @@ class SupabaseRepository(
                 val title = obj.optString("title", "")
                 val bodyText = obj.optString("body", "")
                 val createdAt = obj.optString("created_at", "")
-                val userId = obj.optString("author_id", obj.optString("user_id", ""))
+                val userId = obj.optString("author_id", "")
+                val metadata = obj.optJSONObject("metadata")
+                val author = obj.optJSONObject("author")?.let { profileToModel(it) }
+                    ?: Profile(
+                        id = userId,
+                        username = "tambay",
+                        displayName = "Tambay",
+                        avatarInitial = "T",
+                        avatarColorHex = 0xFF00A94F,
+                        bio = "",
+                        statusText = "",
+                        province = "Philippines"
+                    )
 
                 val pollOptionsArray = obj.optJSONArray("poll_options")
                 val poll = if (pollOptionsArray != null && pollOptionsArray.length() > 0) {
                     val opts = mutableListOf<PollOption>()
+                    var selectedOptionId: String? = null
                     for (j in 0 until pollOptionsArray.length()) {
                         val pOpt = pollOptionsArray.getJSONObject(j)
+                        if (pOpt.optBoolean("is_selected", false)) selectedOptionId = pOpt.optString("id")
                         opts.add(
                             PollOption(
                                 id = pOpt.optString("id", "$j"),
                                 text = pOpt.optString("label", "Option $j"),
-                                votes = pOpt.optInt("vote_count", pOpt.optInt("votes", 0))
+                                votes = pOpt.optInt("vote_count", 0)
                             )
                         )
                     }
@@ -255,22 +335,18 @@ class SupabaseRepository(
                         id = "poll_$id",
                         question = title,
                         options = opts,
-                        totalVotes = opts.sumOf { it.votes }
+                        totalVotes = opts.sumOf { it.votes },
+                        hasVoted = selectedOptionId != null,
+                        selectedOptionId = selectedOptionId
                     )
                 } else null
 
-                val author = obj.optJSONObject("author")?.let { profileToModel(it) }
-                    ?: Profile(
-                        id = userId,
-                        username = "tambay",
-                        displayName = "Tambay",
-                        avatarInitial = "T",
-                        avatarColorHex = 0xFF0038A8,
-                        bio = "",
-                        statusText = "",
-                        province = "Philippines"
-                    )
-                val metadata = obj.optJSONObject("metadata")
+                val kind = when (obj.optString("kind", "post").lowercase()) {
+                    "poll" -> ContentKind.POLL
+                    "announcement" -> ContentKind.ANNOUNCEMENT
+                    else -> ContentKind.POST
+                }
+
                 list.add(
                     ContentPost(
                         id = id,
@@ -278,10 +354,13 @@ class SupabaseRepository(
                         title = title,
                         body = bodyText,
                         category = metadata?.optString("category", "General")?.ifBlank { "General" } ?: "General",
+                        kind = kind,
                         poll = poll,
-                        createdAt = if (createdAt.length >= 10) createdAt.substring(0, 10) else "Recent",
-                        likesCount = 0,
-                        commentsCount = 0
+                        likesCount = obj.optInt("likes_count", 0),
+                        isLiked = obj.optBoolean("is_liked", false),
+                        isSaved = obj.optBoolean("is_saved", false),
+                        commentsCount = obj.optInt("comments_count", 0),
+                        createdAt = if (createdAt.length >= 10) createdAt.substring(0, 10) else "Recent"
                     )
                 )
             }
@@ -325,37 +404,39 @@ suspend fun addBuddy(targetUserId: String): Result<Boolean> = withContext(Dispat
 
 suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val url = "${SupabaseConfig.url}/rest/v1/conversation_members?user_id=eq.$userId&select=conversation_id,conversations(id,title,kind,updated_at,conversation_members(user_id,profiles(*)))&order=joined_at.desc"
-            val response = client.newCall(buildRequest(url).get().build()).execute()
-            val body = response.body?.string().orEmpty()
-            if (!response.isSuccessful) return@withContext Result.failure(Exception("Failed to fetch conversations: ${response.code}"))
-            val array = JSONArray(body)
+            val result = callRpc("list_conversations")
+            if (result.isFailure) return@withContext Result.failure(result.exceptionOrNull()!!)
+            val array = JSONArray(result.getOrNull().orEmpty())
             val out = mutableListOf<Conversation>()
             for (i in 0 until array.length()) {
                 val row = array.getJSONObject(i)
-                val conv = row.optJSONObject("conversations") ?: continue
-                val members = conv.optJSONArray("conversation_members") ?: continue
-                var participant: Profile? = null
-                for (j in 0 until members.length()) {
-                    val member = members.optJSONObject(j) ?: continue
-                    if (member.optString("user_id") != userId) {
-                        val profile = member.optJSONObject("profiles")
-                        if (profile != null) participant = profileToModel(profile)
-                    }
-                }
-                if (participant != null) {
-                    out.add(Conversation(
-                        id = conv.optString("id"),
+                val participant = Profile(
+                    id = row.optString("participant_id", ""),
+                    username = row.optString("participant_username", "user"),
+                    displayName = row.optString("participant_display_name", row.optString("participant_username", "user")),
+                    avatarInitial = row.optString("participant_display_name", "T").take(1).uppercase(),
+                    avatarColorHex = 0xFF00A94F,
+                    bio = row.optString("participant_bio", ""),
+                    statusText = row.optString("participant_status_text", ""),
+                    province = "Philippines",
+                    isActive = row.optBoolean("participant_is_active", false),
+                    lastSeenAt = row.optString("participant_last_seen_at", "")
+                )
+                out.add(
+                    Conversation(
+                        id = row.optString("id", ""),
                         participant = participant,
-                        lastMessage = "",
-                        lastMessageTime = conv.optString("updated_at", ""),
-                        unreadCount = 0
-                    ))
-                }
+                        lastMessage = row.optString("last_message", ""),
+                        lastMessageTime = row.optString("last_message_at", ""),
+                        unreadCount = row.optLong("unread_count", 0).toInt(),
+                        isPinned = row.optBoolean("is_pinned", false)
+                    )
+                )
             }
-            Result.success(out.distinctBy { it.id })
-        } catch (e: Exception) { Result.failure(e) }
+            Result.success(out)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
     }
 
     suspend fun getDirectMessages(conversationId: String): Result<List<DirectMessage>> = withContext(Dispatchers.IO) {
@@ -547,14 +628,33 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
     }
 
     suspend fun setRoomPinned(roomId: String, pinned: Boolean): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val payload = JSONObject().apply { put("is_pinned", pinned) }.toString()
-            val req = buildRequest("${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId")
-                .header("Content-Type", "application/json").patch(payload.toRequestBody(jsonMediaType)).build()
-            val resp = client.newCall(req).execute()
-            Result.success(resp.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("set_room_member_chat_preferences", JSONObject().apply {
+            put("p_room_id", roomId)
+            put("p_notifications_enabled", JSONObject.NULL)
+            put("p_is_pinned", pinned)
+        }).map { true }
+    }
+
+    suspend fun setRoomChatSettings(
+        roomId: String,
+        announcement: String,
+        viewOnly: Boolean,
+        membersCanInvite: Boolean
+    ): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("set_room_chat_settings", JSONObject().apply {
+            put("p_room_id", roomId)
+            put("p_announcement", announcement)
+            put("p_view_only", viewOnly)
+            put("p_members_can_invite", membersCanInvite)
+        }).map { true }
+    }
+
+    suspend fun setRoomLock(roomId: String, locked: Boolean, reason: String? = null): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("set_room_lock", JSONObject().apply {
+            put("p_room_id", roomId)
+            put("p_locked", locked)
+            if (reason.isNullOrBlank()) put("p_reason", JSONObject.NULL) else put("p_reason", reason)
+        }).map { true }
     }
 
     suspend fun toggleRoomMembership(roomId: String): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -571,14 +671,6 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
                 callRpc("join_room", JSONObject().apply { put("p_room_id", roomId) })
             }
             result.map { !joined }
-        } catch (e: Exception) { Result.failure(e) }
-    }
-
-    suspend fun updateRoom(roomId: String, fields: JSONObject): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val req = buildRequest("${SupabaseConfig.url}/rest/v1/rooms?id=eq.$roomId").header("Content-Type","application/json").patch(fields.toString().toRequestBody(jsonMediaType)).build()
-            val resp = client.newCall(req).execute()
-            Result.success(resp.isSuccessful)
         } catch (e: Exception) { Result.failure(e) }
     }
 

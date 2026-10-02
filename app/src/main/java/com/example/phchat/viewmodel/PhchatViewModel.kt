@@ -216,18 +216,17 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     fun openRoom(roomId: String) {
         navigateTo(Screen.RoomChat(roomId))
         loadRoomMessages(roomId)
-        realtimeClient.connectAndSubscribeRoom(roomId) { newMsg ->
-            viewModelScope.launch(Dispatchers.Main) {
-                if (newMsg.senderId in _blockedUserIds.value) return@launch
-                val currentMap = _roomMessages.value.toMutableMap()
-                val list = (currentMap[roomId] ?: emptyList()).toMutableList()
-                if (list.none { it.id == newMsg.id }) {
-                    list.add(newMsg)
-                    currentMap[roomId] = list
-                    _roomMessages.value = currentMap
+        realtimeClient.connectAndSubscribeRoom(
+            roomId = roomId,
+            onNewMessage = {},
+            onDataChanged = { table, _ ->
+                when (table) {
+                    "room_messages", "room_message_reactions" -> loadRoomMessages(roomId)
+                    "room_members" -> refreshRooms()
+                    "notifications" -> refreshNotifications()
                 }
             }
-        }
+        )
     }
 
     fun submitReport(targetId: String, reason: String, details: String, onResult: (Boolean) -> Unit) {
@@ -270,17 +269,47 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         navigateTo(Screen.DirectChat(conversationId))
         markConversationRead(conversationId)
         loadDirectMessages(conversationId)
-        realtimeClient.connectAndSubscribeConversation(conversationId) { newMsg ->
-            viewModelScope.launch(Dispatchers.Main) {
-                if (newMsg.senderId in _blockedUserIds.value) return@launch
-                val currentMap = _directMessages.value.toMutableMap()
-                val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
-                if (list.none { it.id == newMsg.id }) {
-                    list.add(newMsg)
-                    currentMap[conversationId] = list
+        realtimeClient.connectAndSubscribeConversation(
+            conversationId = conversationId,
+            onNewMessage = { newMsg ->
+                viewModelScope.launch(Dispatchers.Main) {
+                    if (newMsg.senderId in _blockedUserIds.value) return@launch
+                    val currentMap = _directMessages.value.toMutableMap()
+                    val list = (currentMap[conversationId] ?: emptyList()).toMutableList()
+                    if (list.none { it.id == newMsg.id }) {
+                        list.add(newMsg)
+                        currentMap[conversationId] = list
+                    }
                     _directMessages.value = currentMap
                 }
+            },
+            onDataChanged = { table, _ ->
+                when (table) {
+                    "conversation_messages" -> {
+                        loadDirectMessages(conversationId)
+                        refreshConversations()
+                    }
+                    "notifications" -> refreshNotifications()
+                }
             }
+        )
+    }
+
+    private fun refreshRooms() {
+        viewModelScope.launch {
+            repository.getRooms().onSuccess { _rooms.value = it }
+        }
+    }
+
+    private fun refreshConversations() {
+        viewModelScope.launch {
+            repository.getConversations().onSuccess { _conversations.value = it }
+        }
+    }
+
+    private fun refreshNotifications() {
+        viewModelScope.launch {
+            repository.getNotifications().onSuccess { _notifications.value = it }
         }
     }
 
@@ -391,10 +420,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun deleteMessage(roomId: String, messageId: String) {
-        val currentMap = _roomMessages.value.toMutableMap()
-        val list = (currentMap[roomId] ?: emptyList()).filter { it.id != messageId }
-        currentMap[roomId] = list
-        _roomMessages.value = currentMap
+        deleteRoomMessagePersisted(roomId, messageId)
     }
 
     fun toggleMessageReaction(roomId: String, messageId: String, emoji: String) {
@@ -419,16 +445,32 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         val locked = !room.isLocked
         _rooms.value = _rooms.value.map { if (it.id == roomId) it.copy(isLocked = locked) else it }
         viewModelScope.launch {
-            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("is_locked", locked) })
-            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            val result = repository.setRoomLock(roomId, locked)
+            if (result.isFailure) {
+                loadSupabaseData()
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+            } else {
+                refreshRooms()
+            }
         }
     }
 
     fun updateRoomAnnouncement(roomId: String, announcement: String) {
+        val room = _rooms.value.firstOrNull { it.id == roomId } ?: return
         _rooms.value = _rooms.value.map { r -> if (r.id == roomId) r.copy(announcement = announcement) else r }
         viewModelScope.launch {
-            val result = repository.updateRoom(roomId, org.json.JSONObject().apply { put("announcement", announcement) })
-            if (result.isFailure) { loadSupabaseData(); _errorMessage.value = result.exceptionOrNull()?.localizedMessage }
+            val result = repository.setRoomChatSettings(
+                roomId = roomId,
+                announcement = announcement,
+                viewOnly = room.viewOnly,
+                membersCanInvite = room.membersCanInvite
+            )
+            if (result.isFailure) {
+                loadSupabaseData()
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage
+            } else {
+                refreshRooms()
+            }
         }
     }
 
@@ -842,9 +884,11 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
     fun deleteRoomMessagePersisted(roomId: String, messageId: String) {
         viewModelScope.launch {
             val result = repository.updateRoomMessageDeleted(messageId)
-            featureResult("Message deletion persisted", result.map { "ok" })
-            if (result.isSuccess) loadRoomMessages(roomId)
+            if (result.isSuccess) {
+                loadRoomMessages(roomId)
+            } else {
+                _errorMessage.value = result.exceptionOrNull()?.localizedMessage ?: "Failed to delete message"
+            }
         }
     }
-
 }
