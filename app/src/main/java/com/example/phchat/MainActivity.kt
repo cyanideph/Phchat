@@ -28,6 +28,7 @@ class MainActivity : ComponentActivity() {
                 getSharedPreferences("phchat_preferences", Context.MODE_PRIVATE)
             }
             val systemDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+            var showOnboarding by remember { mutableStateOf(!prefs.getBoolean("onboarding_complete", false)) }
             var darkTheme by remember {
                 mutableStateOf(
                     if (prefs.contains("dark_theme")) prefs.getBoolean("dark_theme", false)
@@ -43,7 +44,13 @@ class MainActivity : ComponentActivity() {
                     val currentScreen by viewModel.currentScreen.collectAsState()
                     var showNotificationsSheet by remember { mutableStateOf(false) }
 
-                    when (val screen = currentScreen) {
+                    if (showOnboarding) {
+                        OnboardingScreen(onComplete = {
+                            prefs.edit().putBoolean("onboarding_complete", true).apply()
+                            showOnboarding = false
+                            viewModel.openAuthScreen()
+                        })
+                    } else when (val screen = currentScreen) {
                         is Screen.Auth -> {
                             AuthScreen(
                                 viewModel = viewModel,
