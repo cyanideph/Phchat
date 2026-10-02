@@ -702,4 +702,140 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
+
+    private val _featureResults = MutableStateFlow<List<String>>(emptyList())
+    val featureResults: StateFlow<List<String>> = _featureResults.asStateFlow()
+
+    private fun featureResult(label: String, result: Result<String>) {
+        _featureResults.value = listOf(
+            if (result.isSuccess) "✓ $label" else "✕ $label: ${result.exceptionOrNull()?.localizedMessage ?: "failed"}
+        ) + _featureResults.value.take(19)
+    }
+
+    fun runFeatureRpc(label: String, functionName: String, payload: org.json.JSONObject = org.json.JSONObject()) {
+        viewModelScope.launch {
+            featureResult(label, repository.advancedRpc(functionName, payload))
+        }
+    }
+
+    fun searchFeature(kind: String, query: String) {
+        if (query.isBlank()) return
+        val fn = when (kind) {
+            "profiles" -> "search_profiles"
+            "content" -> "search_content"
+            "rooms" -> "search_public_rooms"
+            "chats" -> "search_public_chats"
+            else -> return
+        }
+        val payload = org.json.JSONObject().apply {
+            put("p_query", query)
+            put("p_limit", 30)
+            if (kind == "content") put("p_room_id", org.json.JSONObject.NULL)
+            if (kind == "content") put("p_offset", 0)
+        }
+        runFeatureRpc("Search $kind: $query", fn, payload)
+    }
+
+    fun toggleFavoriteUser(userId: String) =
+        runFeatureRpc("Favorite user $userId", "toggle_favorite", org.json.JSONObject().put("p_target_user_id", userId))
+
+    fun recordProfileVisit(profileId: String) =
+        runFeatureRpc("Recorded profile visit", "record_profile_visit", org.json.JSONObject().put("p_profile_id", profileId))
+
+    fun loadFollowers(userId: String) =
+        runFeatureRpc("Loaded followers", "list_followers", org.json.JSONObject().put("p_user_id", userId).put("p_limit", 50))
+
+    fun loadFollowing(userId: String) =
+        runFeatureRpc("Loaded following", "list_following", org.json.JSONObject().put("p_user_id", userId).put("p_limit", 50))
+
+    fun loadFavorites() =
+        runFeatureRpc("Loaded favorite users", "list_favorite_users", org.json.JSONObject().put("p_limit", 50).put("p_offset", 0))
+
+    fun loadProfileVisitors() =
+        runFeatureRpc("Loaded profile visitors", "list_profile_visitors", org.json.JSONObject().put("p_limit", 50))
+
+    fun loadOnlineUsers() =
+        runFeatureRpc("Loaded online users", "list_online_users", org.json.JSONObject().put("p_limit", 50).put("p_offset", 0).put("p_online_for", "00:15:00"))
+
+    fun loadOnlineRoomMembers(roomId: String) =
+        runFeatureRpc("Loaded online room members", "list_online_room_members", org.json.JSONObject().put("p_room_id", roomId).put("p_limit", 50).put("p_offset", 0).put("p_online_for", "00:15:00"))
+
+    fun createRoomInvite(roomId: String, userId: String) =
+        runFeatureRpc("Room invite created", "create_room_invite", org.json.JSONObject().put("p_room_id", roomId).put("p_invitee_id", userId))
+
+    fun respondRoomInvite(inviteId: String, accept: Boolean) =
+        runFeatureRpc("Room invite response", "respond_room_invite", org.json.JSONObject().put("p_invite_id", inviteId).put("p_accept", accept))
+
+    fun createConversationInvite(conversationId: String, userId: String) =
+        runFeatureRpc("Conversation invite created", "create_conversation_invite", org.json.JSONObject().put("p_conversation_id", conversationId).put("p_invitee_id", userId))
+
+    fun respondConversationInvite(inviteId: String, accept: Boolean) =
+        runFeatureRpc("Conversation invite response", "respond_conversation_invite", org.json.JSONObject().put("p_invite_id", inviteId).put("p_accept", accept))
+
+    fun requestCoHost(roomId: String, userId: String) =
+        runFeatureRpc("Co-host request created", "request_room_co_host", org.json.JSONObject().put("p_room_id", roomId).put("p_target_user_id", userId))
+
+    fun respondCoHostRequest(requestId: String, accept: Boolean) =
+        runFeatureRpc("Co-host request response", if (accept) "accept_room_co_host_request" else "decline_room_co_host_request", org.json.JSONObject().put("p_request_id", requestId))
+
+    fun cancelCoHostRequest(requestId: String) =
+        runFeatureRpc("Co-host request cancelled", "cancel_room_co_host_request", org.json.JSONObject().put("p_request_id", requestId))
+
+    fun setCoHost(roomId: String, userId: String, enabled: Boolean) =
+        runFeatureRpc("Co-host updated", "set_room_co_host", org.json.JSONObject().put("p_room_id", roomId).put("p_target_user_id", userId).put("p_enabled", enabled))
+
+    fun strikeMember(roomId: String, userId: String, durationMinutes: Int, reason: String) =
+        runFeatureRpc("Member strike issued", "strike_room_member", org.json.JSONObject().put("p_room_id", roomId).put("p_target_user_id", userId).put("p_duration_minutes", durationMinutes).put("p_reason", reason))
+
+    fun kickMember(roomId: String, userId: String, allowRejoin: Boolean, reason: String) =
+        runFeatureRpc("Member kicked", "kick_room_member", org.json.JSONObject().put("p_room_id", roomId).put("p_target_user_id", userId).put("p_allow_rejoin", allowRejoin).put("p_reason", reason))
+
+    fun moderateMember(roomId: String, userId: String, action: String, durationMinutes: Int, reason: String) =
+        runFeatureRpc("Member $action", "moderate_room_member", org.json.JSONObject().put("p_room_id", roomId).put("p_target_user_id", userId).put("p_action", action).put("p_duration_minutes", durationMinutes).put("p_reason", reason))
+
+    fun moderateMessage(messageId: String, action: String, reason: String) =
+        runFeatureRpc("Message $action", "moderate_room_message", org.json.JSONObject().put("p_message_id", messageId).put("p_action", action).put("p_reason", reason))
+
+    fun addContentComment(contentId: String, body: String, parentId: String? = null) =
+        runFeatureRpc("Content comment added", "add_content_comment", org.json.JSONObject().apply {
+            put("p_content_id", contentId); put("p_body", body)
+            put("p_parent_id", parentId ?: org.json.JSONObject.NULL)
+        })
+
+    fun voteContentComment(commentId: String, value: Int) =
+        runFeatureRpc("Comment vote updated", "toggle_content_comment_vote", org.json.JSONObject().put("p_comment_id", commentId).put("p_value", value))
+
+    fun repostContent(contentId: String, roomId: String? = null) =
+        runFeatureRpc("Content reposted", "repost_content", org.json.JSONObject().apply {
+            put("p_content_id", contentId); put("p_room_id", roomId ?: org.json.JSONObject.NULL)
+        })
+
+    fun markNotificationRead(notificationId: String) =
+        runFeatureRpc("Notification marked read", "mark_notification_read", org.json.JSONObject().put("p_notification_id", notificationId))
+
+    fun deleteNotification(notificationId: String) =
+        runFeatureRpc("Notification deleted", "delete_notification", org.json.JSONObject().put("p_notification_id", notificationId))
+
+    fun clearNotifications() =
+        runFeatureRpc("Notifications cleared", "clear_notifications")
+
+    fun uploadFeatureMedia(context: android.content.Context, uri: android.net.Uri, roomId: String? = null, contentId: String? = null, messageId: String? = null) {
+        viewModelScope.launch {
+            val relation = org.json.JSONObject().apply {
+                if (roomId != null) put("room_id", roomId)
+                if (contentId != null) put("content_id", contentId)
+                if (messageId != null) put("message_id", messageId)
+            }
+            featureResult("Media uploaded", repository.uploadMedia(context, uri, relation = relation))
+        }
+    }
+
+    fun deleteRoomMessagePersisted(roomId: String, messageId: String) {
+        viewModelScope.launch {
+            val result = repository.updateRoomMessageDeleted(roomId, messageId)
+            featureResult("Message deletion persisted", result.map { "ok" })
+            if (result.isSuccess) loadRoomMessages(roomId)
+        }
+    }
+
 }
