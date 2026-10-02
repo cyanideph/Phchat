@@ -27,5 +27,19 @@ jobs:
         with:
           gradle-version: '9.3.1'
 
+      - name: Provision debug keystore
+        shell: bash
+        run: |
+          keytool -genkeypair \
+            -keystore "$GITHUB_WORKSPACE/debug.keystore" \
+            -storepass android \
+            -keypass android \
+            -alias androiddebugkey \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 10000 \
+            -dname "CN=Android Debug,O=Android,C=US"
+          test -f "$GITHUB_WORKSPACE/debug.keystore"
+
       - name: Verify
         run: gradle --no-daemon :app:assembleDebug :app:testDebugUnitTest
