@@ -68,9 +68,9 @@ class SupabaseRepository(
                         provinceName = mapProvinceToRegion(provinceCode),
                         isLocked = isLocked,
                         announcement = announcement,
-                        memberCount = 0,
-                        onlineCount = 0,
-                        isJoined = false
+                        memberCount = obj.optInt("member_count", 0),
+                        onlineCount = obj.optInt("online_count", 0),
+                        isJoined = obj.optBoolean("is_joined", false)
                     )
                 )
             }
@@ -97,7 +97,7 @@ class SupabaseRepository(
             val request = buildRequest(url)
                 .header("Prefer", "return=representation")
                 .header("Content-Type", "application/json")
-                .patch(payload.toRequestBody(jsonMediaType))
+                .post(payload.toRequestBody(jsonMediaType))
                 .build()
 
             val response = client.newCall(request).execute()
@@ -131,7 +131,7 @@ class SupabaseRepository(
 
     suspend fun getRoomMessages(roomId: String): Result<List<RoomMessage>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*&order=created_at.asc"
+            val url = "${SupabaseConfig.url}/rest/v1/room_messages?room_id=eq.$roomId&select=*,sender:profiles!room_messages_sender_id_fkey(*)&order=created_at.asc"
             val request = buildRequest(url).get().build()
             val response = client.newCall(request).execute()
             val body = response.body?.string().orEmpty()
@@ -149,6 +149,8 @@ class SupabaseRepository(
                 val msgBody = obj.optString("body", "")
                 val kindStr = obj.optString("kind", "text")
                 val createdAt = obj.optString("created_at", "")
+                val sender = obj.optJSONObject("sender")
+                val senderName = sender?.optString("display_name")?.ifBlank { sender.optString("username") }?.ifBlank { "Tambay" } ?: if (kindStr == "system") "PHChat" else "Tambay"
 
                 val kind = when (kindStr) {
                     "system" -> MessageKind.SYSTEM
@@ -161,7 +163,7 @@ class SupabaseRepository(
                         id = id,
                         roomId = roomId,
                         senderId = senderId,
-                        senderName = if (kind == MessageKind.SYSTEM) "uzzapbot" else "User ${senderId.take(4)}",
+                        senderName = senderName,
                         senderAvatarHex = 0xFF0038A8,
                         senderRole = if (kind == MessageKind.SYSTEM) MemberRole.ADMIN else MemberRole.MEMBER,
                         body = msgBody,
@@ -237,10 +239,10 @@ class SupabaseRepository(
                         avatarColorHex = 0xFFCE1126,
                         bio = bio,
                         statusText = statusText,
-                        province = "NCR",
+                        province = "Philippines",
                         isActive = isActive,
-                        points = 100,
-                        streak = 1
+                        points = 0,
+                        streak = 0
                     )
                 )
             }
@@ -252,7 +254,7 @@ class SupabaseRepository(
 
     suspend fun getContents(): Result<List<ContentPost>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/contents?select=*,poll_options(*)&order=created_at.desc"
+            val url = "${SupabaseConfig.url}/rest/v1/contents?select=*,author:profiles!contents_author_id_fkey(*),poll_options(*)&order=created_at.desc"
             val request = buildRequest(url).get().build()
             val response = client.newCall(request).execute()
             val body = response.body?.string().orEmpty()
@@ -279,7 +281,7 @@ class SupabaseRepository(
                         opts.add(
                             PollOption(
                                 id = pOpt.optString("id", "$j"),
-                                text = pOpt.optString("text", pOpt.optString("title", "Option $j")),
+                                text = pOpt.optString("label", "Option $j"),
                                 votes = pOpt.optInt("vote_count", pOpt.optInt("votes", 0))
                             )
                         )
@@ -322,34 +324,14 @@ class SupabaseRepository(
     }
 
     suspend fun createContent(title: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val payload = JSONObject().apply {
-                put("title", title)
-                put("body", body)
-                put("author_id", userId)
-                put("kind", "post")
-                put("metadata", JSONObject())
-                put("is_published", true)
-                put("is_featured", false)
-                put("is_hidden", false)
-            }.toString()
-
-            val url = "${SupabaseConfig.url}/rest/v1/contents"
-            val request = buildRequest(url)
-                .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
-                .build()
-
-            val response = client.newCall(request).execute()
-            if (response.isSuccessful) {
-                Result.success(true)
-            } else {
-                Result.failure(Exception("Failed to post: ${response.code}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val result = callRpc("create_content", JSONObject().apply {
+            put("p_room_id", JSONObject.NULL)
+            put("p_kind", "post")
+            put("p_title", title)
+            put("p_body", body)
+            put("p_metadata", JSONObject())
+        })
+        result.map { true }
     }
 
     suspend fun submitReport(targetId: String, reason: String, details: String): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -542,51 +524,23 @@ class SupabaseRepository(
     }
 
     suspend fun toggleContentReaction(contentId: String, reaction: String = "like"): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val base = "${SupabaseConfig.url}/rest/v1/content_reactions?content_id=eq.$contentId&user_id=eq.$userId"
-            val existing = client.newCall(buildRequest(base).get().build()).execute()
-            val existingBody = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Reaction lookup failed: ${existing.code}"))
-            if (JSONArray(existingBody).length() > 0) {
-                val del = client.newCall(buildRequest(base).delete().build()).execute()
-                return@withContext Result.success(del.isSuccessful.not().not())
-            }
-            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId); put("reaction", reaction) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_reactions").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("toggle_content_reaction", JSONObject().apply {
+            put("p_content_id", contentId)
+            put("p_reaction", reaction)
+        }).map { true }
     }
 
     suspend fun toggleContentSave(contentId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val base = "${SupabaseConfig.url}/rest/v1/content_saves?content_id=eq.$contentId&user_id=eq.$userId"
-            val existing = client.newCall(buildRequest(base).get().build()).execute()
-            val body = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Save lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) {
-                val del = client.newCall(buildRequest(base).delete().build()).execute()
-                return@withContext Result.success(del.isSuccessful)
-            }
-            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_saves").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("toggle_content_save", JSONObject().apply {
+            put("p_content_id", contentId)
+        }).map { true }
     }
 
     suspend fun votePoll(contentId: String, optionId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val checkUrl = "${SupabaseConfig.url}/rest/v1/poll_votes?content_id=eq.$contentId&user_id=eq.$userId"
-            val check = client.newCall(buildRequest(checkUrl).get().build()).execute()
-            val checkBody = check.body?.string().orEmpty()
-            if (!check.isSuccessful) return@withContext Result.failure(Exception("Vote lookup failed: ${check.code}"))
-            if (JSONArray(checkBody).length() > 0) return@withContext Result.success(false)
-            val payload = JSONObject().apply { put("content_id", contentId); put("option_id", optionId); put("user_id", userId) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/poll_votes").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("vote_content_poll", JSONObject().apply {
+            put("p_content_id", contentId)
+            put("p_option_id", optionId)
+        }).map { true }
     }
 
     suspend fun addProfileComment(profileId: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -620,15 +574,10 @@ class SupabaseRepository(
 
     suspend fun checkInToday(): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val url = "${SupabaseConfig.url}/rest/v1/user_check_ins?user_id=eq.$userId&checkin_date=eq.${java.time.LocalDate.now()}"
-            val existing = client.newCall(buildRequest(url).get().build()).execute()
-            val body = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Check-in lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) return@withContext Result.success(false)
-            val payload = JSONObject().apply { put("user_id", userId); put("checkin_date", java.time.LocalDate.now().toString()); put("streak", 1); put("points", 50) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/user_check_ins").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
+            val response = callRpc("check_in")
+            if (response.isFailure) return@withContext Result.failure(response.exceptionOrNull()!!)
+            val obj = JSONObject(response.getOrNull().orEmpty())
+            Result.success(!obj.optBoolean("already_checked_in", false))
         } catch (e: Exception) { Result.failure(e) }
     }
 
@@ -816,6 +765,88 @@ class SupabaseRepository(
             Result.success(patch.isSuccessful)
         } catch (e: Exception) {
             Log.e(tag, "updateNotificationPreference error", e)
+            Result.failure(e)
+        }
+    }
+
+
+    /**
+     * Canonical backend operation bridge. Missing UI features use the existing
+     * Supabase RPC contract instead of duplicating business rules in Compose.
+     */
+    suspend fun callRpc(functionName: String, payload: JSONObject = JSONObject()): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val url = "${SupabaseConfig.url}/rest/v1/rpc/$functionName"
+            val request = buildRequest(url)
+                .header("Content-Type", "application/json")
+                .post(payload.toString().toRequestBody(jsonMediaType))
+                .build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                Result.failure(Exception("$functionName failed: ${response.code} $body"))
+            } else {
+                Result.success(body)
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "$functionName error", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun advancedRpc(functionName: String, payload: JSONObject = JSONObject()): Result<String> =
+        callRpc(functionName, payload)
+
+    suspend fun uploadMedia(
+        context: android.content.Context,
+        uri: android.net.Uri,
+        bucket: String = "room-media",
+        relation: JSONObject = JSONObject()
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val resolver = context.contentResolver
+            val bytes = resolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: return@withContext Result.failure(Exception("Unable to read selected media"))
+            val mime = resolver.getType(uri) ?: "application/octet-stream"
+            val name = "user_$userId/${System.currentTimeMillis()}_${java.util.UUID.randomUUID()}"
+            val objectUrl = "${SupabaseConfig.url}/storage/v1/object/$bucket/$name"
+            val upload = buildRequest(objectUrl)
+                .header("Content-Type", mime)
+                .header("x-upsert", "false")
+                .put(bytes.toRequestBody(mime.toMediaType()))
+                .build()
+            val uploadResponse = client.newCall(upload).execute()
+            val uploadBody = uploadResponse.body?.string().orEmpty()
+            if (!uploadResponse.isSuccessful) {
+                return@withContext Result.failure(Exception("Media upload failed: ${uploadResponse.code} $uploadBody"))
+            }
+
+            val metadata = JSONObject().apply {
+                put("owner_id", userId)
+                put("bucket", bucket)
+                put("path", name)
+                put("mime_type", mime)
+                put("size_bytes", bytes.size)
+                put("metadata", JSONObject())
+                put("position", 0)
+            }
+            relation.keys().forEach { key -> metadata.put(key, relation.get(key)) }
+
+            val mediaUrl = "${SupabaseConfig.url}/rest/v1/media"
+            val mediaRequest = buildRequest(mediaUrl)
+                .header("Content-Type", "application/json")
+                .header("Prefer", "return=representation")
+                .post(metadata.toString().toRequestBody(jsonMediaType))
+                .build()
+            val mediaResponse = client.newCall(mediaRequest).execute()
+            val mediaBody = mediaResponse.body?.string().orEmpty()
+            if (!mediaResponse.isSuccessful) {
+                return@withContext Result.failure(Exception("Media metadata failed: ${mediaResponse.code} $mediaBody"))
+            }
+            Result.success("$objectUrl")
+        } catch (e: Exception) {
+            Log.e(tag, "uploadMedia error", e)
             Result.failure(e)
         }
     }
