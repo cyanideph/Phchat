@@ -833,7 +833,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
 
     fun deleteRoomMessagePersisted(roomId: String, messageId: String) {
         viewModelScope.launch {
-            val result = repository.updateRoomMessageDeleted(roomId, messageId)
+            val result = repository.updateRoomMessageDeleted(messageId)
             featureResult("Message deletion persisted", result.map { "ok" })
             if (result.isSuccess) loadRoomMessages(roomId)
         }
