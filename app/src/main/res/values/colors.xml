@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ph_blue">#0038A8</color>
+    <!-- Canonical PHChat palette; keep in sync with ui/theme/Color.kt. -->
+    <color name="ph_blue">#002F6C</color>
     <color name="ph_red">#CE1126</color>
     <color name="ph_yellow">#FCD116</color>
-    <color name="ph_navy">#0A192F</color>
-    <color name="ph_surface">#F8FAFC</color>
+    <color name="ph_navy">#00193D</color>
+    <color name="ph_surface">#F6F8FC</color>
 </resources>
