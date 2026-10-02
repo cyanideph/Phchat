@@ -52,6 +52,10 @@ fun DirectChatScreen(
     val messages = directMessagesMap[conversationId] ?: emptyList()
     val currentUser by viewModel.currentUser.collectAsState()
 
+    LaunchedEffect(conversationId) {
+        viewModel.markConversationRead(conversationId)
+    }
+
     var inputText by remember { mutableStateOf("") }
     var showStickerSheet by remember { mutableStateOf(false) }
 
