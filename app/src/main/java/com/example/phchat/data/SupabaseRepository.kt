@@ -820,4 +820,86 @@ class SupabaseRepository(
         }
     }
 
+
+    /**
+     * Canonical backend operation bridge. Missing UI features use the existing
+     * Supabase RPC contract instead of duplicating business rules in Compose.
+     */
+    suspend fun callRpc(functionName: String, payload: JSONObject = JSONObject()): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val url = "${SupabaseConfig.url}/rest/v1/rpc/$functionName"
+            val request = buildRequest(url)
+                .header("Content-Type", "application/json")
+                .post(payload.toString().toRequestBody(jsonMediaType))
+                .build()
+            val response = client.newCall(request).execute()
+            val body = response.body?.string().orEmpty()
+            if (!response.isSuccessful) {
+                Result.failure(Exception("$functionName failed: ${response.code} $body"))
+            } else {
+                Result.success(body)
+            }
+        } catch (e: Exception) {
+            Log.e(tag, "$functionName error", e)
+            Result.failure(e)
+        }
+    }
+
+    suspend fun advancedRpc(functionName: String, payload: JSONObject = JSONObject()): Result<String> =
+        callRpc(functionName, payload)
+
+    suspend fun uploadMedia(
+        context: android.content.Context,
+        uri: android.net.Uri,
+        bucket: String = "chat-media",
+        relation: JSONObject = JSONObject()
+    ): Result<String> = withContext(Dispatchers.IO) {
+        try {
+            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
+            val resolver = context.contentResolver
+            val bytes = resolver.openInputStream(uri)?.use { it.readBytes() }
+                ?: return@withContext Result.failure(Exception("Unable to read selected media"))
+            val mime = resolver.getType(uri) ?: "application/octet-stream"
+            val name = "user_$userId/${System.currentTimeMillis()}_${java.util.UUID.randomUUID()}"
+            val objectUrl = "${SupabaseConfig.url}/storage/v1/object/$bucket/$name"
+            val upload = buildRequest(objectUrl)
+                .header("Content-Type", mime)
+                .header("x-upsert", "false")
+                .put(bytes.toRequestBody(mime.toMediaType()))
+                .build()
+            val uploadResponse = client.newCall(upload).execute()
+            val uploadBody = uploadResponse.body?.string().orEmpty()
+            if (!uploadResponse.isSuccessful) {
+                return@withContext Result.failure(Exception("Media upload failed: ${uploadResponse.code} $uploadBody"))
+            }
+
+            val metadata = JSONObject().apply {
+                put("owner_id", userId)
+                put("bucket", bucket)
+                put("path", name)
+                put("mime_type", mime)
+                put("size_bytes", bytes.size)
+                put("metadata", JSONObject())
+                put("position", 0)
+            }
+            relation.keys().forEach { key -> metadata.put(key, relation.get(key)) }
+
+            val mediaUrl = "${SupabaseConfig.url}/rest/v1/media"
+            val mediaRequest = buildRequest(mediaUrl)
+                .header("Content-Type", "application/json")
+                .header("Prefer", "return=representation")
+                .post(metadata.toString().toRequestBody(jsonMediaType))
+                .build()
+            val mediaResponse = client.newCall(mediaRequest).execute()
+            val mediaBody = mediaResponse.body?.string().orEmpty()
+            if (!mediaResponse.isSuccessful) {
+                return@withContext Result.failure(Exception("Media metadata failed: ${mediaResponse.code} $mediaBody"))
+            }
+            Result.success("$objectUrl")
+        } catch (e: Exception) {
+            Log.e(tag, "uploadMedia error", e)
+            Result.failure(e)
+        }
+    }
+
 }
