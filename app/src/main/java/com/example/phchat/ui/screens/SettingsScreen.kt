@@ -47,7 +47,8 @@ fun SettingsScreen(
     viewModel: PhchatViewModel,
     darkTheme: Boolean,
     onThemeChange: (Boolean) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onOpenFeatureCenter: () -> Unit
 ) {
     val authState by viewModel.authState.collectAsState()
     val user by viewModel.currentUser.collectAsState()
@@ -123,6 +124,18 @@ fun SettingsScreen(
                     NotificationToggle("Mentions", preferences.mentionEnabled, loaded) { viewModel.updateNotificationPreference("mention_enabled", it) }
                     NotificationToggle("Room invites", preferences.roomInviteEnabled, loaded) { viewModel.updateNotificationPreference("room_invite_enabled", it) }
                     NotificationToggle("Direct-message invites", preferences.conversationInviteEnabled, loaded) { viewModel.updateNotificationPreference("conversation_invite_enabled", it) }
+                }
+            }
+
+            item {
+                Card(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text("Advanced features", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                            Text("Invites, discovery, favorites, moderation, media, comments and more", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        }
+                        TextButton(onClick = onOpenFeatureCenter) { Text("Open") }
+                    }
                 }
             }
 
