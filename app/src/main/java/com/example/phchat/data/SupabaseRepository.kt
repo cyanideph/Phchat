@@ -322,34 +322,14 @@ class SupabaseRepository(
     }
 
     suspend fun createContent(title: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val payload = JSONObject().apply {
-                put("title", title)
-                put("body", body)
-                put("author_id", userId)
-                put("kind", "post")
-                put("metadata", JSONObject())
-                put("is_published", true)
-                put("is_featured", false)
-                put("is_hidden", false)
-            }.toString()
-
-            val url = "${SupabaseConfig.url}/rest/v1/contents"
-            val request = buildRequest(url)
-                .header("Content-Type", "application/json")
-                .post(payload.toRequestBody(jsonMediaType))
-                .build()
-
-            val response = client.newCall(request).execute()
-            if (response.isSuccessful) {
-                Result.success(true)
-            } else {
-                Result.failure(Exception("Failed to post: ${response.code}"))
-            }
-        } catch (e: Exception) {
-            Result.failure(e)
-        }
+        val result = callRpc("create_content", JSONObject().apply {
+            put("p_room_id", JSONObject.NULL)
+            put("p_kind", "post")
+            put("p_title", title)
+            put("p_body", body)
+            put("p_metadata", JSONObject())
+        })
+        result.map { true }
     }
 
     suspend fun submitReport(targetId: String, reason: String, details: String): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -542,51 +522,23 @@ class SupabaseRepository(
     }
 
     suspend fun toggleContentReaction(contentId: String, reaction: String = "like"): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val base = "${SupabaseConfig.url}/rest/v1/content_reactions?content_id=eq.$contentId&user_id=eq.$userId"
-            val existing = client.newCall(buildRequest(base).get().build()).execute()
-            val existingBody = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Reaction lookup failed: ${existing.code}"))
-            if (JSONArray(existingBody).length() > 0) {
-                val del = client.newCall(buildRequest(base).delete().build()).execute()
-                return@withContext Result.success(del.isSuccessful.not().not())
-            }
-            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId); put("reaction", reaction) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_reactions").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("toggle_content_reaction", JSONObject().apply {
+            put("p_content_id", contentId)
+            put("p_reaction", reaction)
+        }).map { true }
     }
 
     suspend fun toggleContentSave(contentId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val base = "${SupabaseConfig.url}/rest/v1/content_saves?content_id=eq.$contentId&user_id=eq.$userId"
-            val existing = client.newCall(buildRequest(base).get().build()).execute()
-            val body = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Save lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) {
-                val del = client.newCall(buildRequest(base).delete().build()).execute()
-                return@withContext Result.success(del.isSuccessful)
-            }
-            val payload = JSONObject().apply { put("content_id", contentId); put("user_id", userId) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/content_saves").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("toggle_content_save", JSONObject().apply {
+            put("p_content_id", contentId)
+        }).map { true }
     }
 
     suspend fun votePoll(contentId: String, optionId: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val checkUrl = "${SupabaseConfig.url}/rest/v1/poll_votes?content_id=eq.$contentId&user_id=eq.$userId"
-            val check = client.newCall(buildRequest(checkUrl).get().build()).execute()
-            val checkBody = check.body?.string().orEmpty()
-            if (!check.isSuccessful) return@withContext Result.failure(Exception("Vote lookup failed: ${check.code}"))
-            if (JSONArray(checkBody).length() > 0) return@withContext Result.success(false)
-            val payload = JSONObject().apply { put("content_id", contentId); put("option_id", optionId); put("user_id", userId) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/poll_votes").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("vote_content_poll", JSONObject().apply {
+            put("p_content_id", contentId)
+            put("p_option_id", optionId)
+        }).map { true }
     }
 
     suspend fun addProfileComment(profileId: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
