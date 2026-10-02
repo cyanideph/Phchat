@@ -83,10 +83,10 @@ fun HomeScreen(
                         Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                     IconButton(
-                        onClick = { viewModel.openAuthScreen() },
-                        modifier = Modifier.testTag("account_button")
+                        onClick = { viewModel.navigateTo(com.example.phchat.viewmodel.Screen.Settings) },
+                        modifier = Modifier.testTag("settings_button")
                     ) {
-                        Icon(imageVector = Icons.Default.AccountCircle, contentDescription = "Account")
+                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
                     }
                     IconButton(
                         onClick = onOpenNotifications,
