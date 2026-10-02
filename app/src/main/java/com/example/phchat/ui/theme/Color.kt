@@ -2,44 +2,45 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Authentic Philippine Uzzap Colorway & Retro-Modern Palette
-val PhBluePrimary = Color(0xFF002F6C)      // Deep Royal Philippine Navy
-val PhBlueDark = Color(0xFF00193D)         // Midnight Blue Header
-val PhBlueLight = Color(0xFF2575FC)        // Electric J2ME Cyan/Blue
-val PhBlueContainer = Color(0xFFE3EDF8)    // Soft Tinted Surface
-val PhOnBlueContainer = Color(0xFF001C3D)  // Deep Contrast Navy
+// PHchat light-mode palette: mint/ivory surfaces, deep Philippine emerald and warm gold.
+// Targets the supplied reference UI while keeping PHchat's own visual identity.
+val PhBluePrimary = Color(0xFF0C4033)      // Deep emerald brand primary
+val PhBlueDark = Color(0xFF07352B)         // Deep emerald / header
+val PhBlueLight = Color(0xFF245B87)        // Restrained Philippine blue accent
+val PhBlueContainer = Color(0xFFDCEDE7)    // Soft mint container
+val PhOnBlueContainer = Color(0xFF12352D)
 
-val PhRedSecondary = Color(0xFFCE1126)     // Philippine Flag Fiesta Crimson
-val PhRedContainer = Color(0xFFFFE5E7)     // Warm Pastel Pink
-val PhOnRedContainer = Color(0xFF5C000B)
+val PhRedSecondary = Color(0xFFB83A3A)     // Restrained warm red accent
+val PhRedContainer = Color(0xFFF5DFDD)
+val PhOnRedContainer = Color(0xFF5A1717)
 
-val PhYellowSun = Color(0xFFFCD116)        // Philippine Golden 8-Ray Sun
-val PhGoldContainer = Color(0xFFFFF8D6)    // Warm Golden Tint
-val PhOnGoldContainer = Color(0xFF544200)
+val PhYellowSun = Color(0xFFF4C928)        // Warm reference gold
+val PhGoldContainer = Color(0xFFFFF3B8)    // Soft warm gold
+val PhOnGoldContainer = Color(0xFF4D3C00)
 
-val SurfaceLight = Color(0xFFF6F8FC)       // Crisp modern off-white
-val SurfaceVariantLight = Color(0xFFEBF1F8)
-val OnSurfaceLight = Color(0xFF0E1A29)
-val OutlineLight = Color(0xFF8692A6)
+val SurfaceLight = Color(0xFFE9F4F0)       // Main mint/ivory background
+val SurfaceVariantLight = Color(0xFFDCEDE7)
+val OnSurfaceLight = Color(0xFF17332C)     // Deep green-black text
+val OutlineLight = Color(0xFFC9D9D4)       // Soft gray-green border
 
-val SurfaceDark = Color(0xFF090E17)        // Cyber-Retro Deep Dark
-val SurfaceVariantDark = Color(0xFF131D2D)
-val OnSurfaceDark = Color(0xFFE3EDF8)
-val OutlineDark = Color(0xFF6B7A90)
+val SurfaceDark = Color(0xFF091713)
+val SurfaceVariantDark = Color(0xFF12241E)
+val OnSurfaceDark = Color(0xFFE4F1EC)
+val OutlineDark = Color(0xFF61766E)
 
-val StatusOnline = Color(0xFF10B981)
-val StatusBusy = Color(0xFFEF4444)
-val StatusAway = Color(0xFFF59E0B)
+val StatusOnline = Color(0xFF45A56F)
+val StatusBusy = Color(0xFFB83A3A)
+val StatusAway = Color(0xFFE2A92B)
 
-// Cultural Regional Identity Colors
-val RegionNcr = Color(0xFF0052CC)          // Metro Blue
-val RegionVisayas = Color(0xFFFF6D00)      // Tropical Amber
-val RegionMindanao = Color(0xFF00897B)     // Mindanao Emerald
-val RegionLuzon = Color(0xFF8E24AA)        // Cordillera/Luzon Plum
-val RegionBicol = Color(0xFFD32F2F)        // Siling Labuyo Chili Red
+// Regional accents stay intentionally restrained so the core emerald/gold identity dominates.
+val RegionNcr = Color(0xFF245B87)
+val RegionVisayas = Color(0xFFB97821)
+val RegionMindanao = Color(0xFF0E7B68)
+val RegionLuzon = Color(0xFF76558E)
+val RegionBicol = Color(0xFFB83A3A)
 
 // Roles
-val RoleOwner = Color(0xFFCE1126)
-val RoleAdmin = Color(0xFF002F6C)
-val RoleMod = Color(0xFF00897B)
-val RoleMember = Color(0xFF5A6E85)
+val RoleOwner = Color(0xFFB83A3A)
+val RoleAdmin = Color(0xFF0C4033)
+val RoleMod = Color(0xFF0E7B68)
+val RoleMember = Color(0xFF5D716A)
