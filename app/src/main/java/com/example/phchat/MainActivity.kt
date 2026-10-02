@@ -27,10 +27,11 @@ class MainActivity : ComponentActivity() {
             val prefs = remember {
                 getSharedPreferences("phchat_preferences", Context.MODE_PRIVATE)
             }
+            val systemDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
             var darkTheme by remember {
                 mutableStateOf(
                     if (prefs.contains("dark_theme")) prefs.getBoolean("dark_theme", false)
-                    else androidx.compose.foundation.isSystemInDarkTheme()
+                    else systemDarkTheme
                 )
             }
 
