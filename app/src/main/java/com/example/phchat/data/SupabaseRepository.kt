@@ -68,9 +68,9 @@ class SupabaseRepository(
                         provinceName = mapProvinceToRegion(provinceCode),
                         isLocked = isLocked,
                         announcement = announcement,
-                        memberCount = 0,
-                        onlineCount = 0,
-                        isJoined = false
+                        memberCount = obj.optInt("member_count", 0),
+                        onlineCount = obj.optInt("online_count", 0),
+                        isJoined = obj.optBoolean("is_joined", false)
                     )
                 )
             }
@@ -237,10 +237,10 @@ class SupabaseRepository(
                         avatarColorHex = 0xFFCE1126,
                         bio = bio,
                         statusText = statusText,
-                        province = "NCR",
+                        province = "Philippines",
                         isActive = isActive,
-                        points = 100,
-                        streak = 1
+                        points = 0,
+                        streak = 0
                     )
                 )
             }
@@ -252,7 +252,7 @@ class SupabaseRepository(
 
     suspend fun getContents(): Result<List<ContentPost>> = withContext(Dispatchers.IO) {
         try {
-            val url = "${SupabaseConfig.url}/rest/v1/contents?select=*,poll_options(*)&order=created_at.desc"
+            val url = "${SupabaseConfig.url}/rest/v1/contents?select=*,author:profiles!contents_author_id_fkey(*),poll_options(*)&order=created_at.desc"
             val request = buildRequest(url).get().build()
             val response = client.newCall(request).execute()
             val body = response.body?.string().orEmpty()
@@ -279,7 +279,7 @@ class SupabaseRepository(
                         opts.add(
                             PollOption(
                                 id = pOpt.optString("id", "$j"),
-                                text = pOpt.optString("text", pOpt.optString("title", "Option $j")),
+                                text = pOpt.optString("label", "Option $j"),
                                 votes = pOpt.optInt("vote_count", pOpt.optInt("votes", 0))
                             )
                         )
@@ -620,15 +620,10 @@ class SupabaseRepository(
 
     suspend fun checkInToday(): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val url = "${SupabaseConfig.url}/rest/v1/user_check_ins?user_id=eq.$userId&checkin_date=eq.${java.time.LocalDate.now()}"
-            val existing = client.newCall(buildRequest(url).get().build()).execute()
-            val body = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Check-in lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) return@withContext Result.success(false)
-            val payload = JSONObject().apply { put("user_id", userId); put("checkin_date", java.time.LocalDate.now().toString()); put("streak", 1); put("points", 50) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/user_check_ins").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
+            val response = callRpc("check_in")
+            if (response.isFailure) return@withContext Result.failure(response.exceptionOrNull()!!)
+            val obj = JSONObject(response.getOrNull().orEmpty())
+            Result.success(!obj.optBoolean("already_checked_in", false))
         } catch (e: Exception) { Result.failure(e) }
     }
 
