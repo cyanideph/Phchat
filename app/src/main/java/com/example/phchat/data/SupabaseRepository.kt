@@ -490,32 +490,23 @@ class SupabaseRepository(
     }
 
     suspend fun addProfileComment(profileId: String, body: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val payload = JSONObject().apply { put("profile_id", profileId); put("author_id", userId); put("body", body) }.toString()
-            val resp = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/profile_comments").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(resp.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+        callRpc("add_profile_comment", JSONObject().apply {
+            put("p_profile_id", profileId)
+            put("p_body", body)
+            put("p_parent_id", JSONObject.NULL)
+        }).map { true }
     }
 
-    suspend fun toggleFollow(targetUserId: String): Result<Boolean> = toggleRelationship(targetUserId, "follow")
-    suspend fun toggleBlock(targetUserId: String): Result<Boolean> = toggleRelationship(targetUserId, "block")
+    suspend fun toggleFollow(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("toggle_follow", JSONObject().apply { put("p_target_user_id", targetUserId) }).map { true }
+    }
 
-    private suspend fun toggleRelationship(targetUserId: String, kind: String): Result<Boolean> = withContext(Dispatchers.IO) {
-        try {
-            val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val base = "${SupabaseConfig.url}/rest/v1/relationships?user_id=eq.$userId&target_user_id=eq.$targetUserId&kind=eq.$kind"
-            val existing = client.newCall(buildRequest(base).get().build()).execute()
-            val body = existing.body?.string().orEmpty()
-            if (!existing.isSuccessful) return@withContext Result.failure(Exception("Relationship lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) {
-                val del = client.newCall(buildRequest(base).delete().build()).execute()
-                return@withContext Result.success(del.isSuccessful)
-            }
-            val payload = JSONObject().apply { put("user_id", userId); put("target_user_id", targetUserId); put("kind", kind) }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/relationships").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
-        } catch (e: Exception) { Result.failure(e) }
+    suspend fun toggleBlock(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("toggle_block", JSONObject().apply { put("p_target_user_id", targetUserId) }).map { true }
+    }
+
+    suspend fun toggleFavorite(targetUserId: String): Result<Boolean> = withContext(Dispatchers.IO) {
+        callRpc("toggle_favorite", JSONObject().apply { put("p_target_user_id", targetUserId) }).map { true }
     }
 
     suspend fun checkInToday(): Result<Boolean> = withContext(Dispatchers.IO) {
@@ -562,17 +553,17 @@ class SupabaseRepository(
     suspend fun toggleRoomMembership(roomId: String): Result<Boolean> = withContext(Dispatchers.IO) {
         try {
             val userId = authManager.getCurrentUserId() ?: return@withContext Result.failure(Exception("Must be logged in"))
-            val url = "${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId"
-            val existing = client.newCall(buildRequest(url).get().build()).execute()
+            val membershipUrl = "${SupabaseConfig.url}/rest/v1/room_members?room_id=eq.$roomId&user_id=eq.$userId"
+            val existing = client.newCall(buildRequest(membershipUrl).get().build()).execute()
             val body = existing.body?.string().orEmpty()
             if (!existing.isSuccessful) return@withContext Result.failure(Exception("Membership lookup failed: ${existing.code}"))
-            if (JSONArray(body).length() > 0) {
-                val del = client.newCall(buildRequest(url).delete().build()).execute()
-                return@withContext Result.success(!del.isSuccessful.not())
+            val joined = JSONArray(body).length() > 0
+            val result = if (joined) {
+                callRpc("leave_room", JSONObject().apply { put("p_room_id", roomId) })
+            } else {
+                callRpc("join_room", JSONObject().apply { put("p_room_id", roomId) })
             }
-            val payload = JSONObject().apply { put("room_id", roomId); put("user_id", userId); put("role", "member") }.toString()
-            val add = client.newCall(buildRequest("${SupabaseConfig.url}/rest/v1/room_members").header("Content-Type","application/json").post(payload.toRequestBody(jsonMediaType)).build()).execute()
-            Result.success(add.isSuccessful)
+            result.map { !joined }
         } catch (e: Exception) { Result.failure(e) }
     }
 
