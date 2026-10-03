@@ -7,18 +7,18 @@ The visual language is informed by the Awesome DESIGN.md reference studies, espe
 
 ## Color roles
 ### Brand palette
-- Violet: primary action and selected state.
-- Electric lime: brand signature, logo, highlights and expressive accents.
-- Soft mint: positive/online/supporting semantic accent.
-- Navy-charcoal: dark canvas and elevated surfaces.
-- Lavender neutrals: light canvas, borders and secondary surfaces.
+- Acid lime: primary action, selection, active states and signature highlights.
+- Lavender/periwinkle: secondary surfaces, alternate blocks and supporting actions.
+- Mint/teal: positive, online, confirmation and supporting data.
+- Graphite-charcoal: dark canvas and elevated surfaces.
+- Lavender neutrals: light canvas, borders and light-mode surfaces.
 
 ### Rules
-- MaterialTheme.colorScheme.primary is the action/selection color.
+- MaterialTheme.colorScheme.primary is acid lime in dark mode and the accessible lavender/periwinkle action color in light mode.
 - Do not use primary for decorative headings or passive icons.
 - Use semantic error/warning/success colors for status.
 - Never rely on color alone to communicate state.
-- Brand mark may retain lime because the logo is a brand asset, not a UI action.
+- Brand mark may retain acid lime because the logo is a brand asset, not a UI action.
 - Keep backgrounds quiet; decorative Signal Field geometry must stay behind content.
 
 ## Typography
@@ -78,9 +78,9 @@ Creation forms should generally appear after explicit user intent.
 
 ## Signature elements
 ### Signal Field
-A subtle geometric backdrop using violet, lime and mint accents. It provides identity without competing with content or controls.
+A subtle geometric backdrop using acid lime, lavender and mint accents. It provides identity without competing with content or controls.
 ### Phchat Mark
-A custom network/chat mark using the lime brand signature and navy foreground.
+A custom network/chat mark using the acid-lime brand signature and graphite foreground.
 ### Live Strip
 A compact activity strip communicating current room/community activity without becoming a dashboard.
 
