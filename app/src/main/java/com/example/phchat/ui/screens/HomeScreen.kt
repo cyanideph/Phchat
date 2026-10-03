@@ -185,6 +185,10 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
+            PhchatBackdrop(
+                modifier = Modifier.fillMaxSize(),
+                intensity = if (selectedTab == 0) 0.8f else 0.45f
+            )
             when (selectedTab) {
                 0 -> RoomsTab(viewModel = viewModel)
                 1 -> MessagesTab(viewModel = viewModel)
