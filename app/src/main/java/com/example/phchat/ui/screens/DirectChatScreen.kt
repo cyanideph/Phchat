@@ -115,7 +115,7 @@ fun DirectChatScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { showStickerSheet = true }) {
-                    Text(text = "🇵🇭", fontSize = 22.sp)
+                    Icon(imageVector = Icons.Default.EmojiEmotions, contentDescription = "Stickers")
                 }
 
                 OutlinedTextField(
@@ -150,7 +150,7 @@ fun DirectChatScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) Color.White else MaterialTheme.colorScheme.outline
+                        tint = if (inputText.isNotBlank()) PhBlueDark else MaterialTheme.colorScheme.outline
                     )
                 }
             }
