@@ -20,11 +20,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.data.AuthState
-import com.example.phchat.ui.components.PhchatMark
-import com.example.phchat.ui.theme.PhchatVioletDeep
-import com.example.phchat.ui.theme.PhchatDanger
-import com.example.phchat.ui.theme.PhchatLime
-import com.example.phchat.ui.theme.PhchatNavy950
+import com.example.phchat.ui.theme.PhAcidLime
+import com.example.phchat.ui.theme.PhBlack
+import com.example.phchat.ui.theme.PhRedSecondary
+import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -63,13 +62,16 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Phchat brand mark
-            PhchatMark(
-                size = 72.dp,
-                backgroundColor = PhchatLime,
-                foregroundColor = PhchatNavy950,
-                contentDescription = "Phchat"
-            )
+            // Retro Uzzap / Phchat Header
+            Surface(
+                color = PhAcidLime,
+                shape = RoundedCornerShape(20.dp),
+                modifier = Modifier.size(72.dp)
+            ) {
+                Box(contentAlignment = Alignment.Center) {
+                    Text(text = "P", fontSize = 30.sp)
+                }
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -77,10 +79,10 @@ fun AuthScreen(
                 text = "Phchat",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.onSurface
+                color = PhAcidLime
             )
             Text(
-                text = "A community built for connection",
+                text = "Chat with people. Find your tambayan.",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -95,12 +97,12 @@ fun AuthScreen(
                 Tab(
                     selected = !isRegisterMode,
                     onClick = { isRegisterMode = false; userMessage = null },
-                    text = { Text("Sign in") }
+                    text = { Text("Pumasok (Sign In)") }
                 )
                 Tab(
                     selected = isRegisterMode,
                     onClick = { isRegisterMode = true; userMessage = null },
-                    text = { Text("Create account") }
+                    text = { Text("Mag-rehistro (Register)") }
                 )
             }
 
@@ -110,17 +112,17 @@ fun AuthScreen(
             if (userMessage != null || authState is AuthState.Error) {
                 val errorMsg = userMessage ?: (authState as? AuthState.Error)?.message.orEmpty()
                 Surface(
-                    color = PhchatDanger.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(12.dp),
+                    color = PhRedSecondary.copy(alpha = 0.14f),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                 ) {
                     Row(
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = PhchatDanger)
+                        Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = PhRedSecondary)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = errorMsg, color = PhchatDanger, fontSize = 13.sp)
+                        Text(text = errorMsg, color = PhRedSecondary, fontSize = 13.sp)
                     }
                 }
             }
@@ -186,7 +188,7 @@ fun AuthScreen(
             Button(
                 onClick = {
                     if (email.isBlank() || password.isBlank()) {
-                        userMessage = "Enter your email and password."
+                        userMessage = "Pakilagay ang email at password."
                         return@Button
                     }
                     isSubmitting = true
@@ -212,18 +214,18 @@ fun AuthScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(52.dp)
                     .testTag("auth_submit_button"),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = PhAcidLime, contentColor = PhBlack),
                 enabled = !isSubmitting && authState !is AuthState.Loading
             ) {
                 if (isSubmitting || authState is AuthState.Loading) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(22.dp))
                 } else {
                     Text(
-                        text = if (isRegisterMode) "Create account" else "Sign in",
+                        text = if (isRegisterMode) "Gumawa ng Account (Sign Up)" else "Pumasok sa Tambayan (Sign In)",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -231,7 +233,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Community messaging",
+                text = "Your conversations stay synced across Phchat.",
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.outline
             )
