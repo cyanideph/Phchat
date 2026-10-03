@@ -255,13 +255,13 @@ fun RoomChatScreen(
                     horizontalArrangement = Arrangement.spacedBy(6.dp)
                 ) {
                     val quickPills = listOf(
-                        "☕ Kape Muna",
-                        "🚀 Tara G!",
-                        "🙏 Salamat Lodi",
-                        "✨ Sana All",
-                        "👏 Edi Wow",
-                        "👋 Kumusta",
-                        "💖 Lablab"
+                        "Kape Muna",
+                        "Tara G!",
+                        "Salamat Lodi",
+                        "Sana All",
+                        "Edi Wow",
+                        "Kumusta",
+                        "Lablab"
                     )
                     items(quickPills) { phrase ->
                         Surface(
