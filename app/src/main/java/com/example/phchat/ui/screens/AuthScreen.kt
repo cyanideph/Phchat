@@ -64,7 +64,7 @@ fun AuthScreen(
         ) {
             // Retro Uzzap / Phchat Header
             Surface(
-                color = PhBluePrimary,
+                color = PhAcidLime,
                 shape = RoundedCornerShape(20.dp),
                 modifier = Modifier.size(72.dp)
             ) {
