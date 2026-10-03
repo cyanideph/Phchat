@@ -55,14 +55,14 @@ fun HomeScreen(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "🇵🇭 Phchat",
+                            text = "Phchat",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
-                            color = PhRedSecondary,
+                            color = PhAcidLime,
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
@@ -95,8 +95,8 @@ fun HomeScreen(
                         BadgedBox(
                             badge = {
                                 if (unreadCount > 0) {
-                                    Badge(containerColor = PhRedSecondary) {
-                                        Text("$unreadCount")
+                                    Badge(containerColor = PhAcidLime) {
+                                        Text("$unreadCount", color = PhBlack)
                                     }
                                 }
                             }
@@ -116,7 +116,7 @@ fun HomeScreen(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                tonalElevation = 2.dp
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -162,8 +162,8 @@ fun HomeScreen(
                         onClick = { showCreateRoomDialog = true },
                         icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
                         text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
-                        containerColor = PhYellowSun,
-                        contentColor = PhOnGoldContainer,
+                        containerColor = PhAcidLime,
+                        contentColor = PhBlack,
                         modifier = Modifier.testTag("create_room_fab")
                     )
                 }
@@ -172,8 +172,8 @@ fun HomeScreen(
                         onClick = { showCreatePostDialog = true },
                         icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Plaza") },
                         text = { Text("Mag-Post sa Plaza", fontWeight = FontWeight.Bold) },
-                        containerColor = PhBluePrimary,
-                        contentColor = Color.White,
+                        containerColor = PhLavender,
+                        contentColor = PhBlack,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
@@ -227,14 +227,14 @@ fun TambayanTab(viewModel: PhchatViewModel) {
     var showRegionExplorer by remember { mutableStateOf(false) }
 
     val provinces = listOf(
-        "ALL" to "🇵🇭 Lahat ng Probinsya",
-        "NCR" to "🏙️ Metro Manila (NCR)",
-        "CEB" to "🏝️ Cebu (Sugbo)",
-        "DVO" to "🦅 Davao Region",
-        "PAM" to "🍲 Pampanga",
-        "ILO" to "⛵ Iloilo (Panay)",
-        "BAG" to "🌲 Baguio Benguet",
-        "ALB" to "🌶️ Bicol Albay"
+        "ALL" to "Lahat ng Probinsya",
+        "NCR" to "Metro Manila (NCR)",
+        "CEB" to "Cebu (Sugbo)",
+        "DVO" to "Davao Region",
+        "PAM" to "Pampanga",
+        "ILO" to "Iloilo (Panay)",
+        "BAG" to "Baguio Benguet",
+        "ALB" to "Bicol Albay"
     )
 
     LazyColumn(
@@ -286,7 +286,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = "☀️ PAMBANSANG TAMBAYAN",
+                                text = "PAMBANSANG TAMBAYAN",
                                 color = PhOnGoldContainer,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
@@ -334,7 +334,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "🗺️ 17 Rehiyon & 81 Lalawigan Explorer ➜",
+                    text = "17 Rehiyon & 81 Lalawigan Explorer",
                     fontWeight = FontWeight.Black,
                     fontSize = 13.sp
                 )
