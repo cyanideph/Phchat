@@ -709,7 +709,7 @@ fun RoomMessageBubble(
                             text = message.body,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (isMe) PhBlack else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "Pinoy Sticker",
