@@ -221,3 +221,64 @@ Current app uses Material Icons Extended. Keep one icon family and one visual we
 6. Check icon consistency and remove emoji-as-icons from chrome.
 7. Run build/CI and Android runtime checks.
 8. Capture visual evidence before declaring the redesign complete.
+
+## Awesome DESIGN.md implementation contract
+
+This section turns the reference studies into Phchat-specific engineering gates. The references are static studies and are not treated as live copies of any referenced brand.
+
+### Visual hierarchy
+- Every screen has one dominant purpose and one obvious primary action.
+- Use neutral surfaces for structure; reserve the primary accent for actions, selection and focus.
+- Do not create equal-weight grids where every card competes for attention.
+- Prefer whitespace, grouping and hairlines before adding borders, shadows or containers.
+- Keep social activity scannable: identity → latest activity → attention state → action.
+
+### Surface and depth
+- Dark mode uses layered tonal surfaces rather than glassmorphism.
+- Resting content stays visually flat; elevation is reserved for sheets, dialogs, menus and floating controls.
+- Avoid permanent blur, neon glows, decorative gradients and excessive shadow stacks.
+- Any decorative backdrop must remain subordinate to readable content.
+
+### Typography and density
+- Typography must come from the Material theme scale, not screen-level literal sizes.
+- Use the smallest number of type levels that clearly establish hierarchy.
+- Headings should identify purpose; labels and metadata should support scanning, not compete with content.
+- Preserve readable line height and system font scaling.
+
+### Shape language
+- Use PhchatShapes for repeated geometry.
+- Do not introduce screen-local rounded-corner values when an existing shape token fits.
+- Reserve pills for genuinely compact status/filter controls; not every button or card should be pill-shaped.
+- Message bubbles use the shared directional bubble geometry.
+
+### Interaction
+- Primary navigation remains predictable and thumb-reachable on mobile.
+- Use bottom navigation for peer destinations; do not duplicate competing navigation patterns.
+- Prefer contextual menus, bottom sheets and inline expansion for sub-tasks when they preserve the user's current context.
+- Destructive, error, warning and success states require non-color cues.
+- Pressed, focused, selected and disabled states must remain visually distinguishable.
+
+### Accessibility gates
+- Interactive targets: minimum 48dp.
+- Meaningful icons require content descriptions; decorative icons are hidden from accessibility services.
+- Text and controls must maintain appropriate contrast in both themes.
+- UI meaning must never depend on color alone.
+- Validate with increased system font scale and narrow mobile widths.
+- Do not use opacity-only disabled states when they reduce contrast unpredictably.
+
+### Anti-generic guardrails
+- No generic AI-agent/chatbot visual language.
+- No dashboard shell made from equal cards.
+- No ecommerce/fintech task language in social UI.
+- No emoji as interface chrome.
+- No decorative chart or metric when a messaging/community interaction is the actual task.
+- No palette expansion merely for visual variety; add a color only when it has a semantic role.
+
+### Evidence gate
+A design change is not considered complete from source inspection alone. Before final sign-off:
+1. CI/build passes.
+2. Auth, Home, Rooms, Messages/Chat, Profile and Settings are checked.
+3. Light and dark themes are checked.
+4. Typography scaling and 48dp touch targets are checked.
+5. Android runtime screenshots or equivalent rendered evidence are captured.
+6. Frontend behavior remains compatible with existing Supabase contracts.
