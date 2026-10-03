@@ -56,7 +56,7 @@ fun HomeScreen(
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         PhchatMark(
                             size = 30.dp,
-                            backgroundColor = PhBlueLight,
+                            backgroundColor = PhchatLime,
                             foregroundColor = Color(0xFF10110D),
                             contentDescription = "Phchat"
                         )
@@ -166,8 +166,8 @@ fun HomeScreen(
                         onClick = { showCreatePostDialog = true },
                         icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
                         text = { Text("Create post", fontWeight = FontWeight.Bold) },
-                        containerColor = PhBluePrimary,
-                        contentColor = PhBlueDark,
+                        containerColor = PhchatVioletDeep,
+                        contentColor = PhchatNavy950,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
@@ -310,7 +310,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     .fillMaxWidth()
                     .testTag("open_region_explorer_btn"),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = PhBlueContainer,
+                    containerColor = PhchatVioletDeep.copy(alpha = 0.18f),
                     contentColor = PhOnBlueContainer
                 )
             ) {
@@ -367,7 +367,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     text = "Active rooms (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = PhBluePrimary
+                    color = PhchatVioletDeep
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "All" else selectedProvince,
@@ -398,7 +398,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                             text = "No rooms here yet.",
                             fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
-                            color = PhBluePrimary
+                            color = PhchatVioletDeep
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -456,7 +456,7 @@ fun RoomCard(
         "DVO" -> RegionMindanao
         "PAM", "BAG" -> RegionLuzon
         "ALB" -> RegionBicol
-        else -> PhBluePrimary
+        else -> PhchatVioletDeep
     }
 
     Card(
@@ -514,7 +514,7 @@ fun RoomCard(
                                     text = room.name,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = PhBluePrimary,
+                                    color = PhchatVioletDeep,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -593,7 +593,7 @@ fun RoomCard(
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PhBluePrimary,
+                            containerColor = PhchatVioletDeep,
                             contentColor = Color.White
                         )
                     ) {
@@ -620,7 +620,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
         TabRow(
             selectedTabIndex = selectedSubTab,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = PhBluePrimary
+            contentColor = PhchatVioletDeep
         ) {
             Tab(
                 selected = selectedSubTab == 0,
@@ -645,7 +645,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
                         text = "Active now",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhBluePrimary
+                        color = PhchatVioletDeep
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(
@@ -682,7 +682,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
                         text = "Pribadong Mensahe",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhBluePrimary
+                        color = PhchatVioletDeep
                     )
                 }
 
@@ -800,7 +800,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
                                 onClick = { viewModel.startConversationWithUser(buddy) },
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary)
+                                colors = ButtonDefaults.buttonColors(containerColor = PhchatVioletDeep)
                             ) {
                                 Text("Bulong ➜", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
@@ -910,7 +910,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                         onClick = { viewModel.votePoll(post.id, option.id) },
                                         shape = RoundedCornerShape(8.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = if (isSelected) PhBlueContainer else MaterialTheme.colorScheme.surface
+                                            containerColor = if (isSelected) PhchatVioletDeep.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surface
                                         ),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -936,7 +936,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                             LinearProgressIndicator(
                                                 progress = { if (post.poll.totalVotes > 0) option.votes.toFloat() / post.poll.totalVotes else 0f },
                                                 modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                                                color = if (isSelected) PhBluePrimary else PhYellowSun,
+                                                color = if (isSelected) PhchatVioletDeep else PhYellowSun,
                                             )
                                         }
                                     }
@@ -989,7 +989,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             Icon(
                                 imageVector = if (post.isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Save",
-                                tint = if (post.isSaved) PhBluePrimary else MaterialTheme.colorScheme.outline
+                                tint = if (post.isSaved) PhchatVioletDeep else MaterialTheme.colorScheme.outline
                             )
                         }
                     }
@@ -1094,7 +1094,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                 onClick = { viewModel.openProfile(p.id) },
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (p.id == currentUser.id) PhBlueContainer else MaterialTheme.colorScheme.surface
+                    containerColor = if (p.id == currentUser.id) PhchatVioletDeep.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1133,7 +1133,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                                     text = "(You)",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = PhBluePrimary
+                                    color = PhchatVioletDeep
                                 )
                             }
                         }
@@ -1151,7 +1151,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                             text = "${p.points} pts",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = PhBluePrimary
+                            color = PhchatVioletDeep
                         )
                         Text(
                             text = "${p.streak} days",
@@ -1333,7 +1333,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(PhBluePrimary)
+                        .background(PhchatVioletDeep)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
@@ -1375,7 +1375,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                                 Icon(
                                     imageVector = Icons.Default.ThumbUp,
                                     contentDescription = "Upvote",
-                                    tint = if (comment.userVote == 1) PhBluePrimary else MaterialTheme.colorScheme.outline,
+                                    tint = if (comment.userVote == 1) PhchatVioletDeep else MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
