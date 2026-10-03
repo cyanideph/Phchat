@@ -23,6 +23,8 @@ import com.example.phchat.data.AuthState
 import com.example.phchat.ui.components.PhchatMark
 import com.example.phchat.ui.theme.PhchatVioletDeep
 import com.example.phchat.ui.theme.PhchatDanger
+import com.example.phchat.ui.theme.PhchatLime
+import com.example.phchat.ui.theme.PhchatNavy950
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
