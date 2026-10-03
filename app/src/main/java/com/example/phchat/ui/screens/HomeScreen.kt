@@ -54,25 +54,19 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
+                        PhchatMark(
+                            size = 30.dp,
+                            backgroundColor = PhBlueLight,
+                            foregroundColor = Color(0xFF10110D),
+                            contentDescription = "Phchat"
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Phchat",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Surface(
-                            color = PhRedSecondary,
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
-                            Text(
-                                text = "COMMUNITY",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
                     }
                 },
                 actions = {
