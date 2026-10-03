@@ -67,7 +67,7 @@ fun AuthScreen(
                 modifier = Modifier.size(72.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "P", fontSize = 30.sp)
+                    Text(text = "P", fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                 }
             }
 
