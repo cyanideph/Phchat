@@ -179,7 +179,7 @@ fun SettingsScreen(
                         }
                         Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
                             Text("Sign out", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold)
-                            Text("End the current Current session", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
+                            Text("End the current session", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
                         }
                     }
                 }
