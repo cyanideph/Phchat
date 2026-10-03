@@ -114,7 +114,7 @@ fun RoomChatScreen(
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "📍 ${room.provinceName} • ${room.onlineCount} online",
+                                text = "${room.provinceName} • ${room.onlineCount} online",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -140,7 +140,7 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = Icons.Default.Vibration,
                             contentDescription = "Kalabit / Buzz",
-                            tint = PhYellowSun
+                            tint = PhAcidLime
                         )
                     }
                     IconButton(
@@ -156,7 +156,7 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = if (room.isPinned) Icons.Default.PushPin else Icons.Default.BookmarkBorder,
                             contentDescription = "Pin",
-                            tint = if (room.isPinned) PhRedSecondary else MaterialTheme.colorScheme.onSurface
+                            tint = if (room.isPinned) PhAcidLime else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Box {
@@ -294,7 +294,7 @@ fun RoomChatScreen(
                         onClick = { showStickerSheet = true },
                         modifier = Modifier.testTag("sticker_button")
                     ) {
-                        Text(text = "🇵🇭", fontSize = 22.sp)
+                        Icon(Icons.Default.EmojiEmotions, contentDescription = "Stickers")
                     }
 
                     IconButton(
@@ -308,7 +308,7 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = Icons.Default.Image,
                             contentDescription = "Photo",
-                            tint = PhBluePrimary
+                            tint = PhAcidLime
                         )
                     }
 
@@ -341,13 +341,13 @@ fun RoomChatScreen(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(CircleShape)
-                            .background(if (inputText.isNotBlank()) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant)
+                            .background(if (inputText.isNotBlank()) PhAcidLime else MaterialTheme.colorScheme.surfaceVariant)
                             .testTag("send_button")
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
-                            tint = if (inputText.isNotBlank()) Color.White else MaterialTheme.colorScheme.outline
+                            tint = if (inputText.isNotBlank()) PhBlack else MaterialTheme.colorScheme.outline
                         )
                     }
                 }
@@ -712,9 +712,9 @@ fun RoomMessageBubble(
                             color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "🇵🇭 Pinoy Sticker",
+                            text = "Pinoy Sticker",
                             fontSize = 9.sp,
-                            color = if (isMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.outline
+                            color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline
                         )
                     }
                 } else {
@@ -723,7 +723,7 @@ fun RoomMessageBubble(
                             text = message.body,
                             color = when {
                                 message.isDeleted -> MaterialTheme.colorScheme.outline
-                                isMe -> Color.White
+                                isMe -> PhBlack
                                 else -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             fontSize = 14.sp
@@ -731,7 +731,7 @@ fun RoomMessageBubble(
                         if (isMe) {
                             Text(
                                 text = message.timestamp,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = PhBlack.copy(alpha = 0.62f),
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
