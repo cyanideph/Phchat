@@ -35,16 +35,17 @@ fun PhchatBackdrop(
     modifier: Modifier = Modifier,
     intensity: Float = 1f
 ) {
+    val background = MaterialTheme.colorScheme.background
+    val lime = PhBlueLight.copy(alpha = 0.10f * intensity)
+    val amber = PhYellowSun.copy(alpha = 0.08f * intensity)
+    val graphite = Color(0xFF1A1A17).copy(alpha = 0.16f * intensity)
+
     androidx.compose.foundation.Canvas(
         modifier = modifier.fillMaxSize()
     ) {
         val w = size.width
         val h = size.height
-        drawRect(color = MaterialTheme.colorScheme.background)
-
-        val lime = PhBlueLight.copy(alpha = 0.10f * intensity)
-        val amber = PhYellowSun.copy(alpha = 0.08f * intensity)
-        val graphite = Color(0xFF1A1A17).copy(alpha = 0.16f * intensity)
+        drawRect(color = background)
 
         drawCircle(
             color = lime,
