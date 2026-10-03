@@ -54,7 +54,7 @@ fun RegionProvinceExplorerSheet(
                         text = "🗺️ Pambansang Talaan ng Tambayan",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Black,
-                        color = PhBluePrimary
+                        color = PhAcidLime
                     )
                     Text(
                         text = "17 Rehiyon • 81 Lalawigan ng Pilipinas",
@@ -81,7 +81,7 @@ fun RegionProvinceExplorerSheet(
                     Card(
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (isExpanded) PhBlueContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
+                            containerColor = if (isExpanded) PhAcidLimeContainer else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.4f)
                         ),
                         modifier = Modifier.fillMaxWidth()
                     ) {
@@ -117,7 +117,7 @@ fun RegionProvinceExplorerSheet(
                                 Icon(
                                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                                     contentDescription = null,
-                                    tint = if (isExpanded) PhBluePrimary else MaterialTheme.colorScheme.outline
+                                    tint = if (isExpanded) PhAcidLime else MaterialTheme.colorScheme.outline
                                 )
                             }
 
