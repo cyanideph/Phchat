@@ -416,7 +416,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "🇵🇭", fontSize = 48.sp)
+                        Text(text = "🇵🇭", fontSize = MaterialTheme.typography.displayLarge.fontSize)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "Walang tambayan pa rito!",
@@ -721,9 +721,9 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                 modifier = Modifier.fillMaxWidth().padding(20.dp),
                                 horizontalAlignment = Alignment.CenterHorizontally
                             ) {
-                                Text(text = "💬", fontSize = 36.sp)
+                                Text(text = "💬", fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                                 Spacer(modifier = Modifier.height(6.dp))
-                                Text("Walang usapan pa", fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                Text("Walang usapan pa", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
                                 Text("Pumili ng tambay sa itaas upang mag-umpisa ng pribadong chika!", fontSize = MaterialTheme.typography.labelMedium.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                         }
@@ -753,7 +753,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                         horizontalArrangement = Arrangement.SpaceBetween,
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
-                                        Text(conv.participant.displayName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
+                                        Text(conv.participant.displayName, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
                                         Text(conv.lastMessageTime, fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                                     }
                                     Text(conv.lastMessage, fontSize = MaterialTheme.typography.bodyMedium.fontSize, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
@@ -780,7 +780,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                             modifier = Modifier.padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text("☀️", fontSize = 24.sp)
+                            Text("☀️", fontSize = MaterialTheme.typography.titleLarge.fontSize)
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
                                 Text("Talaan ng Barkada", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = PhOnGoldContainer)
