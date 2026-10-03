@@ -22,7 +22,6 @@ import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhchatShapes
 import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.ui.theme.PhRedSecondary
-import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
