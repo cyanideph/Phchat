@@ -12,6 +12,13 @@ object PhchatShapes {
     val pill = RoundedCornerShape(percent = 50)
     val bottomSheet = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
 
+    fun messageBubble(isMe: Boolean) = RoundedCornerShape(
+        topStart = 16.dp,
+        topEnd = 16.dp,
+        bottomStart = if (isMe) 16.dp else 4.dp,
+        bottomEnd = if (isMe) 4.dp else 16.dp
+    )
+
     fun material() = Shapes(
         extraSmall = small,
         small = compact,
