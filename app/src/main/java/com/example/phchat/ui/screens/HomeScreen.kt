@@ -269,8 +269,8 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                                 Brush.verticalGradient(
                                     colors = listOf(
                                         Color.Transparent,
-                                        Color(0x6607352B),
-                                        Color(0xF207352B)
+                                        PhGraphite.copy(alpha = 0.40f),
+                                        PhGraphite.copy(alpha = 0.95f)
                                     )
                                 )
                             )
@@ -302,7 +302,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         )
                         Text(
                             text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
-                            color = Color(0xFFDCE6F5),
+                            color = PhTextMuted,
                             fontSize = 11.sp
                         )
                     }
@@ -312,7 +312,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
 
         // Live Ticker Ribbon
         item {
-            UzzapRetroTicker(
+            PhchatLiveStrip(
                 roomCount = rooms.size,
                 onlineCount = 28
             )
@@ -327,8 +327,8 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     .fillMaxWidth()
                     .testTag("open_region_explorer_btn"),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = PhBlueContainer,
-                    contentColor = PhOnBlueContainer
+                    containerColor = PhAcidLime.copy(alpha = 0.16f),
+                    contentColor = PhBlack
                 )
             ) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -393,7 +393,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     text = "Mga Aktibong Tambayan (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = PhBluePrimary
+                    color = PhAcidLime
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
@@ -424,7 +424,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             text = "Walang tambayan pa rito!",
                             fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
-                            color = PhBluePrimary
+                            color = PhAcidLime
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -482,7 +482,7 @@ fun RoomCard(
         "DVO" -> RegionMindanao
         "PAM", "BAG" -> RegionLuzon
         "ALB" -> RegionBicol
-        else -> PhBluePrimary
+        else -> PhAcidLime
     }
 
     Card(
@@ -540,7 +540,7 @@ fun RoomCard(
                                     text = room.name,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = PhBluePrimary,
+                                    color = PhAcidLime,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -619,7 +619,7 @@ fun RoomCard(
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PhBluePrimary,
+                            containerColor = PhAcidLime,
                             contentColor = Color.White
                         )
                     ) {
@@ -646,7 +646,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
         TabRow(
             selectedTabIndex = selectedSubTab,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = PhBluePrimary
+            contentColor = PhAcidLime
         ) {
             Tab(
                 selected = selectedSubTab == 0,
@@ -671,7 +671,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                         text = "Aktibong Tambay Ngayon",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhBluePrimary
+                        color = PhAcidLime
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(
@@ -708,7 +708,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                         text = "Pribadong Mensahe",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhBluePrimary
+                        color = PhAcidLime
                     )
                 }
 
@@ -826,7 +826,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                 onClick = { viewModel.startConversationWithUser(buddy) },
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary)
+                                colors = ButtonDefaults.buttonColors(containerColor = PhAcidLime)
                             ) {
                                 Text("Bulong ➜", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
@@ -936,7 +936,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                         onClick = { viewModel.votePoll(post.id, option.id) },
                                         shape = RoundedCornerShape(8.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = if (isSelected) PhBlueContainer else MaterialTheme.colorScheme.surface
+                                            containerColor = if (isSelected) PhAcidLime.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surface
                                         ),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -962,7 +962,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                             LinearProgressIndicator(
                                                 progress = { if (post.poll.totalVotes > 0) option.votes.toFloat() / post.poll.totalVotes else 0f },
                                                 modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                                                color = if (isSelected) PhBluePrimary else PhYellowSun,
+                                                color = if (isSelected) PhAcidLime else PhYellowSun,
                                             )
                                         }
                                     }
@@ -1015,7 +1015,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             Icon(
                                 imageVector = if (post.isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Save",
-                                tint = if (post.isSaved) PhBluePrimary else MaterialTheme.colorScheme.outline
+                                tint = if (post.isSaved) PhAcidLime else MaterialTheme.colorScheme.outline
                             )
                         }
                     }
@@ -1120,7 +1120,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                 onClick = { viewModel.openProfile(p.id) },
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (p.id == currentUser.id) PhBlueContainer else MaterialTheme.colorScheme.surface
+                    containerColor = if (p.id == currentUser.id) PhAcidLime.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1159,7 +1159,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                                     text = "(You)",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = PhBluePrimary
+                                    color = PhAcidLime
                                 )
                             }
                         }
@@ -1177,7 +1177,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                             text = "${p.points} pts",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = PhBluePrimary
+                            color = PhAcidLime
                         )
                         Text(
                             text = "${p.streak} days",
@@ -1359,7 +1359,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(PhBluePrimary)
+                        .background(PhAcidLime)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
@@ -1401,7 +1401,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                                 Icon(
                                     imageVector = Icons.Default.ThumbUp,
                                     contentDescription = "Upvote",
-                                    tint = if (comment.userVote == 1) PhBluePrimary else MaterialTheme.colorScheme.outline,
+                                    tint = if (comment.userVote == 1) PhAcidLime else MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
