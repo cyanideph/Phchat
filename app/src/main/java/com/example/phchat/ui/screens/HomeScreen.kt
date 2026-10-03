@@ -51,106 +51,134 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = "🇵🇭 Phchat",
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Surface(
-                            color = PhRedSecondary,
-                            shape = RoundedCornerShape(10.dp)
-                        ) {
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp,
+                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 20.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "PINOY",
-                                color = Color.White,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                text = "Phchat",
+                                fontWeight = FontWeight.Black,
+                                fontSize = 22.sp,
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                            Spacer(modifier = Modifier.width(7.dp))
+                            Box(
+                                modifier = Modifier
+                                    .size(7.dp)
+                                    .clip(CircleShape)
+                                    .background(PhYellowSun)
                             )
                         }
+                        Text(
+                            text = "Bayanihan, chika, at tambayan",
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
-                },
-                actions = {
                     IconButton(
                         onClick = { viewModel.loadSupabaseData() },
                         modifier = Modifier.testTag("refresh_button")
                     ) {
-                        Icon(imageVector = Icons.Default.Refresh, contentDescription = "Refresh")
+                        Icon(Icons.Default.Refresh, contentDescription = "Refresh")
                     }
                     IconButton(
                         onClick = { viewModel.navigateTo(com.example.phchat.viewmodel.Screen.Settings) },
                         modifier = Modifier.testTag("settings_button")
                     ) {
-                        Icon(imageVector = Icons.Default.Settings, contentDescription = "Settings")
+                        Icon(Icons.Default.Settings, contentDescription = "Settings")
                     }
-                    IconButton(
-                        onClick = onOpenNotifications,
-                        modifier = Modifier.testTag("notifications_button")
-                    ) {
-                        BadgedBox(
-                            badge = {
-                                if (unreadCount > 0) {
-                                    Badge(containerColor = PhRedSecondary) {
-                                        Text("$unreadCount")
-                                    }
-                                }
+                    BadgedBox(
+                        badge = {
+                            if (unreadCount > 0) {
+                                Badge(containerColor = PhRedSecondary) { Text("$unreadCount") }
                             }
+                        }
+                    ) {
+                        IconButton(
+                            onClick = onOpenNotifications,
+                            modifier = Modifier.testTag("notifications_button")
                         ) {
-                            Icon(
-                                imageVector = Icons.Default.Notifications,
-                                contentDescription = "Notifications"
-                            )
+                            Icon(Icons.Default.Notifications, contentDescription = "Notifications")
                         }
                     }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
-            )
+                }
+            }
         },
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                tonalElevation = 0.dp,
+                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
                     icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Tambayan") },
-                    label = { Text("Tambayan", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text("Tambayan", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
                     modifier = Modifier.testTag("tab_tambayan")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
                     icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Chika") },
-                    label = { Text("Chika", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text("Chika", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
                     modifier = Modifier.testTag("tab_chika")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
                     icon = { Icon(Icons.Default.Campaign, contentDescription = "Plaza") },
-                    label = { Text("Plaza", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text("Plaza", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
                     modifier = Modifier.testTag("tab_plaza")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
                     icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Dangal") },
-                    label = { Text("Dangal", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text("Dangal", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
                     modifier = Modifier.testTag("tab_dangal")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 4,
                     onClick = { selectedTab = 4 },
                     icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Ako") },
-                    label = { Text("Ako", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
+                    label = { Text("Ako", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Medium) },
+                    colors = NavigationBarItemDefaults.colors(
+                        selectedIconColor = MaterialTheme.colorScheme.primary,
+                        selectedTextColor = MaterialTheme.colorScheme.primary,
+                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
                     modifier = Modifier.testTag("tab_profile")
                 )
             }
@@ -397,8 +425,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.outline
+                    fontSize = 12.sp,                    color = MaterialTheme.colorScheme.outline
                 )
             }
         }
@@ -797,8 +824,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(14.dp),
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp)
-                    ) {
+                        elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp)                    ) {
                         Row(
                             modifier = Modifier.fillMaxWidth().padding(12.dp),
                             verticalAlignment = Alignment.CenterVertically,
@@ -1197,7 +1223,6 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
     val currentUser by viewModel.currentUser.collectAsState()
     val commentsMap by viewModel.profileComments.collectAsState()
     val myVisits by viewModel.profileVisits.collectAsState()
-
     val myComments = commentsMap[currentUser.id] ?: emptyList()
 
     var showEditStatusDialog by remember { mutableStateOf(false) }
@@ -1598,68 +1623,3 @@ fun CreatePostDialog(
                         label = { Text("📊 Poll") }
                     )
                 }
-
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text(if (isPoll) "Poll Question" else "Title") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                OutlinedTextField(
-                    value = body,
-                    onValueChange = { body = it },
-                    label = { Text("Description / Details") },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 3
-                )
-
-                if (isPoll) {
-                    OutlinedTextField(
-                        value = option1,
-                        onValueChange = { option1 = it },
-                        label = { Text("Option 1") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                    OutlinedTextField(
-                        value = option2,
-                        onValueChange = { option2 = it },
-                        label = { Text("Option 2") },
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
-
-                Text("Category:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    items(categories) { cat ->
-                        FilterChip(
-                            selected = category == cat,
-                            onClick = { category = cat },
-                            label = { Text(cat) }
-                        )
-                    }
-                }
-            }
-        },
-        confirmButton = {
-            Button(
-                onClick = {
-                    if (title.isNotBlank()) {
-                        val pollList = if (isPoll && option1.isNotBlank() && option2.isNotBlank()) {
-                            listOf(option1, option2)
-                        } else emptyList()
-                        onCreate(title, body, category, pollList)
-                    }
-                },
-                enabled = title.isNotBlank()
-            ) {
-                Text("Publish")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel")
-            }
-        }
-    )
-}
