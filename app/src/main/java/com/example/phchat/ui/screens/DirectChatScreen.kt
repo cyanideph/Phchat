@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.sp
 import com.example.phchat.model.MessageKind
 import com.example.phchat.ui.components.StickerPickerSheet
 import com.example.phchat.ui.components.UserAvatar
-import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
@@ -145,7 +145,7 @@ fun DirectChatScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                        .background(if (inputText.isNotBlank()) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant)
+                        .background(if (inputText.isNotBlank()) PhAcidLime else MaterialTheme.colorScheme.surfaceVariant)
                         .testTag("dm_send_button")
                 ) {
                     Icon(
@@ -172,7 +172,7 @@ fun DirectChatScreen(
                     horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
                 ) {
                     Surface(
-                        color = if (isMe) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                        color = if (isMe) PhAcidLime else MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(
                             topStart = 16.dp,
                             topEnd = 16.dp,
