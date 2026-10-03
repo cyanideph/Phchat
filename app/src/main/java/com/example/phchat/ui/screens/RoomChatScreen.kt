@@ -76,7 +76,7 @@ fun RoomChatScreen(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            viewModel.sendRoomMessage(room.id, "📷 Nag-padala ng larawan: $uri")
+            viewModel.sendRoomMessage(room.id, "Photo: $uri")
         }
     }
 
@@ -114,7 +114,7 @@ fun RoomChatScreen(
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "📍 ${room.provinceName} • ${room.onlineCount} online",
+                                text = "${room.provinceName} · ${room.onlineCount} online",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -139,7 +139,7 @@ fun RoomChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Vibration,
-                            contentDescription = "Kalabit / Buzz",
+                            contentDescription = "Buzz",
                             tint = PhYellowSun
                         )
                     }
