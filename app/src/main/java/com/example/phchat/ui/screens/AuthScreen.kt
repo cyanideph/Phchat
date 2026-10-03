@@ -77,7 +77,7 @@ fun AuthScreen(
                 text = "Phchat",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Black,
-                color = PhchatVioletDeep
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = "A community built for connection",
@@ -214,7 +214,7 @@ fun AuthScreen(
                     .fillMaxWidth()
                     .height(50.dp)
                     .testTag("auth_submit_button"),
-                colors = ButtonDefaults.buttonColors(containerColor = PhchatVioletDeep),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary),
                 enabled = !isSubmitting && authState !is AuthState.Loading
             ) {
                 if (isSubmitting || authState is AuthState.Loading) {
