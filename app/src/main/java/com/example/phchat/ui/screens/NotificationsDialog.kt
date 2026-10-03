@@ -100,7 +100,7 @@ fun NotificationsSheet(
                                     else -> Icons.Default.Notifications
                                 }
                                 val iconColor = when (notif.type) {
-                                    "mention" -> PhchatVioletDeep
+                                    "mention" -> MaterialTheme.colorScheme.primary
                                     "checkin" -> PhRedSecondary
                                     else -> MaterialTheme.colorScheme.primary
                                 }
