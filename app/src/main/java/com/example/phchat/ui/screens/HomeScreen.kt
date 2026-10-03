@@ -173,7 +173,7 @@ fun HomeScreen(
                         icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
                         text = { Text("Create post", fontWeight = FontWeight.Bold) },
                         containerColor = PhBluePrimary,
-                        contentColor = Color.White,
+                        contentColor = PhBlueDark,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
@@ -231,14 +231,14 @@ fun RoomsTab(viewModel: PhchatViewModel) {
     var showRegionExplorer by remember { mutableStateOf(false) }
 
     val provinces = listOf(
-        "ALL" to " All provinces",
-        "NCR" to "🏙️ Metro Manila (NCR)",
-        "CEB" to "🏝️ Cebu (Sugbo)",
-        "DVO" to "🦅 Davao Region",
-        "PAM" to "🍲 Pampanga",
-        "ILO" to "⛵ Iloilo (Panay)",
-        "BAG" to "🌲 Baguio Benguet",
-        "ALB" to "🌶️ Bicol Albay"
+        "ALL" to "All provinces",
+        "NCR" to "Metro Manila (NCR)",
+        "CEB" to "Cebu (Sugbo)",
+        "DVO" to "Davao Region",
+        "PAM" to "Pampanga",
+        "ILO" to "Iloilo (Panay)",
+        "BAG" to "Baguio Benguet",
+        "ALB" to "Bicol Albay"
     )
 
     LazyColumn(
@@ -407,7 +407,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                             .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "", fontSize = 48.sp)
+                        Text(text = "No rooms", fontSize = 0.sp)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "No rooms here yet.",
@@ -657,7 +657,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
             ) {
                 item {
                     Text(
-                        text = "Aktibong Tambay Ngayon",
+                        text = "Active now",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = PhBluePrimary
@@ -1436,7 +1436,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         )
         AlertDialog(
             onDismissRequest = { showEditStatusDialog = false },
-            title = { Text("Update Tambay Status") },
+            title = { Text("Update your status") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
@@ -1502,7 +1502,7 @@ fun CreateRoomDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create Rooms Room") },
+        title = { Text("Create room") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
@@ -1584,7 +1584,7 @@ fun CreatePostDialog(
                     FilterChip(
                         selected = isPoll,
                         onClick = { isPoll = true },
-                        label = { Text("📊 Poll") }
+                        label = { Text("Poll") }
                     )
                 }
 
