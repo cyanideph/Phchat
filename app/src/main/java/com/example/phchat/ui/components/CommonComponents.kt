@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.LocalFireDepartment
@@ -24,7 +23,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.phchat.model.ChatSticker
 import com.example.phchat.model.MemberRole
 import com.example.phchat.model.StickerPacks
@@ -80,7 +78,7 @@ fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
 
     Surface(
         color = bg,
-        shape = RoundedCornerShape(6.dp),
+        shape = PhchatShapes.small,
         modifier = modifier
     ) {
         Text(
@@ -108,7 +106,7 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
 
     Surface(
         color = bg,
-        shape = RoundedCornerShape(8.dp),
+        shape = PhchatShapes.small,
         modifier = modifier
     ) {
         Row(
@@ -118,7 +116,7 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
             Text(
                 text = "$code",
                 color = fg,
-                fontSize = 11.sp,
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 fontWeight = FontWeight.ExtraBold
             )
         }
@@ -133,7 +131,7 @@ fun PhchatLiveStrip(
 ) {
     Surface(
         color = PhGraphite,
-        shape = RoundedCornerShape(14.dp),
+        shape = PhchatShapes.medium,
         modifier = modifier.fillMaxWidth()
     ) {
         Row(
@@ -154,14 +152,14 @@ fun PhchatLiveStrip(
                 Text(
                     text = "PILIPINAS LIVE",
                     color = PhAcidLime,
-                    fontSize = 10.sp,
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                     fontWeight = FontWeight.Black
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "• $roomCount Rooms",
                     color = Color.White.copy(alpha = 0.9f),
-                    fontSize = 10.sp,
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -169,7 +167,7 @@ fun PhchatLiveStrip(
             Text(
                 text = "$onlineCount Tambay Online",
                 color = Color.White.copy(alpha = 0.85f),
-                fontSize = 10.sp,
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 fontWeight = FontWeight.Bold
             )
         }
@@ -221,7 +219,7 @@ fun StreakPointsCard(
                     Text(
                         text = "$streak-Araw na Tambay",
                         fontWeight = FontWeight.Black,
-                        fontSize = 16.sp,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
                         color = PhBlack
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -234,7 +232,7 @@ fun StreakPointsCard(
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "$points Tambay Points",
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = PhAcidLimeBright,
                             fontWeight = FontWeight.Medium
                         )
@@ -251,13 +249,13 @@ fun StreakPointsCard(
                     disabledContainerColor = Color.White.copy(alpha = 0.25f),
                     disabledContentColor = Color.White.copy(alpha = 0.7f)
                 ),
-                shape = RoundedCornerShape(20.dp),
+                shape = PhchatShapes.large,
                 modifier = Modifier.testTag("checkin_button")
             ) {
                 Text(
                     text = if (hasCheckedIn) "Naka-Check In ✓" else "Mag-Tambay +50",
                     fontWeight = FontWeight.ExtraBold,
-                    fontSize = 11.sp
+                    fontSize = MaterialTheme.typography.labelSmall.fontSize
                 )
             }
         }
@@ -288,7 +286,7 @@ fun PinoyStickerDrawer(
                     Text(
                         text = "Pinoy Chat Stickers",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp,
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize,
                         color = PhAcidLime
                     )
                 }
@@ -311,7 +309,7 @@ fun PinoyStickerDrawer(
                             .fillMaxWidth()
                             .clickable { onStickerSelected(sticker) }
                             .testTag("sticker_${sticker.id}"),
-                        shape = RoundedCornerShape(12.dp),
+                        shape = PhchatShapes.compact,
                         colors = CardDefaults.cardColors(
                             containerColor = MaterialTheme.colorScheme.surfaceVariant
                         )
@@ -322,12 +320,12 @@ fun PinoyStickerDrawer(
                                 .padding(8.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Text(text = sticker.emoji, fontSize = 28.sp)
+                            Text(text = sticker.emoji, fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                             Spacer(modifier = Modifier.height(2.dp))
                             Text(
                                 text = sticker.title,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 11.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 textAlign = TextAlign.Center,
                                 maxLines = 1
                             )
@@ -377,7 +375,7 @@ fun QuickReactionRow(
                     .clickable { onSelectEmoji(emoji) }
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = emoji, fontSize = 20.sp)
+                    Text(text = emoji, fontSize = MaterialTheme.typography.titleLarge.fontSize)
                 }
             }
         }
