@@ -2,46 +2,87 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// PHchat Soft Pro: BLACK + WHITE + GREEN.
-// No blue cast in either mode. Philippine accents stay secondary.
+// Phchat "Acid Signal": premium graphite-charcoal, acid lime, lavender and mint.
+// Lime is the hero action/selection color; lavender and mint are supporting surfaces.
 
-val PhBluePrimary = Color(0xFF00A94F)      // Brand green
-val PhBlueDark = Color(0xFF050505)         // Pure near-black header/dark background
-val PhBlueLight = Color(0xFF16C96A)        // Active green
-val PhBlueContainer = Color(0xFFE8F8EF)    // Pale green selection
-val PhOnBlueContainer = Color(0xFF06351E)
+val PhchatLime = Color(0xFFD7F542)
+val PhchatLimeSoft = Color(0xFFCCF52C)
+val PhchatViolet = Color(0xFFA78BFA)
+val PhchatVioletStrong = Color(0xFF8B7CF6)
+val PhchatVioletDeep = Color(0xFF7C6AE8)
+val PhchatMint = Color(0xFF3ECF8E)
+val PhchatMintStrong = Color(0xFF2FD6A3)
 
-val PhRedSecondary = Color(0xFFD84B4B)
-val PhRedContainer = Color(0xFFFBE9E9)
+val PhchatNavy950 = Color(0xFF16161A)
+val PhchatNavy900 = Color(0xFF1C1C20)
+val PhchatNavy800 = Color(0xFF242429)
+val PhchatNavy700 = Color(0xFF2D2D33)
+val PhchatNavy600 = Color(0xFF3A3A42)
+
+val PhchatLavender50 = Color(0xFFF7F6FA)
+val PhchatLavender100 = Color(0xFFEDEAF8)
+val PhchatLavender200 = Color(0xFFD8D2EB)
+val PhchatLavender300 = Color(0xFFAFA9BD)
+
+val PhchatTextOnDark = Color(0xFFF2F2F5)
+val PhchatTextMutedDark = Color(0xFF8A8A93)
+val PhchatTextOnLight = Color(0xFF0A0A0C)
+val PhchatTextMutedLight = Color(0xFF5F5F67)
+
+val PhchatDanger = Color(0xFFFF6B6B)
+val PhchatDangerContainer = Color(0xFF3A1F2A)
+val PhchatSuccess = PhchatMintStrong
+val PhchatWarning = Color(0xFFFFC857)
+
+// Legacy compatibility aliases: blue-era names now map to the new visual roles.
+val PhBluePrimary = PhchatVioletDeep
+val PhBlueDark = PhchatNavy950
+val PhBlueLight = PhchatLime
+val PhBlueContainer = Color(0xFFEDE8FF)
+val PhOnBlueContainer = Color(0xFF0A0A0C)
+
+val PhRedSecondary = PhchatDanger
+val PhRedContainer = Color(0xFFFFE8E8)
 val PhOnRedContainer = Color(0xFF641B1B)
 
-val PhYellowSun = Color(0xFFF4C84B)
+val PhYellowSun = PhchatWarning
 val PhGoldContainer = Color(0xFFFFF5CF)
 val PhOnGoldContainer = Color(0xFF4D3B00)
 
-val SurfaceLight = Color(0xFFF7F7F5)       // Warm soft-white
-val SurfaceVariantLight = Color(0xFFEEEEEB) // Soft neutral input/chip surface
-val OnSurfaceLight = Color(0xFF111111)     // Black text
-val OutlineLight = Color(0xFFD8D8D4)       // Neutral border
+val SurfaceLight = Color(0xFFF4F2F7)
+val SurfaceVariantLight = Color(0xFFE9E6EE)
+val OnSurfaceLight = PhchatTextOnLight
+val OutlineLight = Color(0xFFA7A3AE)
 
-val SurfaceDark = Color(0xFF050505)        // BLACK
-val SurfaceVariantDark = Color(0xFF111111) // Elevated black card
-val OnSurfaceDark = Color(0xFFF7F7F5)      // White text
-val OutlineDark = Color(0xFF2A2A2A)        // Neutral black-mode border
+val SurfaceDark = PhchatNavy900
+val SurfaceVariantDark = PhchatNavy800
+val OnSurfaceDark = PhchatTextOnDark
+val OutlineDark = PhchatNavy600
 
-val StatusOnline = Color(0xFF20D56F)
-val StatusBusy = Color(0xFFD84B4B)
-val StatusAway = Color(0xFFF0B83D)
+val StatusOnline = PhchatMint
+val StatusBusy = PhchatDanger
+val StatusAway = PhchatWarning
 
-// Regional accents are intentionally restrained and do not define the theme.
-val RegionNcr = Color(0xFF2476A8)
-val RegionVisayas = Color(0xFFB87924)
-val RegionMindanao = Color(0xFF008C68)
-val RegionLuzon = Color(0xFF765A91)
-val RegionBicol = Color(0xFFD84B4B)
+// Regional accents remain restrained and subordinate to the product palette.
+val RegionNcr = PhchatMint
+val RegionVisayas = PhchatViolet
+val RegionMindanao = PhchatMint
+val RegionLuzon = PhchatViolet
+val RegionBicol = PhchatDanger
 
-// Roles
-val RoleOwner = Color(0xFFD84B4B)
-val RoleAdmin = Color(0xFF00A94F)
-val RoleMod = Color(0xFF008C68)
-val RoleMember = Color(0xFF666666)
+val RoleOwner = PhchatDanger
+val RoleAdmin = PhchatMint
+val RoleMod = PhchatMint
+val RoleMember = PhchatTextMutedLight
+
+val PhchatAccent = PhchatLime
+val PhchatAccentStrong = PhchatLimeSoft
+val PhchatInk = PhchatTextOnLight
+val PhchatCanvas = SurfaceLight
+val PhchatSurface = Color.White
+val PhchatGold = PhchatWarning
+val PhchatTextPrimary = PhchatTextOnLight
+val PhchatTextSecondary = PhchatTextMutedLight
+val PhchatTextOnAccent = Color(0xFF0A0A0C)
+val PhchatDividerLight = PhchatLavender200
+val PhchatDividerDark = PhchatNavy600

@@ -93,10 +93,10 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         Profile(
             id = authManager.getCurrentUserId() ?: "guest_user",
             username = "guest",
-            displayName = "Tambay",
+            displayName = "User",
             avatarInitial = "T",
             avatarColorHex = 0xFF0038A8,
-            bio = "Active Tambay",
+            bio = "",
             statusText = "Online",
             province = "NCR",
             isActive = true
@@ -123,8 +123,8 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
                             displayName = state.user.displayName.ifBlank { state.user.email.substringBefore("@") },
                             avatarInitial = state.user.displayName.take(1).uppercase(),
                             avatarColorHex = 0xFF0038A8,
-                            bio = "Mabuhay!",
-                            statusText = "Online sa Supabase",
+                            bio = "",
+                            statusText = "Online",
                             province = "NCR",
                             isActive = true
                         )
@@ -176,7 +176,7 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             val res = authManager.signIn(email, pass)
             if (res.isSuccess) {
-                onResult(true, "Maligayang pagbabalik!")
+                onResult(true, "Welcome back.")
             } else {
                 onResult(false, res.exceptionOrNull()?.localizedMessage ?: "Sign in failed")
             }
@@ -249,9 +249,9 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         viewModelScope.launch {
             val res = repository.addBuddy(targetUserId)
             if (res.isSuccess) {
-                onResult(true, "Matagumpay na naidagdag sa Barkada!")
+                onResult(true, "Added to connections.")
             } else {
-                onResult(false, res.exceptionOrNull()?.localizedMessage ?: "Hindi ma-add sa barkada")
+                onResult(false, res.exceptionOrNull()?.localizedMessage ?: "Could not add connection.")
             }
         }
     }
