@@ -150,8 +150,8 @@ fun ProfileScreen(
                                 onClick = { viewModel.startConversationWithUser(profile) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = PhchatVioletDeep,
-                                    contentColor = Color.White
+                                    containerColor = MaterialTheme.colorScheme.primary,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
                                 Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null, modifier = Modifier.size(16.dp))
@@ -249,7 +249,7 @@ fun ProfileScreen(
                                     Icon(
                                         imageVector = Icons.Default.ThumbUp,
                                         contentDescription = "Upvote",
-                                        tint = if (comment.userVote == 1) PhchatLime else MaterialTheme.colorScheme.outline,
+                                        tint = if (comment.userVote == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
@@ -266,7 +266,7 @@ fun ProfileScreen(
                                     Icon(
                                         imageVector = Icons.Default.ThumbDown,
                                         contentDescription = "Downvote",
-                                        tint = if (comment.userVote == -1) PhchatVioletDeep else MaterialTheme.colorScheme.outline,
+                                        tint = if (comment.userVote == -1) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
