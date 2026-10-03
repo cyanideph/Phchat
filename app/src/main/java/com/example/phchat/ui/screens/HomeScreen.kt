@@ -119,7 +119,7 @@ fun HomeScreen(
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp)
+                modifier = Modifier.padding(horizontal = PhchatSpacing.sm, vertical = PhchatSpacing.sm)
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
@@ -129,7 +129,7 @@ fun HomeScreen(
                     colors = NavigationBarItemDefaults.colors(
                         selectedIconColor = MaterialTheme.colorScheme.primary,
                         selectedTextColor = MaterialTheme.colorScheme.primary,
-                        indicatorColor = MaterialTheme.colorScheme.primaryContainer
+                        indicatorColor = MaterialTheme.colorScheme.secondaryContainer
                     ),
                     modifier = Modifier.testTag("tab_tambayan")
                 )
@@ -186,12 +186,12 @@ fun HomeScreen(
         floatingActionButton = {
             when (selectedTab) {
                 0 -> {
-                    ExtendedFloatingActionButton(
+                    FloatingActionButton(
                         onClick = { showCreateRoomDialog = true },
-                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
-                        text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
-                        containerColor = PhYellowSun,
-                        contentColor = PhOnGoldContainer,
+                        content = { Icon(Icons.Default.Add, contentDescription = "Create tambayan") },
+                        
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.testTag("create_room_fab")
                     )
                 }
