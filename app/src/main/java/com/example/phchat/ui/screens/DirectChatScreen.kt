@@ -10,9 +10,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import com.example.phchat.model.MessageKind
 import com.example.phchat.ui.components.StickerPickerSheet
 import com.example.phchat.ui.components.UserAvatar
-import com.example.phchat.ui.theme.PhchatLime
-import com.example.phchat.ui.theme.PhchatNavy950
+import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
 
@@ -116,7 +116,7 @@ fun DirectChatScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { showStickerSheet = true }) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Stickers")
+                    Icon(Icons.Default.EmojiEmotions, contentDescription = "Stickers", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
 
                 OutlinedTextField(
@@ -124,7 +124,7 @@ fun DirectChatScreen(
                     onValueChange = { inputText = it },
                     placeholder = { Text("Message ${conv.participant.displayName.split(" ").first()}...") },
                     modifier = Modifier.weight(1f).testTag("dm_input"),
-                    shape = MaterialTheme.shapes.medium,
+                    shape = RoundedCornerShape(24.dp),
                     maxLines = 4
                 )
 
@@ -145,13 +145,13 @@ fun DirectChatScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                         .background(if (inputText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                        .background(if (inputText.isNotBlank()) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant)
                         .testTag("dm_send_button")
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline
+                        tint = if (inputText.isNotBlank()) PhBlack else MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -172,7 +172,7 @@ fun DirectChatScreen(
                     horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
                 ) {
                     Surface(
-                        color = if (isMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
+                        color = if (isMe) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(
                             topStart = 16.dp,
                             topEnd = 16.dp,
@@ -188,12 +188,12 @@ fun DirectChatScreen(
                             }
                             Text(
                                 text = msg.body,
-                                color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isMe) PhBlack else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = msg.timestamp,
-                                color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
+                                color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline,
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
