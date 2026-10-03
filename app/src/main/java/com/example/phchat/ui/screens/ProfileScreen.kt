@@ -155,7 +155,7 @@ fun ProfileScreen(
                             ) {
                                 Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Chika (DM)")
+                                Text("Message")
                             }
                         }
 
@@ -183,7 +183,7 @@ fun ProfileScreen(
 
             item {
                 Text(
-                    text = "📝 Leave a Message on ${profile.displayName.split(" ").first()}'s Wall",
+                    text = "📝 Leave a Message on ${profile.displayName.split(" ").first()}'s Posts",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
