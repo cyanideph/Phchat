@@ -187,7 +187,7 @@ fun RoomMemberDirectorySheet(
                         text = "👥 Mga Tambay sa Loob",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Black,
-                        color = PhBluePrimary
+                        color = PhAcidLime
                     )
                     Text(
                         text = "$roomName • ${members.size} Kasama",
@@ -242,7 +242,7 @@ fun RoomMemberDirectorySheet(
                                         )
                                         if (member.id == currentUserId) {
                                             Spacer(modifier = Modifier.width(4.dp))
-                                            Text("(Ikaw)", fontSize = 11.sp, color = PhBlueLight)
+                                            Text("(Ikaw)", fontSize = 11.sp, color = PhAcidLimeBright)
                                         }
                                     }
                                     Text(

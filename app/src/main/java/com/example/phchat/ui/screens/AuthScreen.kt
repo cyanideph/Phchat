@@ -62,7 +62,7 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Retro Uzzap / Phchat Header
+            // Phchat editorial header
             Surface(
                 color = PhAcidLime,
                 shape = RoundedCornerShape(20.dp),

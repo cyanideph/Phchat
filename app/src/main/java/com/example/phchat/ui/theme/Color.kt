@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.Color
 val PhAcidLime = Color(0xFFD7F542)
 val PhAcidLimeBright = Color(0xFFCCF52C)
 val PhAcidLimePressed = Color(0xFFB7D82E)
+val PhAcidLimeContainer = PhAcidLime.copy(alpha = 0.16f)
 val PhBlack = Color(0xFF0A0A0C)
 
 val PhGraphite = Color(0xFF16161A)

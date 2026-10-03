@@ -17,6 +17,7 @@ class SupabaseRepository(
     private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(15, TimeUnit.SECONDS)
         .readTimeout(20, TimeUnit.SECONDS)
+        .authenticator(SupabaseTokenAuthenticator(authManager))
         .build()
 ) {
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
@@ -269,7 +270,7 @@ class SupabaseRepository(
                         avatarColorHex = 0xFFCE1126,
                         bio = bio,
                         statusText = statusText,
-                        province = "Philippines",
+                        province = obj.optString("province", "Philippines").ifBlank { "Philippines" },
                         isActive = isActive,
                         points = 0,
                         streak = 0
