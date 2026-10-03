@@ -201,7 +201,7 @@ fun UzzapRetroTicker(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "• $roomCount Rooms",
+                    text = "$roomCount rooms",
                     color = Color.White.copy(alpha = 0.9f),
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Medium
@@ -209,7 +209,7 @@ fun UzzapRetroTicker(
             }
 
             Text(
-                text = "$onlineCount ONLINE",
+                text = "$onlineCount online",
                 color = Color.White.copy(alpha = 0.85f),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
@@ -405,7 +405,7 @@ fun QuickReactionRow(
     onSelectEmoji: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val emojis = listOf("👍", "❤️", "🔥", "😂", "🇵🇭", "🙏")
+    val emojis = listOf("👍", "❤️", "🔥", "😂", "🙏")
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
