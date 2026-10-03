@@ -91,14 +91,15 @@ fun PhchatMark(
         contentAlignment = Alignment.Center
     ) {
         androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize().padding(size * 0.19f)) {
-            val stroke = size.minDimension * 0.095f
+            val iconSize = this.size.minDimension
+            val stroke = iconSize * 0.095f
             val bubble = androidx.compose.ui.geometry.RoundRect(
-                left = size.minDimension * 0.06f,
-                top = size.minDimension * 0.06f,
-                right = size.minDimension * 0.94f,
-                bottom = size.minDimension * 0.78f,
-                radiusX = size.minDimension * 0.18f,
-                radiusY = size.minDimension * 0.18f
+                left = iconSize * 0.06f,
+                top = iconSize * 0.06f,
+                right = iconSize * 0.94f,
+                bottom = iconSize * 0.78f,
+                radiusX = iconSize * 0.18f,
+                radiusY = iconSize * 0.18f
             )
             drawRoundRect(
                 color = foregroundColor,
@@ -107,10 +108,10 @@ fun PhchatMark(
                 cornerRadius = androidx.compose.ui.geometry.CornerRadius(bubble.radiusX, bubble.radiusY),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke)
             )
-            val cy = size.minDimension * 0.42f
-            val leftNode = size.minDimension * 0.30f
-            val midNode = size.minDimension * 0.50f
-            val rightNode = size.minDimension * 0.70f
+            val cy = iconSize * 0.42f
+            val leftNode = iconSize * 0.30f
+            val midNode = iconSize * 0.50f
+            val rightNode = iconSize * 0.70f
             drawLine(
                 color = foregroundColor,
                 start = androidx.compose.ui.geometry.Offset(leftNode, cy),
@@ -121,8 +122,8 @@ fun PhchatMark(
             drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(leftNode, cy))
             drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(midNode, cy))
             drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(rightNode, cy))
-            val tailStart = androidx.compose.ui.geometry.Offset(size.minDimension * 0.30f, size.minDimension * 0.77f)
-            val tailEnd = androidx.compose.ui.geometry.Offset(size.minDimension * 0.24f, size.minDimension * 0.93f)
+            val tailStart = androidx.compose.ui.geometry.Offset(iconSize * 0.30f, iconSize * 0.77f)
+            val tailEnd = androidx.compose.ui.geometry.Offset(iconSize * 0.24f, iconSize * 0.93f)
             drawLine(
                 color = foregroundColor,
                 start = tailStart,
