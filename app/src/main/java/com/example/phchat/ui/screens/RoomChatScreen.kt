@@ -701,7 +701,7 @@ fun RoomMessageBubble(
                         modifier = Modifier.padding(12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = message.stickerEmoji ?: "🇵🇭", fontSize = 42.sp)
+                        Text(text = message.stickerEmoji ?: "🇵🇭", fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = message.body,
@@ -711,7 +711,7 @@ fun RoomMessageBubble(
                         )
                         Text(
                             text = "Pinoy Sticker",
-                            fontSize = 9.sp,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
                             color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline
                         )
                     }
@@ -730,7 +730,7 @@ fun RoomMessageBubble(
                             Text(
                                 text = message.timestamp,
                                 color = PhBlack.copy(alpha = 0.62f),
-                                fontSize = 9.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 modifier = Modifier.align(Alignment.End)
                             )
                         }
