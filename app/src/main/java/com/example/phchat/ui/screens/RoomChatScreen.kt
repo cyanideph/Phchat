@@ -228,7 +228,7 @@ fun RoomChatScreen(
                                     text = "Replying to ${replyingTo?.senderName}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 11.sp,
-                                    color = PhBluePrimary
+                                    color = PhAcidLime
                                 )
                                 Text(
                                     text = replyingTo?.snippet ?: "",
@@ -266,7 +266,7 @@ fun RoomChatScreen(
                     items(quickPills) { phrase ->
                         Surface(
                             shape = RoundedCornerShape(14.dp),
-                            color = PhBlueContainer,
+                            color = PhAcidLime.copy(alpha = 0.16f),
                             modifier = Modifier.clickable {
                                 viewModel.sendRoomMessage(room.id, phrase, replyingTo)
                                 replyingTo = null
@@ -276,7 +276,7 @@ fun RoomChatScreen(
                                 text = phrase,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = PhOnBlueContainer,
+                                color = PhBlack,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                             )
                         }
@@ -362,7 +362,7 @@ fun RoomChatScreen(
             // Room announcement / Pinned banner
             if (room.announcement.isNotBlank() || room.pinnedMessage != null) {
                 Surface(
-                    color = PhBlueContainer,
+                    color = PhAcidLime.copy(alpha = 0.16f),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -374,14 +374,14 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = Icons.Default.Campaign,
                             contentDescription = null,
-                            tint = PhBluePrimary,
+                            tint = PhAcidLime,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = room.announcement.ifBlank { "Pinned: " + room.pinnedMessage?.body },
                             fontSize = 12.sp,
-                            color = PhOnBlueContainer,
+                            color = PhBlack,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f)
@@ -670,7 +670,7 @@ fun RoomMessageBubble(
                             text = "Replying to ${message.replyTo.senderName}",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PhBluePrimary
+                            color = PhAcidLime
                         )
                         Text(
                             text = message.replyTo.snippet,
@@ -686,7 +686,7 @@ fun RoomMessageBubble(
             Surface(
                 color = when {
                     message.isDeleted -> MaterialTheme.colorScheme.surfaceVariant
-                    isMe -> PhBluePrimary
+                    isMe -> PhAcidLime
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
                 shape = RoundedCornerShape(
