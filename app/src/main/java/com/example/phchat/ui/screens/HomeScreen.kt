@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Feed
@@ -28,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.phchat.R
 import com.example.phchat.model.*
 import com.example.phchat.ui.components.*
@@ -57,18 +55,18 @@ fun HomeScreen(
                         Text(
                             text = "Phchat",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             color = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(6.dp))
                         Surface(
                             color = PhAcidLime,
-                            shape = RoundedCornerShape(10.dp)
+                            shape = PhchatShapes.compact
                         ) {
                             Text(
                                 text = "PINOY",
                                 color = Color.White,
-                                fontSize = 10.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
@@ -245,7 +243,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
         // Hero Banner Art
         item {
             Card(
-                shape = RoundedCornerShape(20.dp),
+                shape = PhchatShapes.large,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("hero_banner_card"),
@@ -283,12 +281,12 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     ) {
                         Surface(
                             color = PhYellowSun,
-                            shape = RoundedCornerShape(6.dp)
+                            shape = PhchatShapes.small
                         ) {
                             Text(
                                 text = "PAMBANSANG TAMBAYAN",
                                 color = PhOnGoldContainer,
-                                fontSize = 10.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 fontWeight = FontWeight.Black,
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
                             )
@@ -297,13 +295,13 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         Text(
                             text = "Usapang Pinoy, Bawat Probinsya",
                             color = Color.White,
-                            fontSize = 18.sp,
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize,
                             fontWeight = FontWeight.Black
                         )
                         Text(
                             text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
                             color = PhTextMuted,
-                            fontSize = 11.sp
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize
                         )
                     }
                 }
@@ -322,7 +320,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
         item {
             FilledTonalButton(
                 onClick = { showRegionExplorer = true },
-                shape = RoundedCornerShape(14.dp),
+                shape = PhchatShapes.medium,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("open_region_explorer_btn"),
@@ -336,7 +334,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Text(
                     text = "17 Rehiyon & 81 Lalawigan Explorer",
                     fontWeight = FontWeight.Black,
-                    fontSize = 13.sp
+                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
                 )
             }
         }
@@ -354,7 +352,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("search_rooms_input"),
-                shape = RoundedCornerShape(14.dp),
+                shape = PhchatShapes.medium,
                 singleLine = true
             )
         }
@@ -397,7 +395,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
-                    fontSize = 12.sp,
+                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
                     color = MaterialTheme.colorScheme.outline
                 )
             }
@@ -409,7 +407,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = 16.dp),
-                    shape = RoundedCornerShape(20.dp),
+                    shape = PhchatShapes.large,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
                 ) {
                     Column(
@@ -423,13 +421,13 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         Text(
                             text = "Walang tambayan pa rito!",
                             fontWeight = FontWeight.Black,
-                            fontSize = 17.sp,
+                            fontSize = MaterialTheme.typography.titleMedium.fontSize,
                             color = PhAcidLime
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Ikaw ang unang mag-bukas ng tambayan sa probinsyang ito para sa iyong mga kababayan.",
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -522,7 +520,7 @@ fun RoomCard(
                         Box(
                             modifier = Modifier
                                 .size(46.dp)
-                                .clip(RoundedCornerShape(12.dp))
+                                .clip(PhchatShapes.compact)
                                 .background(regionalAccent),
                             contentAlignment = Alignment.Center
                         ) {
@@ -530,7 +528,7 @@ fun RoomCard(
                                 text = room.name.take(2).uppercase(),
                                 color = Color.White,
                                 fontWeight = FontWeight.Black,
-                                fontSize = 16.sp
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize
                             )
                         }
                         Spacer(modifier = Modifier.width(12.dp))
@@ -539,7 +537,7 @@ fun RoomCard(
                                 Text(
                                     text = room.name,
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 16.sp,
+                                    fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                     color = PhAcidLime,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -577,12 +575,12 @@ fun RoomCard(
                     Spacer(modifier = Modifier.height(10.dp))
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                        shape = RoundedCornerShape(10.dp),
+                        shape = PhchatShapes.compact,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Text(
                             text = "📢 " + room.announcement,
-                            fontSize = 12.sp,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -608,7 +606,7 @@ fun RoomCard(
                         Spacer(modifier = Modifier.width(6.dp))
                         Text(
                             text = "${room.onlineCount} Tambay Online",
-                            fontSize = 12.sp,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             fontWeight = FontWeight.Bold,
                             color = StatusOnline
                         )
@@ -616,7 +614,7 @@ fun RoomCard(
 
                     Button(
                         onClick = onClick,
-                        shape = RoundedCornerShape(16.dp),
+                        shape = PhchatShapes.medium,
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = PhAcidLime,
@@ -625,7 +623,7 @@ fun RoomCard(
                     ) {
                         Text(
                             text = "Pumasok ➜",
-                            fontSize = 12.sp,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             fontWeight = FontWeight.ExtraBold
                         )
                     }
@@ -693,7 +691,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                 Spacer(modifier = Modifier.height(4.dp))
                                 Text(
                                     text = user.displayName.split(" ").first(),
-                                    fontSize = 12.sp,
+                                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                     fontWeight = FontWeight.Medium,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
@@ -716,7 +714,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                     item {
                         Card(
                             modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp),
-                            shape = RoundedCornerShape(16.dp),
+                            shape = PhchatShapes.medium,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
                         ) {
                             Column(
@@ -726,7 +724,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                 Text(text = "💬", fontSize = 36.sp)
                                 Spacer(modifier = Modifier.height(6.dp))
                                 Text("Walang usapan pa", fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                Text("Pumili ng tambay sa itaas upang mag-umpisa ng pribadong chika!", fontSize = 12.sp, color = MaterialTheme.colorScheme.outline)
+                                Text("Pumili ng tambay sa itaas upang mag-umpisa ng pribadong chika!", fontSize = MaterialTheme.typography.labelMedium.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                         }
                     }
@@ -734,7 +732,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                     items(conversations) { conv ->
                         Card(
                             onClick = { viewModel.openDirectChat(conv.id) },
-                            shape = RoundedCornerShape(14.dp),
+                            shape = PhchatShapes.medium,
                             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                             elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                         ) {
@@ -756,9 +754,9 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(conv.participant.displayName, fontWeight = FontWeight.Bold, fontSize = 15.sp)
-                                        Text(conv.lastMessageTime, fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                                        Text(conv.lastMessageTime, fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                                     }
-                                    Text(conv.lastMessage, fontSize = 13.sp, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(conv.lastMessage, fontSize = MaterialTheme.typography.bodyMedium.fontSize, maxLines = 1, overflow = TextOverflow.Ellipsis, color = MaterialTheme.colorScheme.onSurfaceVariant)
                                 }
                             }
                         }
@@ -775,7 +773,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                 item {
                     Surface(
                         color = PhGoldContainer,
-                        shape = RoundedCornerShape(12.dp),
+                        shape = PhchatShapes.compact,
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(
@@ -785,8 +783,8 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                             Text("☀️", fontSize = 24.sp)
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
-                                Text("Talaan ng Barkada", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = PhOnGoldContainer)
-                                Text("Maaari mong kausapin ang iyong mga barkada anumang oras.", fontSize = 11.sp, color = PhOnGoldContainer.copy(alpha = 0.8f))
+                                Text("Talaan ng Barkada", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize, color = PhOnGoldContainer)
+                                Text("Maaari mong kausapin ang iyong mga barkada anumang oras.", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = PhOnGoldContainer.copy(alpha = 0.8f))
                             }
                         }
                     }
@@ -795,7 +793,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                 items(profiles) { buddy ->
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(14.dp),
+                        shape = PhchatShapes.medium,
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         elevation = CardDefaults.cardElevation(defaultElevation = 1.5.dp)
                     ) {
@@ -813,10 +811,10 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
-                                    Text(buddy.displayName, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                                    Text(buddy.displayName, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
                                     Text(
                                         text = if (buddy.statusText.isNotBlank()) buddy.statusText else "Online sa tambayan",
-                                        fontSize = 11.sp,
+                                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                         color = if (buddy.isActive) StatusOnline else MaterialTheme.colorScheme.outline
                                     )
                                 }
@@ -824,11 +822,11 @@ fun ChikaTab(viewModel: PhchatViewModel) {
 
                             Button(
                                 onClick = { viewModel.startConversationWithUser(buddy) },
-                                shape = RoundedCornerShape(16.dp),
+                                shape = PhchatShapes.medium,
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
                                 colors = ButtonDefaults.buttonColors(containerColor = PhAcidLime)
                             ) {
-                                Text("Bulong ➜", fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                                Text("Bulong ➜", fontSize = MaterialTheme.typography.labelSmall.fontSize, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -866,7 +864,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
 
         items(filteredPosts) { post ->
             Card(
-                shape = RoundedCornerShape(16.dp),
+                shape = PhchatShapes.medium,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 elevation = CardDefaults.cardElevation(2.dp),
                 modifier = Modifier.fillMaxWidth().testTag("post_${post.id}")
@@ -888,11 +886,11 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             Text(
                                 text = post.author.displayName,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
                             )
                             Text(
                                 text = "${post.category} • ${post.createdAt}",
-                                fontSize = 11.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 color = MaterialTheme.colorScheme.outline
                             )
                         }
@@ -902,12 +900,12 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                     Text(
                         text = post.title,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 16.sp
+                        fontSize = MaterialTheme.typography.titleMedium.fontSize
                     )
                     Spacer(modifier = Modifier.height(6.dp))
                     Text(
                         text = post.body,
-                        fontSize = 14.sp,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
@@ -916,14 +914,14 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Surface(
                             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-                            shape = RoundedCornerShape(12.dp),
+                            shape = PhchatShapes.compact,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
                                 Text(
                                     text = "📊 " + post.poll.question,
                                     fontWeight = FontWeight.SemiBold,
-                                    fontSize = 13.sp
+                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize
                                 )
                                 Spacer(modifier = Modifier.height(8.dp))
                                 post.poll.options.forEach { option ->
@@ -934,7 +932,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
 
                                     Card(
                                         onClick = { viewModel.votePoll(post.id, option.id) },
-                                        shape = RoundedCornerShape(8.dp),
+                                        shape = PhchatShapes.small,
                                         colors = CardDefaults.cardColors(
                                             containerColor = if (isSelected) PhAcidLime.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surface
                                         ),
@@ -949,12 +947,12 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                             ) {
                                                 Text(
                                                     text = option.text,
-                                                    fontSize = 13.sp,
+                                                    fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                                     fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                                                 )
                                                 Text(
                                                     text = "$percentage% (${option.votes})",
-                                                    fontSize = 12.sp,
+                                                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                                     color = MaterialTheme.colorScheme.outline
                                                 )
                                             }
@@ -969,7 +967,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                 }
                                 Text(
                                     text = "${post.poll.totalVotes} total votes",
-                                    fontSize = 11.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     color = MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.padding(top = 4.dp)
                                 )
@@ -993,7 +991,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             }
                             Text(
                                 text = "${post.likesCount}",
-                                fontSize = 13.sp,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                 color = MaterialTheme.colorScheme.outline
                             )
                             Spacer(modifier = Modifier.width(16.dp))
@@ -1006,7 +1004,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = "${post.commentsCount}",
-                                fontSize = 13.sp,
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                                 color = MaterialTheme.colorScheme.outline
                             )
                         }
@@ -1061,7 +1059,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                 items(profiles.filter { it.isFeatured }) { p ->
                     Card(
                         onClick = { viewModel.openProfile(p.id) },
-                        shape = RoundedCornerShape(14.dp),
+                        shape = PhchatShapes.medium,
                         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                         modifier = Modifier.width(140.dp)
                     ) {
@@ -1079,23 +1077,23 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                             Text(
                                 text = p.displayName,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 12.sp,
+                                fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
                             Text(
                                 text = p.province,
-                                fontSize = 11.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 color = MaterialTheme.colorScheme.outline
                             )
                             Spacer(modifier = Modifier.height(6.dp))
                             Surface(
                                 color = PhGoldContainer,
-                                shape = RoundedCornerShape(8.dp)
+                                shape = PhchatShapes.small
                             ) {
                                 Text(
                                     text = "🔥 ${p.streak}d streak",
-                                    fontSize = 10.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     color = PhOnGoldContainer,
                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -1118,7 +1116,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
         items(leaderboard.mapIndexed { index, p -> Pair(index + 1, p) }) { (rank, p) ->
             Card(
                 onClick = { viewModel.openProfile(p.id) },
-                shape = RoundedCornerShape(12.dp),
+                shape = PhchatShapes.compact,
                 colors = CardDefaults.cardColors(
                     containerColor = if (p.id == currentUser.id) PhAcidLime.copy(alpha = 0.16f) else MaterialTheme.colorScheme.surface
                 ),
@@ -1136,7 +1134,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                     }
                     Text(
                         text = medalEmoji,
-                        fontSize = 18.sp,
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier.width(36.dp)
                     )
@@ -1151,13 +1149,13 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                             Text(
                                 text = p.displayName,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 14.sp
+                                fontSize = MaterialTheme.typography.bodyMedium.fontSize
                             )
                             if (p.id == currentUser.id) {
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
                                     text = "(You)",
-                                    fontSize = 11.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     color = PhAcidLime
                                 )
@@ -1165,7 +1163,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                         }
                         Text(
                             text = p.statusText,
-                            fontSize = 12.sp,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -1176,12 +1174,12 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                         Text(
                             text = "${p.points} pts",
                             fontWeight = FontWeight.Bold,
-                            fontSize = 14.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = PhAcidLime
                         )
                         Text(
                             text = "${p.streak} days",
-                            fontSize = 11.sp,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
                             color = MaterialTheme.colorScheme.outline
                         )
                     }
@@ -1210,7 +1208,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
     ) {
         item {
             Card(
-                shape = RoundedCornerShape(16.dp),
+                shape = PhchatShapes.medium,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1228,18 +1226,18 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     Text(
                         text = currentUser.displayName,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 18.sp
+                        fontSize = MaterialTheme.typography.titleLarge.fontSize
                     )
                     Text(
                         text = "@${currentUser.username} • ${currentUser.province}",
-                        fontSize = 13.sp,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         color = MaterialTheme.colorScheme.outline
                     )
 
                     Spacer(modifier = Modifier.height(8.dp))
                     Surface(
                         color = MaterialTheme.colorScheme.surfaceVariant,
-                        shape = RoundedCornerShape(20.dp),
+                        shape = PhchatShapes.large,
                         modifier = Modifier.clickable { showEditStatusDialog = true }
                     ) {
                         Row(
@@ -1248,7 +1246,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                         ) {
                             Text(
                                 text = "💬 " + currentUser.statusText,
-                                fontSize = 12.sp,
+                                fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                 fontWeight = FontWeight.Medium
                             )
                             Spacer(modifier = Modifier.width(6.dp))
@@ -1263,7 +1261,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = currentUser.bio,
-                        fontSize = 13.sp,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
 
@@ -1273,16 +1271,16 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                         horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "${currentUser.points}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            Text(text = "Points", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                            Text(text = "${currentUser.points}", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                            Text(text = "Points", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "${currentUser.streak} days", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            Text(text = "Streak", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                            Text(text = "${currentUser.streak} days", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                            Text(text = "Streak", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                         }
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(text = "${myVisits.size}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                            Text(text = "Visits", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                            Text(text = "${myVisits.size}", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                            Text(text = "Visits", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                         }
                     }
                 }
@@ -1302,7 +1300,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     items(myVisits) { visit ->
                         Surface(
                             color = MaterialTheme.colorScheme.surface,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = PhchatShapes.compact,
                             shadowElevation = 1.dp
                         ) {
                             Row(
@@ -1316,8 +1314,8 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                                 )
                                 Spacer(modifier = Modifier.width(6.dp))
                                 Column {
-                                    Text(text = visit.visitor.displayName, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                    Text(text = visit.visitedAt, fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
+                                    Text(text = visit.visitor.displayName, fontSize = MaterialTheme.typography.labelMedium.fontSize, fontWeight = FontWeight.Bold)
+                                    Text(text = visit.visitedAt, fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                                 }
                             }
                         }
@@ -1345,7 +1343,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     onValueChange = { newCommentText = it },
                     placeholder = { Text("Write a message on wall (1-4000 chars)...") },
                     modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = PhchatShapes.compact,
                     maxLines = 3
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -1372,7 +1370,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
 
         items(myComments) { comment ->
             Card(
-                shape = RoundedCornerShape(12.dp),
+                shape = PhchatShapes.compact,
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1388,8 +1386,8 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Column(modifier = Modifier.weight(1f)) {
-                            Text(text = comment.author.displayName, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                            Text(text = comment.createdAt, fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
+                            Text(text = comment.author.displayName, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+                            Text(text = comment.createdAt, fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                         }
 
                         // Vote buttons
@@ -1407,7 +1405,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                             }
                             Text(
                                 text = "${comment.votes}",
-                                fontSize = 12.sp,
+                                fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                 fontWeight = FontWeight.Bold,
                                 modifier = Modifier.padding(horizontal = 4.dp)
                             )
@@ -1427,7 +1425,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = comment.body,
-                        fontSize = 13.sp,
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
@@ -1456,10 +1454,10 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                         label = { Text("Custom status") },
                         modifier = Modifier.fillMaxWidth()
                     )
-                    Text("Quick Presets:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text("Quick Presets:", fontSize = MaterialTheme.typography.labelMedium.fontSize, fontWeight = FontWeight.Bold)
                     statusPresets.forEach { preset ->
                         Surface(
-                            shape = RoundedCornerShape(8.dp),
+                            shape = PhchatShapes.small,
                             color = MaterialTheme.colorScheme.surfaceVariant,
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -1467,7 +1465,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                         ) {
                             Text(
                                 text = preset,
-                                fontSize = 12.sp,
+                                fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                 modifier = Modifier.padding(8.dp)
                             )
                         }
@@ -1523,7 +1521,7 @@ fun CreateRoomDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Text("Province / Location:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Province / Location:", fontSize = MaterialTheme.typography.labelMedium.fontSize, fontWeight = FontWeight.Bold)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(provinces) { (code, prov) ->
                         FilterChip(
@@ -1629,7 +1627,7 @@ fun CreatePostDialog(
                     )
                 }
 
-                Text("Category:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                Text("Category:", fontSize = MaterialTheme.typography.labelMedium.fontSize, fontWeight = FontWeight.Bold)
                 LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
                     items(categories) { cat ->
                         FilterChip(
