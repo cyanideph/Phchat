@@ -326,19 +326,18 @@ fun RoomsTab(viewModel: PhchatViewModel) {
 
         item {
             // Search field
-            OutlinedTextField(
+            PhchatSearchField(
                 value = searchInput,
                 onValueChange = {
                     searchInput = it
                     viewModel.searchQuery.value = it
                 },
-                placeholder = { Text("Search rooms, regions, or topics...") },
-                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .testTag("search_rooms_input"),
-                shape = RoundedCornerShape(14.dp),
-                singleLine = true
+                placeholder = "Search rooms, regions, or topics...",
+                onClear = {
+                    searchInput = ""
+                    viewModel.searchQuery.value = ""
+                },
+                modifier = Modifier.testTag("search_rooms_input")
             )
         }
 
@@ -349,14 +348,11 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(provinces) { (code, label) ->
-                    FilterChip(
+                    PhchatFilterChip(
                         selected = selectedProvince == code,
                         onClick = { viewModel.selectedProvinceFilter.value = code },
-                        label = {
-                            Text(
-                                text = label,
-                                fontWeight = if (selectedProvince == code) FontWeight.Bold else FontWeight.Normal
-                            )
+                        label = label
+                    )
                         },
                         leadingIcon = if (selectedProvince == code) {
                             { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
