@@ -112,7 +112,7 @@ class SupabaseRepository(
                         isJoined = membership != null,
                         isPinned = membership?.optBoolean("is_pinned", false) ?: false,
                         myRole = role,
-                        colorHex = 0xFF00A94F
+                        colorHex = 0xFFB7F34A
                     )
                 )
             }
@@ -180,7 +180,7 @@ class SupabaseRepository(
                 val deleted = !obj.isNull("deleted_at")
                 val sender = obj.optJSONObject("sender")
                 val senderName = sender?.optString("display_name")?.ifBlank { sender.optString("username") }?.ifBlank { "Tambay" }
-                    ?: if (kindStr == "system") "PHChat" else "Tambay"
+                    ?: if (kindStr == "system") "PHChat" else "User"
 
                 val kind = when (kindStr) {
                     "system" -> MessageKind.SYSTEM
@@ -209,7 +209,7 @@ class SupabaseRepository(
                         roomId = roomId,
                         senderId = senderId,
                         senderName = senderName,
-                        senderAvatarHex = 0xFF00A94F,
+                        senderAvatarHex = 0xFFB7F34A,
                         senderRole = if (kind == MessageKind.SYSTEM) MemberRole.ADMIN else MemberRole.MEMBER,
                         body = if (deleted) "[Message deleted]" else msgBody,
                         kind = kind,
@@ -257,7 +257,7 @@ class SupabaseRepository(
                 val username = obj.optString("username", "user")
                 val displayName = obj.optString("display_name", username)
                 val bio = obj.optString("bio", "")
-                val statusText = obj.optString("status_text", "Tambay online")
+                val statusText = obj.optString("status_text", "Online")
                 val isActive = obj.optBoolean("is_active", false)
 
                 list.add(
@@ -307,9 +307,9 @@ class SupabaseRepository(
                 val author = obj.optJSONObject("author")?.let { profileToModel(it) }
                     ?: Profile(
                         id = userId,
-                        username = "tambay",
-                        displayName = "Tambay",
-                        avatarInitial = "T",
+                        username = "user",
+                        displayName = "User",
+                        avatarInitial = "U",
                         avatarColorHex = 0xFF00A94F,
                         bio = "",
                         statusText = "",
@@ -726,7 +726,7 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
     }
 
     private fun profileToModel(obj: JSONObject): Profile {
-        val displayName = obj.optString("display_name").ifBlank { obj.optString("username", "Tambay") }
+        val displayName = obj.optString("display_name").ifBlank { obj.optString("username", "user") }
         return Profile(
             id = obj.optString("id"), username = obj.optString("username", "tambay"),
             displayName = displayName, avatarInitial = displayName.take(1).uppercase(),
