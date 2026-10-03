@@ -105,7 +105,7 @@ fun PhchatMark(
                 color = foregroundColor,
                 topLeft = androidx.compose.ui.geometry.Offset(bubble.left, bubble.top),
                 size = androidx.compose.ui.geometry.Size(bubble.width, bubble.height),
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(bubble.radiusX, bubble.radiusY),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(iconSize * 0.18f, iconSize * 0.18f),
                 style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke)
             )
             val cy = iconSize * 0.42f
