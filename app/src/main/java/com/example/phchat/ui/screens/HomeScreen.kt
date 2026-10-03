@@ -160,8 +160,8 @@ fun HomeScreen(
                 0 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreateRoomDialog = true },
-                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Rooms") },
-                        text = { Text("Tayo Na! Gawa ng Rooms", fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Add, contentDescription = "Create room") },
+                        text = { Text("Create room", fontWeight = FontWeight.Bold) },
                         containerColor = PhYellowSun,
                         contentColor = PhOnGoldContainer,
                         modifier = Modifier.testTag("create_room_fab")
@@ -170,8 +170,8 @@ fun HomeScreen(
                 2 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreatePostDialog = true },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Feed") },
-                        text = { Text("Mag-Post sa Feed", fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
+                        text = { Text("Create post", fontWeight = FontWeight.Bold) },
                         containerColor = PhBluePrimary,
                         contentColor = Color.White,
                         modifier = Modifier.testTag("create_post_fab")
@@ -379,7 +379,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Mga Aktibong Rooms (${rooms.size})",
+                    text = "Active rooms (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
                     color = PhBluePrimary
@@ -417,7 +417,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Ikaw ang unang mag-bukas ng tambayan sa probinsyang ito para sa iyong mga kababayan.",
+                            text = "No rooms here yet. Create the first room for this community.",
                             fontSize = 13.sp,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -450,7 +450,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     name = "${prov.name} Rooms",
                     provinceCode = prov.code,
                     provinceName = prov.name,
-                    announcement = "Maligayang pagdating sa tambayan ng mga taga-${prov.name}!"
+                    announcement = "Welcome to the ${prov.name} community room."
                 )
                 showRegionExplorer = false
             }
