@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.data.AuthState
 import com.example.phchat.ui.components.PhchatMark
-import com.example.phchat.ui.theme.PhBluePrimary
-import com.example.phchat.ui.theme.PhRedSecondary
+import com.example.phchat.ui.theme.PhchatVioletDeep
+import com.example.phchat.ui.theme.PhchatDanger
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -64,8 +64,8 @@ fun AuthScreen(
             // Phchat brand mark
             PhchatMark(
                 size = 72.dp,
-                backgroundColor = PhBluePrimary,
-                foregroundColor = Color(0xFF10110D),
+                backgroundColor = PhchatLime,
+                foregroundColor = PhchatNavy950,
                 contentDescription = "Phchat"
             )
 
@@ -75,7 +75,7 @@ fun AuthScreen(
                 text = "Phchat",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Black,
-                color = PhBluePrimary
+                color = PhchatVioletDeep
             )
             Text(
                 text = "A community built for connection",
@@ -108,7 +108,7 @@ fun AuthScreen(
             if (userMessage != null || authState is AuthState.Error) {
                 val errorMsg = userMessage ?: (authState as? AuthState.Error)?.message.orEmpty()
                 Surface(
-                    color = PhRedSecondary.copy(alpha = 0.12f),
+                    color = PhchatDanger.copy(alpha = 0.12f),
                     shape = RoundedCornerShape(12.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                 ) {
@@ -116,9 +116,9 @@ fun AuthScreen(
                         modifier = Modifier.padding(12.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = PhRedSecondary)
+                        Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = PhchatDanger)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = errorMsg, color = PhRedSecondary, fontSize = 13.sp)
+                        Text(text = errorMsg, color = PhchatDanger, fontSize = 13.sp)
                     }
                 }
             }
@@ -212,7 +212,7 @@ fun AuthScreen(
                     .fillMaxWidth()
                     .height(50.dp)
                     .testTag("auth_submit_button"),
-                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = PhchatVioletDeep),
                 enabled = !isSubmitting && authState !is AuthState.Loading
             ) {
                 if (isSubmitting || authState is AuthState.Loading) {
