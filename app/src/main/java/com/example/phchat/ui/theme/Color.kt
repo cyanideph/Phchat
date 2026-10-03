@@ -68,3 +68,8 @@ val SurfaceDark = PhGraphite
 val SurfaceVariantDark = PhSurface
 val OnSurfaceDark = PhText
 val OutlineDark = PhHairline
+
+
+// Legacy component compatibility tokens.
+val PhchatVioletDeep = PhPeriwinkle
+val PhchatSuccess = PhMint
