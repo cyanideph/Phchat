@@ -149,7 +149,7 @@ fun RoomChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.People,
-                            contentDescription = "Mga Member sa Loob"
+                            contentDescription = "Room members"
                         )
                     }
                     IconButton(onClick = { viewModel.toggleRoomPinned(room.id) }) {
@@ -315,7 +315,7 @@ fun RoomChatScreen(
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        placeholder = { Text("Member chat / use @username...") },
+                        placeholder = { Text("Message the room or use @username...") },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("message_input"),
@@ -712,7 +712,7 @@ fun RoomMessageBubble(
                             color = if (isMe) PhBlueDark else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "🇵🇭 Pinoy Sticker",
+                            text = "Chat sticker",
                             fontSize = 9.sp,
                             color = if (isMe) PhBlueDark.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline
                         )
