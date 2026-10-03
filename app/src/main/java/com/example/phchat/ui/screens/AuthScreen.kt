@@ -67,7 +67,7 @@ fun AuthScreen(
                 modifier = Modifier.size(72.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "🇵🇭", fontSize = 38.sp)
+                    Text(text = "P", fontSize = 30.sp)
                 }
             }
 
@@ -77,10 +77,10 @@ fun AuthScreen(
                 text = "Phchat",
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Black,
-                color = PhBluePrimary
+                color = PhAcidLime
             )
             Text(
-                text = "Ang Pambansang Tambayan ng Pilipinas",
+                text = "Chat with people. Find your tambayan.",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -110,8 +110,8 @@ fun AuthScreen(
             if (userMessage != null || authState is AuthState.Error) {
                 val errorMsg = userMessage ?: (authState as? AuthState.Error)?.message.orEmpty()
                 Surface(
-                    color = PhRedSecondary.copy(alpha = 0.12f),
-                    shape = RoundedCornerShape(12.dp),
+                    color = PhRedSecondary.copy(alpha = 0.14f),
+                    shape = RoundedCornerShape(14.dp),
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                 ) {
                     Row(
@@ -212,9 +212,9 @@ fun AuthScreen(
                 },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(50.dp)
+                    .height(52.dp)
                     .testTag("auth_submit_button"),
-                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary),
+                colors = ButtonDefaults.buttonColors(containerColor = PhAcidLime, contentColor = PhBlack),
                 enabled = !isSubmitting && authState !is AuthState.Loading
             ) {
                 if (isSubmitting || authState is AuthState.Loading) {
@@ -223,7 +223,7 @@ fun AuthScreen(
                     Text(
                         text = if (isRegisterMode) "Gumawa ng Account (Sign Up)" else "Pumasok sa Tambayan (Sign In)",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 15.sp
+                        fontSize = 14.sp
                     )
                 }
             }
@@ -231,7 +231,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Konektado sa Supabase ap-northeast-1 (Tokyo)",
+                text = "Your conversations stay synced across Phchat.",
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.outline
             )
