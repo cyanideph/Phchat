@@ -56,3 +56,14 @@ val Typography = Typography(
         lineHeight = 14.sp
     )
 )
+
+// Phchat spacing rhythm: keep layouts intentional and predictable.
+object PhchatSpacing {
+    val xs = 4.dp
+    val sm = 8.dp
+    val md = 12.dp
+    val lg = 16.dp
+    val xl = 24.dp
+    val xxl = 32.dp
+    val display = 48.dp
+}
