@@ -26,8 +26,8 @@ import androidx.compose.ui.unit.sp
 import com.example.phchat.model.MessageKind
 import com.example.phchat.ui.components.StickerPickerSheet
 import com.example.phchat.ui.components.UserAvatar
-import com.example.phchat.ui.theme.PhBluePrimary
-import com.example.phchat.ui.theme.PhBlueDark
+import com.example.phchat.ui.theme.PhchatLime
+import com.example.phchat.ui.theme.PhchatNavy950
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
 
@@ -124,7 +124,7 @@ fun DirectChatScreen(
                     onValueChange = { inputText = it },
                     placeholder = { Text("Message ${conv.participant.displayName.split(" ").first()}...") },
                     modifier = Modifier.weight(1f).testTag("dm_input"),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = MaterialTheme.shapes.medium,
                     maxLines = 4
                 )
 
@@ -145,13 +145,13 @@ fun DirectChatScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                        .background(if (inputText.isNotBlank()) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant)
+                        .background(if (inputText.isNotBlank()) PhchatLime else MaterialTheme.colorScheme.surfaceVariant)
                         .testTag("dm_send_button")
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) PhBlueDark else MaterialTheme.colorScheme.outline
+                        tint = if (inputText.isNotBlank()) PhchatNavy950 else MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -172,7 +172,7 @@ fun DirectChatScreen(
                     horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
                 ) {
                     Surface(
-                        color = if (isMe) PhBluePrimary else MaterialTheme.colorScheme.surfaceVariant,
+                        color = if (isMe) PhchatLime else MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(
                             topStart = 16.dp,
                             topEnd = 16.dp,
@@ -188,12 +188,12 @@ fun DirectChatScreen(
                             }
                             Text(
                                 text = msg.body,
-                                color = if (isMe) PhBlueDark else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isMe) PhchatNavy950 else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = msg.timestamp,
-                                color = if (isMe) PhBlueDark.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
+                                color = if (isMe) PhchatNavy950.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
