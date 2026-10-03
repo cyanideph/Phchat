@@ -60,12 +60,13 @@ fun PhchatTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    // Dynamic colors stay disabled so OEM wallpaper palettes cannot change Phchat's identity.
+    // Intentionally ignore OEM dynamic colors: Phchat owns its visual identity.
     val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
+        shapes = PhchatShapes,
         content = content
     )
 }
