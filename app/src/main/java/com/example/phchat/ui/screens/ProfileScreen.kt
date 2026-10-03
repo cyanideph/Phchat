@@ -198,7 +198,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = commentText,
                         onValueChange = { commentText = it },
-                        placeholder = { Text("Write on wall...") },
+                        placeholder = { Text("Write a post...") },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     )
