@@ -231,7 +231,7 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun UzzapRetroTicker(
+fun PhchatLiveStrip(
     roomCount: Int,
     onlineCount: Int = 18,
     modifier: Modifier = Modifier
@@ -370,7 +370,7 @@ fun StreakPointsCard(
 }
 
 @Composable
-fun PinoyStickerDrawer(
+fun PhchatStickerDrawer(
     onStickerSelected: (ChatSticker) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -453,7 +453,7 @@ fun StickerPickerSheet(
     ModalBottomSheet(
         onDismissRequest = onDismiss
     ) {
-        PinoyStickerDrawer(
+        PhchatStickerDrawer(
             onStickerSelected = {
                 onSelectSticker(it)
                 onDismiss()
@@ -462,6 +462,16 @@ fun StickerPickerSheet(
         )
     }
 }
+
+@Deprecated("Use PhchatLiveStrip")
+@Composable
+fun UzzapRetroTicker(roomCount: Int, onlineCount: Int = 18, modifier: Modifier = Modifier) =
+    PhchatLiveStrip(roomCount, onlineCount, modifier)
+
+@Deprecated("Use PhchatStickerDrawer")
+@Composable
+fun PinoyStickerDrawer(onStickerSelected: (ChatSticker) -> Unit, onDismiss: () -> Unit) =
+    PhchatStickerDrawer(onStickerSelected, onDismiss)
 
 @Composable
 fun QuickReactionRow(
