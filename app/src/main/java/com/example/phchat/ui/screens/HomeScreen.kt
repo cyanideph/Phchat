@@ -785,7 +785,7 @@ fun ChikaTab(viewModel: PhchatViewModel) {
                             Text("☀️", fontSize = 24.sp)
                             Spacer(modifier = Modifier.width(10.dp))
                             Column {
-                                Text("Talaan ng Barkada (Uzzap Buddies)", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = PhOnGoldContainer)
+                                Text("Talaan ng Barkada", fontWeight = FontWeight.Bold, fontSize = 13.sp, color = PhOnGoldContainer)
                                 Text("Maaari mong kausapin ang iyong mga barkada anumang oras.", fontSize = 11.sp, color = PhOnGoldContainer.copy(alpha = 0.8f))
                             }
                         }
