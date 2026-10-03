@@ -76,7 +76,7 @@ fun RoomChatScreen(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
-            viewModel.sendRoomMessage(room.id, "Photo: $uri")
+            viewModel.sendRoomMessage(room.id, "📷 Nag-padala ng larawan: $uri")
         }
     }
 
@@ -107,14 +107,14 @@ fun RoomChatScreen(
                                 Icon(
                                     imageVector = Icons.Default.Lock,
                                     contentDescription = "Locked",
-                                    tint = PhchatVioletStrong,
+                                    tint = PhRedSecondary,
                                     modifier = Modifier.size(14.dp)
                                 )
                             }
                         }
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
-                                text = "${room.provinceName} · ${room.onlineCount} online",
+                                text = "${room.provinceName} • ${room.onlineCount} online",
                                 fontSize = 11.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
@@ -139,8 +139,8 @@ fun RoomChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.Vibration,
-                            contentDescription = "Buzz",
-                            tint = PhchatLime
+                            contentDescription = "Kalabit / Buzz",
+                            tint = PhAcidLime
                         )
                     }
                     IconButton(
@@ -149,14 +149,14 @@ fun RoomChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.People,
-                            contentDescription = "Room members"
+                            contentDescription = "Mga Tambay sa Loob"
                         )
                     }
                     IconButton(onClick = { viewModel.toggleRoomPinned(room.id) }) {
                         Icon(
                             imageVector = if (room.isPinned) Icons.Default.PushPin else Icons.Default.BookmarkBorder,
                             contentDescription = "Pin",
-                            tint = if (room.isPinned) PhchatVioletStrong else MaterialTheme.colorScheme.onSurface
+                            tint = if (room.isPinned) PhAcidLime else MaterialTheme.colorScheme.onSurface
                         )
                     }
                     Box {
@@ -228,7 +228,7 @@ fun RoomChatScreen(
                                     text = "Replying to ${replyingTo?.senderName}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 11.sp,
-                                    color = PhchatLime
+                                    color = PhBluePrimary
                                 )
                                 Text(
                                     text = replyingTo?.snippet ?: "",
@@ -266,7 +266,7 @@ fun RoomChatScreen(
                     items(quickPills) { phrase ->
                         Surface(
                             shape = RoundedCornerShape(14.dp),
-                            color = PhchatVioletDeep.copy(alpha = 0.18f),
+                            color = PhBlueContainer,
                             modifier = Modifier.clickable {
                                 viewModel.sendRoomMessage(room.id, phrase, replyingTo)
                                 replyingTo = null
@@ -276,7 +276,7 @@ fun RoomChatScreen(
                                 text = phrase,
                                 fontSize = 11.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = PhchatLavender100,
+                                color = PhOnBlueContainer,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                             )
                         }
@@ -294,7 +294,7 @@ fun RoomChatScreen(
                         onClick = { showStickerSheet = true },
                         modifier = Modifier.testTag("sticker_button")
                     ) {
-                        Text(text = "🇵🇭", fontSize = 22.sp)
+                        Icon(Icons.Default.EmojiEmotions, contentDescription = "Stickers")
                     }
 
                     IconButton(
@@ -308,14 +308,14 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = Icons.Default.Image,
                             contentDescription = "Photo",
-                            tint = PhchatLime
+                            tint = PhAcidLime
                         )
                     }
 
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        placeholder = { Text("Message the room or use @username...") },
+                        placeholder = { Text("Tambay chat / use @username...") },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("message_input"),
@@ -341,13 +341,13 @@ fun RoomChatScreen(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(CircleShape)
-                             .background(if (inputText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
+                            .background(if (inputText.isNotBlank()) PhAcidLime else MaterialTheme.colorScheme.surfaceVariant)
                             .testTag("send_button")
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
-                            tint = if (inputText.isNotBlank()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline
+                            tint = if (inputText.isNotBlank()) PhBlack else MaterialTheme.colorScheme.outline
                         )
                     }
                 }
@@ -362,7 +362,7 @@ fun RoomChatScreen(
             // Room announcement / Pinned banner
             if (room.announcement.isNotBlank() || room.pinnedMessage != null) {
                 Surface(
-                    color = PhchatVioletDeep.copy(alpha = 0.18f),
+                    color = PhBlueContainer,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
@@ -374,14 +374,14 @@ fun RoomChatScreen(
                         Icon(
                             imageVector = Icons.Default.Campaign,
                             contentDescription = null,
-                            tint = PhchatLime,
+                            tint = PhBluePrimary,
                             modifier = Modifier.size(18.dp)
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = room.announcement.ifBlank { "Pinned: " + room.pinnedMessage?.body },
                             fontSize = 12.sp,
-                            color = PhchatLavender100,
+                            color = PhOnBlueContainer,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
                             modifier = Modifier.weight(1f)
@@ -670,7 +670,7 @@ fun RoomMessageBubble(
                             text = "Replying to ${message.replyTo.senderName}",
                             fontSize = 10.sp,
                             fontWeight = FontWeight.Bold,
-                            color = PhchatLime
+                            color = PhBluePrimary
                         )
                         Text(
                             text = message.replyTo.snippet,
@@ -686,7 +686,7 @@ fun RoomMessageBubble(
             Surface(
                 color = when {
                     message.isDeleted -> MaterialTheme.colorScheme.surfaceVariant
-                    isMe -> MaterialTheme.colorScheme.primaryContainer
+                    isMe -> PhBluePrimary
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
                 shape = RoundedCornerShape(
@@ -709,12 +709,12 @@ fun RoomMessageBubble(
                             text = message.body,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (isMe) PhBlack else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
-                            text = "Chat sticker",
+                            text = "Pinoy Sticker",
                             fontSize = 9.sp,
-                            color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline
+                            color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline
                         )
                     }
                 } else {
@@ -723,7 +723,7 @@ fun RoomMessageBubble(
                             text = message.body,
                             color = when {
                                 message.isDeleted -> MaterialTheme.colorScheme.outline
-                                isMe -> MaterialTheme.colorScheme.onPrimaryContainer
+                                isMe -> PhBlack
                                 else -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             fontSize = 14.sp
@@ -731,7 +731,7 @@ fun RoomMessageBubble(
                         if (isMe) {
                             Text(
                                 text = message.timestamp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
+                                color = PhBlack.copy(alpha = 0.62f),
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
