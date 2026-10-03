@@ -31,6 +31,47 @@ import com.example.phchat.model.StickerPacks
 import com.example.phchat.ui.theme.*
 
 @Composable
+fun PhchatBackdrop(
+    modifier: Modifier = Modifier,
+    intensity: Float = 1f
+) {
+    androidx.compose.foundation.Canvas(
+        modifier = modifier.fillMaxSize()
+    ) {
+        val w = size.width
+        val h = size.height
+        drawRect(color = MaterialTheme.colorScheme.background)
+
+        val lime = PhBlueLight.copy(alpha = 0.10f * intensity)
+        val amber = PhYellowSun.copy(alpha = 0.08f * intensity)
+        val graphite = Color(0xFF1A1A17).copy(alpha = 0.16f * intensity)
+
+        drawCircle(
+            color = lime,
+            radius = w * 0.48f,
+            center = androidx.compose.ui.geometry.Offset(w * 0.86f, h * 0.08f)
+        )
+        drawCircle(
+            color = amber,
+            radius = w * 0.32f,
+            center = androidx.compose.ui.geometry.Offset(w * 0.08f, h * 0.78f)
+        )
+
+        val step = 34.dp.toPx()
+        var x = -h
+        while (x < w + h) {
+            drawLine(
+                color = graphite,
+                start = androidx.compose.ui.geometry.Offset(x, 0f),
+                end = androidx.compose.ui.geometry.Offset(x + h, h),
+                strokeWidth = 1.dp.toPx()
+            )
+            x += step
+        }
+    }
+}
+
+@Composable
 fun UserAvatar(
     initial: String,
     colorHex: Long,
@@ -72,9 +113,9 @@ fun UserAvatar(
 @Composable
 fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
     val (label, bg, fg) = when (role) {
-        MemberRole.OWNER -> Triple("👑 OWNER", RoleOwner.copy(alpha = 0.15f), RoleOwner)
-        MemberRole.ADMIN -> Triple("🛡️ ADMIN", RoleAdmin.copy(alpha = 0.15f), RoleAdmin)
-        MemberRole.MODERATOR -> Triple("⭐ MOD", RoleMod.copy(alpha = 0.15f), RoleMod)
+        MemberRole.OWNER -> Triple("OWNER", RoleOwner.copy(alpha = 0.15f), RoleOwner)
+        MemberRole.ADMIN -> Triple("ADMIN", RoleAdmin.copy(alpha = 0.15f), RoleAdmin)
+        MemberRole.MODERATOR -> Triple("MOD", RoleMod.copy(alpha = 0.15f), RoleMod)
         MemberRole.MEMBER -> return
     }
 
@@ -96,14 +137,14 @@ fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
 @Composable
 fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
     val (glyph, bg, fg) = when (code.uppercase()) {
-        "NCR", "MNL" -> Triple("🏙️", RegionNcr.copy(alpha = 0.12f), RegionNcr)
-        "CEB" -> Triple("🏝️", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
-        "DVO" -> Triple("🦅", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
-        "PAM", "BUL" -> Triple("🍲", RegionLuzon.copy(alpha = 0.15f), RegionLuzon)
-        "ILO", "NEG" -> Triple("⛵", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
-        "BAG", "BEN" -> Triple("🌲", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
-        "ALB", "CAM" -> Triple("🌶️", RegionBicol.copy(alpha = 0.15f), RegionBicol)
-        else -> Triple("📍", PhBlueContainer, PhOnBlueContainer)
+        "NCR", "MNL" -> Triple("NCR", RegionNcr.copy(alpha = 0.12f), RegionNcr)
+        "CEB" -> Triple("CEB", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
+        "DVO" -> Triple("DVO", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
+        "PAM", "BUL" -> Triple("PAM", RegionLuzon.copy(alpha = 0.15f), RegionLuzon)
+        "ILO", "NEG" -> Triple("ILO", RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
+        "BAG", "BEN" -> Triple("BAG", RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
+        "ALB", "CAM" -> Triple("ALB", RegionBicol.copy(alpha = 0.15f), RegionBicol)
+        else -> Triple("•", PhBlueContainer, PhOnBlueContainer)
     }
 
     Surface(
@@ -116,7 +157,7 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
             modifier = Modifier.padding(horizontal = 7.dp, vertical = 2.5.dp)
         ) {
             Text(
-                text = "$glyph $code",
+                text = if (glyph == "•") code else glyph,
                 color = fg,
                 fontSize = 11.sp,
                 fontWeight = FontWeight.ExtraBold
@@ -152,7 +193,7 @@ fun UzzapRetroTicker(
                 )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "PILIPINAS LIVE",
+                    text = "LIVE NOW",
                     color = PhYellowSun,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black
@@ -167,7 +208,7 @@ fun UzzapRetroTicker(
             }
 
             Text(
-                text = "⚡ $onlineCount Tambay Online",
+                text = "$onlineCount ONLINE",
                 color = Color.White.copy(alpha = 0.85f),
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold
@@ -219,7 +260,7 @@ fun StreakPointsCard(
                 Spacer(modifier = Modifier.width(12.dp))
                 Column {
                     Text(
-                        text = "🔥 $streak-Araw na Tambay!",
+                        text = "$streak-day activity streak",
                         fontWeight = FontWeight.Black,
                         fontSize = 16.sp,
                         color = Color.White
@@ -233,7 +274,7 @@ fun StreakPointsCard(
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
-                            text = "$points Tambay Points",
+                            text = "$points points",
                             fontSize = 13.sp,
                             color = PhGoldContainer,
                             fontWeight = FontWeight.Medium
@@ -255,7 +296,7 @@ fun StreakPointsCard(
                 modifier = Modifier.testTag("checkin_button")
             ) {
                 Text(
-                    text = if (hasCheckedIn) "Naka-Check In ✓" else "Mag-Tambay +50",
+                    text = if (hasCheckedIn) "Checked in" else "Check in +50",
                     fontWeight = FontWeight.ExtraBold,
                     fontSize = 11.sp
                 )
@@ -286,7 +327,7 @@ fun PinoyStickerDrawer(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "🇵🇭 Pinoy Retro Chat Stickers",
+                        text = "Chat stickers",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
                         color = PhBluePrimary
