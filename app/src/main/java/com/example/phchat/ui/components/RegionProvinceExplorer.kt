@@ -104,7 +104,7 @@ fun RegionProvinceExplorerSheet(
                                             text = region.name,
                                             fontWeight = FontWeight.Bold,
                                             fontSize = 14.sp,
-                                            color = if (isExpanded) PhOnBlueContainer else MaterialTheme.colorScheme.onSurface
+                                            color = if (isExpanded) PhBlack else MaterialTheme.colorScheme.onSurface
                                         )
                                         Text(
                                             text = "${region.islandGroup} • ${region.provinces.size} Provinces/Cities",

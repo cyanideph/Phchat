@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
@@ -29,7 +28,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.phchat.model.*
 import com.example.phchat.ui.components.*
 import com.example.phchat.ui.dialogs.*
@@ -98,7 +96,7 @@ fun RoomChatScreen(
                             Text(
                                 text = room.name,
                                 fontWeight = FontWeight.Bold,
-                                fontSize = 16.sp,
+                                fontSize = MaterialTheme.typography.titleMedium.fontSize,
                                 maxLines = 1,
                                 overflow = TextOverflow.Ellipsis
                             )
@@ -115,7 +113,7 @@ fun RoomChatScreen(
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Text(
                                 text = "${room.provinceName} • ${room.onlineCount} online",
-                                fontSize = 11.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
@@ -227,12 +225,12 @@ fun RoomChatScreen(
                                 Text(
                                     text = "Replying to ${replyingTo?.senderName}",
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = 11.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     color = PhAcidLime
                                 )
                                 Text(
                                     text = replyingTo?.snippet ?: "",
-                                    fontSize = 11.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -265,7 +263,7 @@ fun RoomChatScreen(
                     )
                     items(quickPills) { phrase ->
                         Surface(
-                            shape = RoundedCornerShape(14.dp),
+                            shape = PhchatShapes.medium,
                             color = PhAcidLime.copy(alpha = 0.16f),
                             modifier = Modifier.clickable {
                                 viewModel.sendRoomMessage(room.id, phrase, replyingTo)
@@ -274,7 +272,7 @@ fun RoomChatScreen(
                         ) {
                             Text(
                                 text = phrase,
-                                fontSize = 11.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 fontWeight = FontWeight.Bold,
                                 color = PhBlack,
                                 modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
@@ -319,7 +317,7 @@ fun RoomChatScreen(
                         modifier = Modifier
                             .weight(1f)
                             .testTag("message_input"),
-                        shape = RoundedCornerShape(24.dp),
+                        shape = PhchatShapes.large,
                         maxLines = 4
                     )
 
@@ -380,7 +378,7 @@ fun RoomChatScreen(
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = room.announcement.ifBlank { "Pinned: " + room.pinnedMessage?.body },
-                            fontSize = 12.sp,
+                            fontSize = MaterialTheme.typography.labelMedium.fontSize,
                             color = PhBlack,
                             maxLines = 2,
                             overflow = TextOverflow.Ellipsis,
@@ -434,11 +432,11 @@ fun RoomChatScreen(
         AlertDialog(
             onDismissRequest = { selectedMessageForMenu = null },
             title = {
-                Text("Message from ${msg.senderName}", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                Text("Message from ${msg.senderName}", fontSize = MaterialTheme.typography.titleMedium.fontSize, fontWeight = FontWeight.Bold)
             },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text("Quick Reactions:", fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                    Text("Quick Reactions:", fontSize = MaterialTheme.typography.labelMedium.fontSize, fontWeight = FontWeight.SemiBold)
                     QuickReactionRow(
                         onSelectEmoji = { emoji ->
                             viewModel.toggleMessageReaction(room.id, msg.id, emoji)
@@ -595,11 +593,11 @@ fun SystemMessageBubble(message: RoomMessage) {
     ) {
         Surface(
             color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-            shape = RoundedCornerShape(12.dp)
+            shape = PhchatShapes.compact
         ) {
             Text(
                 text = message.body,
-                fontSize = 11.sp,
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -644,7 +642,7 @@ fun RoomMessageBubble(
                     Text(
                         text = message.senderName,
                         fontWeight = FontWeight.Bold,
-                        fontSize = 12.sp,
+                        fontSize = MaterialTheme.typography.labelMedium.fontSize,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -652,7 +650,7 @@ fun RoomMessageBubble(
                     Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = message.timestamp,
-                        fontSize = 10.sp,
+                        fontSize = MaterialTheme.typography.labelSmall.fontSize,
                         color = MaterialTheme.colorScheme.outline
                     )
                 }
@@ -662,19 +660,19 @@ fun RoomMessageBubble(
             if (message.replyTo != null) {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                    shape = PhchatShapes.compact,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) {
                         Text(
                             text = "Replying to ${message.replyTo.senderName}",
-                            fontSize = 10.sp,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
                             fontWeight = FontWeight.Bold,
                             color = PhAcidLime
                         )
                         Text(
                             text = message.replyTo.snippet,
-                            fontSize = 10.sp,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
@@ -689,12 +687,7 @@ fun RoomMessageBubble(
                     isMe -> PhAcidLime
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomStart = if (isMe) 16.dp else 4.dp,
-                    bottomEnd = if (isMe) 4.dp else 16.dp
-                ),
+                shape = PhchatShapes.messageBubble(isMe),
                 shadowElevation = 1.dp,
                 modifier = Modifier.clickable { onClick() }
             ) {
@@ -703,17 +696,17 @@ fun RoomMessageBubble(
                         modifier = Modifier.padding(12.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = message.stickerEmoji ?: "🇵🇭", fontSize = 42.sp)
+                        Text(text = message.stickerEmoji ?: "🇵🇭", fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = message.body,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = if (isMe) PhBlack else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "Pinoy Sticker",
-                            fontSize = 9.sp,
+                            fontSize = MaterialTheme.typography.labelSmall.fontSize,
                             color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline
                         )
                     }
@@ -726,13 +719,13 @@ fun RoomMessageBubble(
                                 isMe -> PhBlack
                                 else -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
-                            fontSize = 14.sp
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize
                         )
                         if (isMe) {
                             Text(
                                 text = message.timestamp,
                                 color = PhBlack.copy(alpha = 0.62f),
-                                fontSize = 9.sp,
+                                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                 modifier = Modifier.align(Alignment.End)
                             )
                         }
@@ -750,7 +743,7 @@ fun RoomMessageBubble(
                     message.reactions.forEach { (emoji, count) ->
                         Surface(
                             color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(12.dp),
+                            shape = PhchatShapes.compact,
                             shadowElevation = 1.dp,
                             modifier = Modifier.clickable { onReactionClick(emoji) }
                         ) {
@@ -758,11 +751,11 @@ fun RoomMessageBubble(
                                 modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
-                                Text(text = emoji, fontSize = 12.sp)
+                                Text(text = emoji, fontSize = MaterialTheme.typography.labelMedium.fontSize)
                                 Spacer(modifier = Modifier.width(2.dp))
                                 Text(
                                     text = "$count",
-                                    fontSize = 10.sp,
+                                    fontSize = MaterialTheme.typography.labelSmall.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )

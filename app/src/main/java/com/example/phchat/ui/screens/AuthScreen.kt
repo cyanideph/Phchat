@@ -3,7 +3,6 @@ package com.example.phchat.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -18,11 +17,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.phchat.data.AuthState
 import com.example.phchat.ui.theme.PhAcidLime
+import com.example.phchat.ui.theme.PhchatShapes
 import com.example.phchat.ui.theme.PhBlack
-import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
@@ -65,11 +63,11 @@ fun AuthScreen(
             // Phchat editorial header
             Surface(
                 color = PhAcidLime,
-                shape = RoundedCornerShape(20.dp),
+                shape = PhchatShapes.large,
                 modifier = Modifier.size(72.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "P", fontSize = 30.sp)
+                    Text(text = "P", fontSize = MaterialTheme.typography.headlineLarge.fontSize)
                 }
             }
 
@@ -77,13 +75,13 @@ fun AuthScreen(
 
             Text(
                 text = "Phchat",
-                fontSize = 28.sp,
+                fontSize = MaterialTheme.typography.headlineLarge.fontSize,
                 fontWeight = FontWeight.Black,
                 color = PhAcidLime
             )
             Text(
                 text = "Chat with people. Find your tambayan.",
-                fontSize = 13.sp,
+                fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                 color = MaterialTheme.colorScheme.outline
             )
 
@@ -113,7 +111,7 @@ fun AuthScreen(
                 val errorMsg = userMessage ?: (authState as? AuthState.Error)?.message.orEmpty()
                 Surface(
                     color = PhRedSecondary.copy(alpha = 0.14f),
-                    shape = RoundedCornerShape(14.dp),
+                    shape = PhchatShapes.medium,
                     modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                 ) {
                     Row(
@@ -122,7 +120,7 @@ fun AuthScreen(
                     ) {
                         Icon(Icons.Default.ErrorOutline, contentDescription = null, tint = PhRedSecondary)
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text(text = errorMsg, color = PhRedSecondary, fontSize = 13.sp)
+                        Text(text = errorMsg, color = PhRedSecondary, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
                     }
                 }
             }
@@ -225,7 +223,7 @@ fun AuthScreen(
                     Text(
                         text = if (isRegisterMode) "Gumawa ng Account (Sign Up)" else "Pumasok sa Tambayan (Sign In)",
                         fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp
+                        fontSize = MaterialTheme.typography.bodyMedium.fontSize
                     )
                 }
             }
@@ -234,7 +232,7 @@ fun AuthScreen(
 
             Text(
                 text = "Your conversations stay synced across Phchat.",
-                fontSize = 11.sp,
+                fontSize = MaterialTheme.typography.labelSmall.fontSize,
                 color = MaterialTheme.colorScheme.outline
             )
         }

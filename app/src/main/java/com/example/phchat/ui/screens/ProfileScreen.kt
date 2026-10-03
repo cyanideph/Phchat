@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Chat
@@ -21,10 +20,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.phchat.ui.components.UserAvatar
 import com.example.phchat.ui.theme.PhAcidLime
-import com.example.phchat.ui.theme.PhAcidLime
+import com.example.phchat.ui.theme.PhchatShapes
 import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.ui.theme.PhMint
 import com.example.phchat.ui.theme.PhRedSecondary
@@ -84,7 +82,7 @@ fun ProfileScreen(
         ) {
             item {
                 Card(
-                    shape = RoundedCornerShape(16.dp),
+                    shape = PhchatShapes.medium,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -102,22 +100,22 @@ fun ProfileScreen(
                         Text(
                             text = profile.displayName,
                             fontWeight = FontWeight.Bold,
-                            fontSize = 18.sp
+                            fontSize = MaterialTheme.typography.titleLarge.fontSize
                         )
                         Text(
                             text = "@${profile.username} • ${profile.province}",
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = MaterialTheme.colorScheme.outline
                         )
 
                         Spacer(modifier = Modifier.height(6.dp))
                         Surface(
                             color = MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(16.dp)
+                            shape = PhchatShapes.medium
                         ) {
                             Text(
                                 text = profile.statusText,
-                                fontSize = 12.sp,
+                                fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                 fontWeight = FontWeight.Medium,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
                             )
@@ -126,7 +124,7 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = profile.bio,
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
 
@@ -168,16 +166,16 @@ fun ProfileScreen(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "${profile.points}", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                Text(text = "Points", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                                Text(text = "${profile.points}", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                                Text(text = "Points", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = "${profile.streak} days", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                Text(text = "Streak", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                                Text(text = "${profile.streak} days", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                                Text(text = "Streak", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                                Text(text = if (profile.isActive) "Online" else "Away", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                                Text(text = "Status", fontSize = 11.sp, color = MaterialTheme.colorScheme.outline)
+                                Text(text = if (profile.isActive) "Online" else "Away", fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.titleMedium.fontSize)
+                                Text(text = "Status", fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                         }
                     }
@@ -202,7 +200,7 @@ fun ProfileScreen(
                         onValueChange = { commentText = it },
                         placeholder = { Text("Write on wall...") },
                         modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = PhchatShapes.compact
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(
@@ -224,7 +222,7 @@ fun ProfileScreen(
 
             items(comments) { comment ->
                 Card(
-                    shape = RoundedCornerShape(12.dp),
+                    shape = PhchatShapes.compact,
                     colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -240,8 +238,8 @@ fun ProfileScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Column(modifier = Modifier.weight(1f)) {
-                                Text(text = comment.author.displayName, fontWeight = FontWeight.Bold, fontSize = 13.sp)
-                                Text(text = comment.createdAt, fontSize = 10.sp, color = MaterialTheme.colorScheme.outline)
+                                Text(text = comment.author.displayName, fontWeight = FontWeight.Bold, fontSize = MaterialTheme.typography.bodyMedium.fontSize)
+                                Text(text = comment.createdAt, fontSize = MaterialTheme.typography.labelSmall.fontSize, color = MaterialTheme.colorScheme.outline)
                             }
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 IconButton(
@@ -257,7 +255,7 @@ fun ProfileScreen(
                                 }
                                 Text(
                                     text = "${comment.votes}",
-                                    fontSize = 12.sp,
+                                    fontSize = MaterialTheme.typography.labelMedium.fontSize,
                                     fontWeight = FontWeight.Bold,
                                     modifier = Modifier.padding(horizontal = 4.dp)
                                 )
@@ -277,7 +275,7 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = comment.body,
-                            fontSize = 13.sp,
+                            fontSize = MaterialTheme.typography.bodyMedium.fontSize,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
