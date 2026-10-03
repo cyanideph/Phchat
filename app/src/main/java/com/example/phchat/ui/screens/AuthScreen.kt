@@ -67,7 +67,7 @@ fun AuthScreen(
                 modifier = Modifier.size(72.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(text = "🇵🇭", fontSize = 38.sp)
+                    Text(text = "", fontSize = 38.sp)
                 }
             }
 
@@ -80,7 +80,7 @@ fun AuthScreen(
                 color = PhBluePrimary
             )
             Text(
-                text = "Ang Pambansang Tambayan ng Pilipinas",
+                text = "Ang Pambansang Communityan ng Pilipinas",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -221,7 +221,7 @@ fun AuthScreen(
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(22.dp))
                 } else {
                     Text(
-                        text = if (isRegisterMode) "Gumawa ng Account (Sign Up)" else "Pumasok sa Tambayan (Sign In)",
+                        text = if (isRegisterMode) "Create account (Sign Up)" else "Pumasok sa Communityan (Sign In)",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
