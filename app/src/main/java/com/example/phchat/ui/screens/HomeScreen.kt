@@ -1623,3 +1623,68 @@ fun CreatePostDialog(
                         label = { Text("📊 Poll") }
                     )
                 }
+
+                OutlinedTextField(
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text(if (isPoll) "Poll Question" else "Title") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                OutlinedTextField(
+                    value = body,
+                    onValueChange = { body = it },
+                    label = { Text("Description / Details") },
+                    modifier = Modifier.fillMaxWidth(),
+                    maxLines = 3
+                )
+
+                if (isPoll) {
+                    OutlinedTextField(
+                        value = option1,
+                        onValueChange = { option1 = it },
+                        label = { Text("Option 1") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    OutlinedTextField(
+                        value = option2,
+                        onValueChange = { option2 = it },
+                        label = { Text("Option 2") },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+
+                Text("Category:", fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                LazyRow(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
+                    items(categories) { cat ->
+                        FilterChip(
+                            selected = category == cat,
+                            onClick = { category = cat },
+                            label = { Text(cat) }
+                        )
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    if (title.isNotBlank()) {
+                        val pollList = if (isPoll && option1.isNotBlank() && option2.isNotBlank()) {
+                            listOf(option1, option2)
+                        } else emptyList()
+                        onCreate(title, body, category, pollList)
+                    }
+                },
+                enabled = title.isNotBlank()
+            ) {
+                Text("Publish")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        }
+    )
+}
