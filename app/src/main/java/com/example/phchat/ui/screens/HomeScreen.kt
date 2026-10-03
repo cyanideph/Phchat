@@ -55,7 +55,7 @@ fun HomeScreen(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "🇵🇭 Phchat",
+                            text = "Phchat",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                             color = MaterialTheme.colorScheme.primary
@@ -66,7 +66,7 @@ fun HomeScreen(
                             shape = RoundedCornerShape(10.dp)
                         ) {
                             Text(
-                                text = "PINOY",
+                                text = "COMMUNITY",
                                 color = Color.White,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Bold,
@@ -121,36 +121,36 @@ fun HomeScreen(
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Tambayan") },
-                    label = { Text("Tambayan", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_tambayan")
+                    icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Rooms") },
+                    label = { Text("Rooms", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_rooms")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Chika") },
-                    label = { Text("Chika", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_chika")
+                    icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Messages") },
+                    label = { Text("Messages", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_messages")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.Campaign, contentDescription = "Plaza") },
-                    label = { Text("Plaza", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_plaza")
+                    icon = { Icon(Icons.Default.Campaign, contentDescription = "Feed") },
+                    label = { Text("Feed", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_feed")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
-                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Dangal") },
-                    label = { Text("Dangal", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_dangal")
+                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Highlights") },
+                    label = { Text("Highlights", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_highlights")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 4,
                     onClick = { selectedTab = 4 },
-                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Ako") },
-                    label = { Text("Ako", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
+                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Profile") },
+                    label = { Text("Profile", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("tab_profile")
                 )
             }
@@ -160,8 +160,8 @@ fun HomeScreen(
                 0 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreateRoomDialog = true },
-                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
-                        text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Rooms") },
+                        text = { Text("Tayo Na! Gawa ng Rooms", fontWeight = FontWeight.Bold) },
                         containerColor = PhYellowSun,
                         contentColor = PhOnGoldContainer,
                         modifier = Modifier.testTag("create_room_fab")
@@ -170,8 +170,8 @@ fun HomeScreen(
                 2 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreatePostDialog = true },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Plaza") },
-                        text = { Text("Mag-Post sa Plaza", fontWeight = FontWeight.Bold) },
+                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Feed") },
+                        text = { Text("Mag-Post sa Feed", fontWeight = FontWeight.Bold) },
                         containerColor = PhBluePrimary,
                         contentColor = Color.White,
                         modifier = Modifier.testTag("create_post_fab")
@@ -186,8 +186,8 @@ fun HomeScreen(
                 .padding(innerPadding)
         ) {
             when (selectedTab) {
-                0 -> TambayanTab(viewModel = viewModel)
-                1 -> ChikaTab(viewModel = viewModel)
+                0 -> RoomsTab(viewModel = viewModel)
+                1 -> MessagesTab(viewModel = viewModel)
                 2 -> CommunityTab(viewModel = viewModel)
                 3 -> TambayHallTab(viewModel = viewModel)
                 4 -> MyProfileTab(viewModel = viewModel)
@@ -218,16 +218,16 @@ fun HomeScreen(
     }
 }
 
-// ---------------- TAB 0: Tambayan (Rooms) ----------------
+// ---------------- TAB 0: Rooms (Rooms) ----------------
 @Composable
-fun TambayanTab(viewModel: PhchatViewModel) {
+fun RoomsTab(viewModel: PhchatViewModel) {
     val rooms by viewModel.filteredRooms.collectAsState()
     val selectedProvince by viewModel.selectedProvinceFilter.collectAsState()
     var searchInput by remember { mutableStateOf("") }
     var showRegionExplorer by remember { mutableStateOf(false) }
 
     val provinces = listOf(
-        "ALL" to "🇵🇭 Lahat ng Probinsya",
+        "ALL" to " All provinces",
         "NCR" to "🏙️ Metro Manila (NCR)",
         "CEB" to "🏝️ Cebu (Sugbo)",
         "DVO" to "🦅 Davao Region",
@@ -258,7 +258,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.img_tambayan_hero),
-                        contentDescription = "Pambansang Tambayan Banner",
+                        contentDescription = "Pambansang Rooms Banner",
                         modifier = Modifier.fillMaxSize(),
                         contentScale = ContentScale.Crop
                     )
@@ -286,7 +286,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = "☀️ PAMBANSANG TAMBAYAN",
+                                text = "☀️ COMMUNITY ROOMS",
                                 color = PhOnGoldContainer,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
@@ -295,13 +295,13 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         }
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Usapang Pinoy, Bawat Probinsya",
+                            text = "Conversations across communities",
                             color = Color.White,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
+                            text = "Discover active rooms and people",
                             color = Color(0xFFDCE6F5),
                             fontSize = 11.sp
                         )
@@ -334,7 +334,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "🗺️ 17 Rehiyon & 81 Lalawigan Explorer ➜",
+                    text = "Explore regions and provinces",
                     fontWeight = FontWeight.Black,
                     fontSize = 13.sp
                 )
@@ -349,7 +349,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     searchInput = it
                     viewModel.searchQuery.value = it
                 },
-                placeholder = { Text("Hanapin ang tambayan, probinsya, o paksa...") },
+                placeholder = { Text("Search rooms, regions, or topics...") },
                 leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -390,13 +390,13 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Mga Aktibong Tambayan (${rooms.size})",
+                    text = "Mga Aktibong Rooms (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
                     color = PhBluePrimary
                 )
                 Text(
-                    text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
+                    text = if (selectedProvince == "ALL") "All" else selectedProvince,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -418,10 +418,10 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "🇵🇭", fontSize = 48.sp)
+                        Text(text = "", fontSize = 48.sp)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "Walang tambayan pa rito!",
+                            text = "No rooms here yet.",
                             fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
                             color = PhBluePrimary
@@ -458,7 +458,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
             },
             onCreateRoomInProvince = { prov ->
                 viewModel.createRoom(
-                    name = "${prov.name} Tambayan",
+                    name = "${prov.name} Rooms",
                     provinceCode = prov.code,
                     provinceName = prov.name,
                     announcement = "Maligayang pagdating sa tambayan ng mga taga-${prov.name}!"
@@ -635,9 +635,9 @@ fun RoomCard(
     }
 }
 
-// ---------------- TAB 1: Chika (DMs & Barkada) ----------------
+// ---------------- TAB 1: Messages (DMs & Barkada) ----------------
 @Composable
-fun ChikaTab(viewModel: PhchatViewModel) {
+fun MessagesTab(viewModel: PhchatViewModel) {
     val conversations by viewModel.conversations.collectAsState()
     val profiles by viewModel.profiles.collectAsState()
     var selectedSubTab by remember { mutableStateOf(0) } // 0: Usapan, 1: Barkada
@@ -1440,10 +1440,10 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         val statusPresets = listOf(
             "Online & Tambay ☕",
             "Kape Muna Tayo ☕",
-            "Chika Time 👀",
+            "Messages Time 👀",
             "Busy sa Work 💻",
             "Kumakain ng Lechon 🐷",
-            "Looking for Tambay Friends 🇵🇭"
+            "Looking for Tambay Friends "
         )
         AlertDialog(
             onDismissRequest = { showEditStatusDialog = false },
@@ -1513,7 +1513,7 @@ fun CreateRoomDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create Tambayan Room") },
+        title = { Text("Create Rooms Room") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
