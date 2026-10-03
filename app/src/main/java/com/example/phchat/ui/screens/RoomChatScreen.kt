@@ -149,7 +149,7 @@ fun RoomChatScreen(
                     ) {
                         Icon(
                             imageVector = Icons.Default.People,
-                            contentDescription = "Mga Tambay sa Loob"
+                            contentDescription = "Mga Member sa Loob"
                         )
                     }
                     IconButton(onClick = { viewModel.toggleRoomPinned(room.id) }) {
@@ -315,7 +315,7 @@ fun RoomChatScreen(
                     OutlinedTextField(
                         value = inputText,
                         onValueChange = { inputText = it },
-                        placeholder = { Text("Tambay chat / use @username...") },
+                        placeholder = { Text("Member chat / use @username...") },
                         modifier = Modifier
                             .weight(1f)
                             .testTag("message_input"),
