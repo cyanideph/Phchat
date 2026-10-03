@@ -24,18 +24,18 @@ val PhchatShapes = Shapes(
 
 private val DarkColorScheme = darkColorScheme(
     // Lime is reserved for action/selection. Violet owns major branded surfaces.
-    primary = PhchatLime,
-    onPrimary = PhchatTextOnAccent,
-    primaryContainer = Color(0xFF33400F),
-    onPrimaryContainer = Color(0xFFE8FF9A),
+    primary = PhchatVioletStrong,
+    onPrimary = Color.White,
+    primaryContainer = Color(0xFF34265F),
+    onPrimaryContainer = Color(0xFFE7DDFF),
     secondary = PhchatMint,
     onSecondary = PhchatTextOnAccent,
     secondaryContainer = Color(0xFF183A37),
     onSecondaryContainer = Color(0xFFB9FFF5),
-    tertiary = PhchatVioletStrong,
-    onTertiary = Color.White,
-    tertiaryContainer = Color(0xFF34265F),
-    onTertiaryContainer = Color(0xFFE7DDFF),
+    tertiary = PhchatLimeSoft,
+    onTertiary = PhchatTextOnAccent,
+    tertiaryContainer = Color(0xFFEAF7B8),
+    onTertiaryContainer = Color(0xFF20270B),
     background = PhchatNavy950,
     onBackground = PhchatTextOnDark,
     surface = PhchatNavy900,
@@ -53,7 +53,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PhchatVioletDeep,
+    primary = PhchatVioletStrong,
     onPrimary = Color.White,
     primaryContainer = Color(0xFFE5DEFF),
     onPrimaryContainer = Color(0xFF24134F),
