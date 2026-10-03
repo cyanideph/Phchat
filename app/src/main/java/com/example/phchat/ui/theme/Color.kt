@@ -2,43 +2,44 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// Phchat "Violet Signal": dark-first navy, vivid violet, electric lime, soft mint.
-// Compatibility names remain only so existing screens migrate safely.
+// Phchat "Acid Signal": premium graphite-charcoal, acid lime, lavender and mint.
+// Lime is the hero action/selection color; lavender and mint are supporting surfaces.
 
-val PhchatViolet = Color(0xFF7557F2)
-val PhchatVioletStrong = Color(0xFF7B5CFF)
-val PhchatVioletDeep = Color(0xFF6D4AE0)
-val PhchatLime = Color(0xFFD4FF3F)
-val PhchatLimeSoft = Color(0xFFC8F04B)
-val PhchatMint = Color(0xFF5FE0D0)
+val PhchatLime = Color(0xFFD7F542)
+val PhchatLimeSoft = Color(0xFFCCF52C)
+val PhchatViolet = Color(0xFFA78BFA)
+val PhchatVioletStrong = Color(0xFF8B7CF6)
+val PhchatVioletDeep = Color(0xFF7C6AE8)
+val PhchatMint = Color(0xFF3ECF8E)
+val PhchatMintStrong = Color(0xFF2FD6A3)
 
-val PhchatNavy900 = Color(0xFF17152A)
-val PhchatNavy950 = Color(0xFF12101F)
-val PhchatNavy800 = Color(0xFF211E36)
-val PhchatNavy700 = Color(0xFF2B2745)
-val PhchatNavy600 = Color(0xFF383252)
+val PhchatNavy950 = Color(0xFF16161A)
+val PhchatNavy900 = Color(0xFF1C1C20)
+val PhchatNavy800 = Color(0xFF242429)
+val PhchatNavy700 = Color(0xFF2D2D33)
+val PhchatNavy600 = Color(0xFF3A3A42)
 
-val PhchatLavender50 = Color(0xFFF7F5FB)
-val PhchatLavender100 = Color(0xFFEDEAF7)
-val PhchatLavender200 = Color(0xFFDCD7E8)
-val PhchatLavender300 = Color(0xFFB9B3C9)
+val PhchatLavender50 = Color(0xFFF7F6FA)
+val PhchatLavender100 = Color(0xFFEDEAF8)
+val PhchatLavender200 = Color(0xFFD8D2EB)
+val PhchatLavender300 = Color(0xFFAFA9BD)
 
-val PhchatTextOnDark = Color(0xFFEDEAF7)
-val PhchatTextMutedDark = Color(0xFFAAA3C2)
-val PhchatTextOnLight = Color(0xFF1A1826)
-val PhchatTextMutedLight = Color(0xFF625C73)
+val PhchatTextOnDark = Color(0xFFF2F2F5)
+val PhchatTextMutedDark = Color(0xFF8A8A93)
+val PhchatTextOnLight = Color(0xFF0A0A0C)
+val PhchatTextMutedLight = Color(0xFF5F5F67)
 
 val PhchatDanger = Color(0xFFFF6B6B)
 val PhchatDangerContainer = Color(0xFF3A1F2A)
-val PhchatSuccess = PhchatMint
+val PhchatSuccess = PhchatMintStrong
 val PhchatWarning = Color(0xFFFFC857)
 
 // Legacy compatibility aliases: blue-era names now map to the new visual roles.
 val PhBluePrimary = PhchatVioletDeep
 val PhBlueDark = PhchatNavy950
 val PhBlueLight = PhchatLime
-val PhBlueContainer = Color(0xFFE5DEFF)
-val PhOnBlueContainer = Color(0xFF24134F)
+val PhBlueContainer = Color(0xFFEDE8FF)
+val PhOnBlueContainer = Color(0xFF0A0A0C)
 
 val PhRedSecondary = PhchatDanger
 val PhRedContainer = Color(0xFFFFE8E8)
@@ -48,10 +49,10 @@ val PhYellowSun = PhchatWarning
 val PhGoldContainer = Color(0xFFFFF5CF)
 val PhOnGoldContainer = Color(0xFF4D3B00)
 
-val SurfaceLight = PhchatLavender50
-val SurfaceVariantLight = PhchatLavender100
+val SurfaceLight = Color(0xFFF4F2F7)
+val SurfaceVariantLight = Color(0xFFE9E6EE)
 val OnSurfaceLight = PhchatTextOnLight
-val OutlineLight = PhchatLavender300
+val OutlineLight = Color(0xFFA7A3AE)
 
 val SurfaceDark = PhchatNavy900
 val SurfaceVariantDark = PhchatNavy800
@@ -74,14 +75,14 @@ val RoleAdmin = PhchatMint
 val RoleMod = PhchatMint
 val RoleMember = PhchatTextMutedLight
 
-val PhchatAccent = PhchatVioletStrong
-val PhchatAccentStrong = PhchatViolet
+val PhchatAccent = PhchatLime
+val PhchatAccentStrong = PhchatLimeSoft
 val PhchatInk = PhchatTextOnLight
 val PhchatCanvas = SurfaceLight
 val PhchatSurface = Color.White
 val PhchatGold = PhchatWarning
 val PhchatTextPrimary = PhchatTextOnLight
 val PhchatTextSecondary = PhchatTextMutedLight
-val PhchatTextOnAccent = Color.White
+val PhchatTextOnAccent = Color(0xFF0A0A0C)
 val PhchatDividerLight = PhchatLavender200
 val PhchatDividerDark = PhchatNavy600
