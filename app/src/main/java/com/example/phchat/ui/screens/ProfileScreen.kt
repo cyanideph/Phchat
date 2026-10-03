@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.ui.components.UserAvatar
 import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhBlueDark
 import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
@@ -102,7 +103,7 @@ fun ProfileScreen(
                             fontSize = 18.sp
                         )
                         Text(
-                            text = "@${profile.username} • 📍 ${profile.province}",
+                            text = "@${profile.username} · ${profile.province}",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -113,7 +114,7 @@ fun ProfileScreen(
                             shape = RoundedCornerShape(16.dp)
                         ) {
                             Text(
-                                text = "💬 " + profile.statusText,
+                                text = profile.statusText,
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Medium,
                                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp)
@@ -139,7 +140,7 @@ fun ProfileScreen(
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else PhBluePrimary,
-                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else Color.White
+                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else PhBlueDark
                                 )
                             ) {
                                 Text(if (profile.isFollowed) "Following ✓" else "Follow")
@@ -183,7 +184,7 @@ fun ProfileScreen(
 
             item {
                 Text(
-                    text = "📝 Leave a Message on ${profile.displayName.split(" ").first()}'s Posts",
+                    text = "Leave a message on ${profile.displayName.split(" ").first()}'s posts",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -212,9 +213,9 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                            .background(PhBluePrimary)
+                             .background(PhBluePrimary)
                     ) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = Color.White)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = PhBlueDark)
                     }
                 }
             }
