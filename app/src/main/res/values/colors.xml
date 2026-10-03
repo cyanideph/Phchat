@@ -5,4 +5,6 @@
     <color name="ph_yellow">#FCD116</color>
     <color name="ph_navy">#0A192F</color>
     <color name="ph_surface">#F8FAFC</color>
+    <color name="phchat_graphite">#16161A</color>
+    <color name="phchat_lime">#D7F542</color>
 </resources>
