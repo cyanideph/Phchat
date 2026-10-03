@@ -1,10 +1,8 @@
 package com.example.phchat.ui.screens
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -17,17 +15,14 @@ import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,11 +30,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.phchat.data.AuthState
+import com.example.phchat.ui.components.PhchatInlineBanner
+import com.example.phchat.ui.components.PhchatSettingRow
+import com.example.phchat.ui.components.PhchatSettingsGroup
+import com.example.phchat.ui.theme.PhchatSpacing
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -54,6 +52,7 @@ fun SettingsScreen(
     val authState by viewModel.authState.collectAsState()
     val user by viewModel.currentUser.collectAsState()
     val preferences by viewModel.notificationPreferences.collectAsState()
+    val blockedIds by viewModel.blockedUserIds.collectAsState()
     var loaded by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
@@ -64,7 +63,7 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Settings", fontWeight = FontWeight.Bold) },
+                title = { Text("Settings", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back")
@@ -75,21 +74,21 @@ fun SettingsScreen(
     ) { padding ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(padding),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(horizontal = PhchatSpacing.lg, vertical = PhchatSpacing.md),
+            verticalArrangement = Arrangement.spacedBy(PhchatSpacing.xl)
         ) {
             item {
-                SettingsSection("Account") {
-                    SettingsInfoRow(
-                        icon = { Icon(Icons.Default.Person, contentDescription = null) },
+                PhchatSettingsGroup("Account") {
+                    PhchatSettingRow(
+                        icon = Icons.Default.Person,
                         title = user.displayName,
-                        subtitle = "@${user.username}"
+                        subtitle = "@" + user.username
                     )
-                    SettingsInfoRow(
-                        icon = { Icon(Icons.Default.Security, contentDescription = null) },
+                    PhchatSettingRow(
+                        icon = Icons.Default.Security,
                         title = "Signed-in account",
                         subtitle = when (authState) {
-                            is AuthState.Authenticated -> "Authenticated with PHChat"
+                            is AuthState.Authenticated -> "Authenticated with Supabase"
                             else -> "Not signed in"
                         }
                     )
@@ -97,24 +96,20 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection("Appearance") {
-                    SettingsSwitchRow(
-                        icon = {
-                            Icon(
-                                if (darkTheme) Icons.Default.DarkMode else Icons.Default.WbSunny,
-                                contentDescription = null
-                            )
-                        },
+                PhchatSettingsGroup("Appearance") {
+                    PhchatSettingRow(
+                        icon = if (darkTheme) Icons.Default.DarkMode else Icons.Default.WbSunny,
                         title = "Dark mode",
                         subtitle = if (darkTheme) "Dark theme" else "Light theme",
-                        checked = darkTheme,
-                        onCheckedChange = onThemeChange
+                        trailing = {
+                            Switch(checked = darkTheme, onCheckedChange = onThemeChange)
+                        }
                     )
                 }
             }
 
             item {
-                SettingsSection("Notifications") {
+                PhchatSettingsGroup("Notifications") {
                     NotificationToggle("Follows", preferences.followEnabled, loaded) { viewModel.updateNotificationPreference("follow_enabled", it) }
                     NotificationToggle("Blocks", preferences.blockEnabled, loaded) { viewModel.updateNotificationPreference("block_enabled", it) }
                     NotificationToggle("Post comments", preferences.contentCommentEnabled, loaded) { viewModel.updateNotificationPreference("content_comment_enabled", it) }
@@ -123,32 +118,29 @@ fun SettingsScreen(
                     NotificationToggle("Room reactions", preferences.roomMessageReactionEnabled, loaded) { viewModel.updateNotificationPreference("room_message_reaction_enabled", it) }
                     NotificationToggle("Profile comments", preferences.profileCommentEnabled, loaded) { viewModel.updateNotificationPreference("profile_comment_enabled", it) }
                     NotificationToggle("Mentions", preferences.mentionEnabled, loaded) { viewModel.updateNotificationPreference("mention_enabled", it) }
-                    NotificationToggle("Room invites", preferences.roomInviteEnabled, loaded) { viewModel.updateNotificationPreference("room_invite_enabled", it) }
+                    NotificationToggle("Room invites", preferences.roomInviteEnabled, loaded) { viewModel.updateNotificationPreference("conversation_invite_enabled", it) }
                     NotificationToggle("Direct-message invites", preferences.conversationInviteEnabled, loaded) { viewModel.updateNotificationPreference("conversation_invite_enabled", it) }
                 }
             }
 
             item {
-                Card(modifier = Modifier.fillMaxWidth()) {
-                    Row(modifier = Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text("Advanced features", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                            Text("Invites, discovery, favorites, moderation, media, comments and more", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                        }
-                        TextButton(onClick = onOpenFeatureCenter) { Text("Open") }
-                    }
-                }
+                PhchatInlineBanner(
+                    title = "Advanced features",
+                    message = "Invites, discovery, favorites, moderation, media and comments.",
+                    actionLabel = "Open",
+                    onAction = onOpenFeatureCenter
+                )
             }
 
             item {
-                SettingsSection("Privacy & safety") {
-                    SettingsInfoRow(
-                        icon = { Icon(Icons.Default.Lock, contentDescription = null) },
+                PhchatSettingsGroup("Privacy & safety") {
+                    PhchatSettingRow(
+                        icon = Icons.Default.Lock,
                         title = "Blocked accounts",
-                        subtitle = "${viewModel.blockedUserIds.collectAsState().value.size} blocked in this session"
+                        subtitle = blockedIds.size.toString() + " blocked in this session"
                     )
-                    SettingsInfoRow(
-                        icon = { Icon(Icons.Default.Security, contentDescription = null) },
+                    PhchatSettingRow(
+                        icon = Icons.Default.Security,
                         title = "Data protection",
                         subtitle = "Supabase Auth + row-level security"
                     )
@@ -156,78 +148,42 @@ fun SettingsScreen(
             }
 
             item {
-                SettingsSection("About") {
-                    SettingsInfoRow(
-                        icon = { Icon(Icons.Default.Info, contentDescription = null) },
-                        title = "PHChat",
+                PhchatSettingsGroup("About") {
+                    PhchatSettingRow(
+                        icon = Icons.Default.Info,
+                        title = "Phchat",
                         subtitle = "Community messaging • Android"
                     )
                 }
             }
 
             item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.errorContainer)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(onClick = { viewModel.signOut() }) {
-                            Icon(Icons.Default.Logout, contentDescription = "Sign out", tint = MaterialTheme.colorScheme.onErrorContainer)
-                        }
-                        Column(modifier = Modifier.weight(1f).padding(end = 12.dp)) {
-                            Text("Sign out", style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onErrorContainer, fontWeight = FontWeight.SemiBold)
-                            Text("End the current session", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onErrorContainer)
-                        }
-                    }
-                }
+                PhchatInlineBanner(
+                    title = "Sign out",
+                    message = "End the current session.",
+                    icon = Icons.Default.Logout,
+                    tone = MaterialTheme.colorScheme.error,
+                    actionLabel = "Sign out",
+                    onAction = { viewModel.signOut() }
+                )
             }
         }
     }
 }
 
 @Composable
-private fun SettingsSection(title: String, content: @Composable () -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(horizontal = 4.dp, vertical = 6.dp))
-        Card(modifier = Modifier.fillMaxWidth(), colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)) {
-            Column(modifier = Modifier.fillMaxWidth()) { content() }
-        }
-    }
-}
-
-@Composable
-private fun SettingsInfoRow(icon: @Composable () -> Unit, title: String, subtitle: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 13.dp), verticalAlignment = Alignment.CenterVertically) {
-        icon()
-        Column(modifier = Modifier.weight(1f).padding(start = 14.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-    }
-}
-
-@Composable
-private fun SettingsSwitchRow(icon: @Composable () -> Unit, title: String, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(modifier = Modifier.fillMaxWidth().padding(horizontal = 14.dp, vertical = 9.dp), verticalAlignment = Alignment.CenterVertically) {
-        icon()
-        Column(modifier = Modifier.weight(1f).padding(start = 14.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
-            Text(subtitle, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        }
-        Switch(checked = checked, onCheckedChange = onCheckedChange)
-    }
-}
-
-@Composable
-private fun NotificationToggle(title: String, checked: Boolean, enabled: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    SettingsSwitchRow(
-        icon = { Icon(Icons.Default.Notifications, contentDescription = null) },
+private fun NotificationToggle(
+    title: String,
+    checked: Boolean,
+    enabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    PhchatSettingRow(
+        icon = Icons.Default.Notifications,
         title = title,
         subtitle = if (enabled) "Receive this notification type" else "Loading preferences…",
-        checked = checked,
-        onCheckedChange = onCheckedChange
+        trailing = {
+            Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
+        }
     )
 }
