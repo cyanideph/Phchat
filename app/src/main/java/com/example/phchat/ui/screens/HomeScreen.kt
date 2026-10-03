@@ -651,12 +651,12 @@ fun ChikaTab(viewModel: PhchatViewModel) {
             Tab(
                 selected = selectedSubTab == 0,
                 onClick = { selectedSubTab = 0 },
-                text = { Text("💬 Mga Usapan (${conversations.size})", fontWeight = FontWeight.Bold) }
+                text = { Text("Mga Usapan (${conversations.size})", fontWeight = FontWeight.Bold) }
             )
             Tab(
                 selected = selectedSubTab == 1,
                 onClick = { selectedSubTab = 1 },
-                text = { Text("👥 Talaan ng Barkada", fontWeight = FontWeight.Bold) }
+                text = { Text("Talaan ng Barkada", fontWeight = FontWeight.Bold) }
             )
         }
 
@@ -1109,7 +1109,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
 
         item {
             Text(
-                text = "🏆 Top Tambay Leaderboard",
+                text = "Top Tambay Leaderboard",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -1293,7 +1293,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         if (myVisits.isNotEmpty()) {
             item {
                 Text(
-                    text = "👀 Recent Profile Visitors",
+                    text = "Recent Profile Visitors",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -1329,7 +1329,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         // Profile Wall / Comments
         item {
             Text(
-                text = "📝 Guestbook & Profile Wall",
+                text = "Guestbook & Profile Wall",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
@@ -1440,9 +1440,9 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         val statusPresets = listOf(
             "Online & Tambay ☕",
             "Kape Muna Tayo ☕",
-            "Chika Time 👀",
-            "Busy sa Work 💻",
-            "Kumakain ng Lechon 🐷",
+            "Chika Time",
+            "Busy sa Work",
+            "Kumakain ng Lechon",
             "Looking for Tambay Friends 🇵🇭"
         )
         AlertDialog(
@@ -1595,7 +1595,7 @@ fun CreatePostDialog(
                     FilterChip(
                         selected = isPoll,
                         onClick = { isPoll = true },
-                        label = { Text("📊 Poll") }
+                        label = { Text("Poll") }
                     )
                 }
 
