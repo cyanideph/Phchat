@@ -139,8 +139,8 @@ fun ProfileScreen(
                                 onClick = { viewModel.toggleFollowUser(profile.id) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else PhchatLime,
-                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else PhchatNavy950
+                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
+                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimary
                                 )
                             ) {
                                 Text(if (profile.isFollowed) "Following ✓" else "Follow")
@@ -213,9 +213,9 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                             .background(PhchatLime)
+                              .background(MaterialTheme.colorScheme.primary)
                     ) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = PhchatNavy950)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = MaterialTheme.colorScheme.onPrimary)
                     }
                 }
             }
