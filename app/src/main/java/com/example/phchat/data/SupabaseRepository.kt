@@ -285,7 +285,7 @@ class SupabaseRepository(
 
     suspend fun getContents(): Result<List<ContentPost>> = withContext(Dispatchers.IO) {
         try {
-            val result = callRpc("list_content_feed", JSONObject().apply {
+            val result = callRpc("list_content_feed_v2", JSONObject().apply {
                 put("p_room_id", JSONObject.NULL)
                 put("p_author_id", JSONObject.NULL)
                 put("p_before_created_at", JSONObject.NULL)

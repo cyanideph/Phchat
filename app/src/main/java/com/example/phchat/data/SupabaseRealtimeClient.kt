@@ -29,6 +29,9 @@ class SupabaseRealtimeClient(
     private var onNewMessageCallback: ((RoomMessage) -> Unit)? = null
     private var onNewDirectMessageCallback: ((com.example.phchat.model.DirectMessage) -> Unit)? = null
     private var onDataChangedCallback: ((table: String, id: String?) -> Unit)? = null
+    private var shouldReconnect = false
+    private var reconnectJob: Job? = null
+    private var reconnectAttempt = 0
 
     fun connectAndSubscribeRoom(
         roomId: String,
@@ -36,34 +39,13 @@ class SupabaseRealtimeClient(
         onDataChanged: ((table: String, id: String?) -> Unit)? = null
     ) {
         disconnect()
+        shouldReconnect = true
         currentRoomId = roomId
         currentConversationId = null
         onNewDirectMessageCallback = null
         onNewMessageCallback = onNewMessage
         onDataChangedCallback = onDataChanged
-
-        val wsUrl = "${SupabaseConfig.url.replaceFirst("https://", "wss://")}/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
-        val request = Request.Builder().url(wsUrl).build()
-
-        webSocket = client.newWebSocket(request, object : WebSocketListener() {
-            override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d(tag, "Realtime WebSocket opened for room: $roomId")
-                startHeartbeat()
-                joinRoomChannel(roomId)
-            }
-
-            override fun onMessage(webSocket: WebSocket, text: String) {
-                handleMessage(text)
-            }
-
-            override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e(tag, "Realtime WebSocket failure: ${t.message}")
-            }
-
-            override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Log.d(tag, "Realtime WebSocket closed: $reason ($code)")
-            }
-        })
+        openSocket()
     }
 
     fun connectAndSubscribeConversation(
@@ -72,29 +54,57 @@ class SupabaseRealtimeClient(
         onDataChanged: ((table: String, id: String?) -> Unit)? = null
     ) {
         disconnect()
+        shouldReconnect = true
         currentConversationId = conversationId
         currentRoomId = null
         onNewDirectMessageCallback = onNewMessage
         onNewMessageCallback = null
         onDataChangedCallback = onDataChanged
+        openSocket()
+    }
 
+    fun connectAndSubscribeNotifications(
+        onDataChanged: (table: String, id: String?) -> Unit
+    ) {
+        disconnect()
+        shouldReconnect = true
+        currentRoomId = null
+        currentConversationId = null
+        onNewDirectMessageCallback = null
+        onNewMessageCallback = null
+        onDataChangedCallback = onDataChanged
+        openSocket()
+    }
+
+    private fun openSocket() {
         val wsUrl = "${SupabaseConfig.url.replaceFirst("https://", "wss://")}/realtime/v1/websocket?apikey=$anonKey&vsn=1.0.0"
         val request = Request.Builder().url(wsUrl).build()
-
         webSocket = client.newWebSocket(request, object : WebSocketListener() {
             override fun onOpen(webSocket: WebSocket, response: Response) {
-                Log.d(tag, "Realtime WebSocket opened for conversation: $conversationId")
+                reconnectAttempt = 0
+                reconnectJob?.cancel()
+                reconnectJob = null
+                Log.d(tag, "Realtime WebSocket opened")
                 startHeartbeat()
-                joinConversationChannel(conversationId)
+                when {
+                    currentRoomId != null -> joinRoomChannel(currentRoomId!!)
+                    currentConversationId != null -> joinConversationChannel(currentConversationId!!)
+                    else -> joinNotificationsChannel()
+                }
             }
+
             override fun onMessage(webSocket: WebSocket, text: String) {
                 handleMessage(text)
             }
+
             override fun onFailure(webSocket: WebSocket, t: Throwable, response: Response?) {
-                Log.e(tag, "Realtime DM WebSocket failure: ${t.message}")
+                Log.e(tag, "Realtime WebSocket failure: ${t.message}")
+                scheduleReconnect()
             }
+
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
-                Log.d(tag, "Realtime DM WebSocket closed: $reason ($code)")
+                Log.d(tag, "Realtime WebSocket closed: $reason ($code)")
+                if (shouldReconnect) scheduleReconnect()
             }
         })
     }
@@ -127,6 +137,7 @@ class SupabaseRealtimeClient(
             put("ref", ref)
         }
         webSocket?.send(joinPayload.toString())
+        joinNotificationsChannel()
     }
 
     private fun joinRoomChannel(roomId: String) {
@@ -168,7 +179,40 @@ class SupabaseRealtimeClient(
             put("ref", ref)
         }
         webSocket?.send(joinPayload.toString())
+        joinNotificationsChannel()
         Log.d(tag, "Joined realtime channel for room $roomId")
+    }
+
+    private fun joinNotificationsChannel() {
+        val ref = refCounter.getAndIncrement().toString()
+        val topic = "realtime:public:notifications"
+        val postgresChanges = org.json.JSONArray().apply {
+            put(JSONObject().apply {
+                put("event", "*")
+                put("schema", "public")
+                put("table", "notifications")
+            })
+        }
+        val joinPayload = JSONObject().apply {
+            put("topic", topic)
+            put("event", "phx_join")
+            put("payload", JSONObject().apply {
+                accessTokenProvider?.invoke()?.takeIf { it.isNotBlank() }?.let { put("access_token", it) }
+                put("config", JSONObject().apply { put("postgres_changes", postgresChanges) })
+            })
+            put("ref", ref)
+        }
+        webSocket?.send(joinPayload.toString())
+    }
+
+    private fun scheduleReconnect() {
+        if (!shouldReconnect || reconnectJob?.isActive == true) return
+        val delayMs = minOf(30000L, 1000L * (1L shl minOf(reconnectAttempt, 5)))
+        reconnectAttempt++
+        reconnectJob = coroutineScope.launch {
+            delay(delayMs)
+            if (shouldReconnect) openSocket()
+        }
     }
 
     private fun startHeartbeat() {
@@ -263,10 +307,14 @@ class SupabaseRealtimeClient(
     }
 
     fun disconnect() {
+        shouldReconnect = false
+        reconnectJob?.cancel()
+        reconnectJob = null
+        reconnectAttempt = 0
         heartbeatJob?.cancel()
         heartbeatJob = null
         try {
-            webSocket?.close(1000, "User left room")
+            webSocket?.close(1000, "User left realtime")
         } catch (e: Exception) {
             // Ignored
         }

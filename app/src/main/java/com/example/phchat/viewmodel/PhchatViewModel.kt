@@ -295,6 +295,12 @@ class PhchatViewModel(application: Application) : AndroidViewModel(application) 
         )
     }
 
+    private fun startNotificationsRealtime() {
+        realtimeClient.connectAndSubscribeNotifications { table, _ ->
+            if (table == "notifications") refreshNotifications()
+        }
+    }
+
     private fun refreshRooms() {
         viewModelScope.launch {
             repository.getRooms().onSuccess { _rooms.value = it }
