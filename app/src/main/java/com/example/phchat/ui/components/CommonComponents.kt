@@ -222,7 +222,7 @@ fun StreakPointsCard(
                         text = "$streak-Araw na Tambay",
                         fontWeight = FontWeight.Black,
                         fontSize = 16.sp,
-                        color = Color.White
+                        color = PhBlack
                     )
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
