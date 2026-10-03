@@ -317,7 +317,7 @@ fun RoomChatScreen(
                         modifier = Modifier
                             .weight(1f)
                             .testTag("message_input"),
-                        shape = RoundedCornerShape(24.dp),
+                        shape = PhchatShapes.large,
                         maxLines = 4
                     )
 
@@ -660,7 +660,7 @@ fun RoomMessageBubble(
             if (message.replyTo != null) {
                 Surface(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.8f),
-                    shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp),
+                    shape = PhchatShapes.compact,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)) {
