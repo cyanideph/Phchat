@@ -353,7 +353,6 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                         onClick = { viewModel.selectedProvinceFilter.value = code },
                         label = label
                     )
-                    )
                 }
             }
         }
