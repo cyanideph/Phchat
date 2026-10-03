@@ -1,105 +1,74 @@
 package com.example.phchat.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Shapes
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-
-@Immutable
-enum class PhchatThemeMode { System, Light, Dark }
-
-val PhchatShapes = Shapes(
-    extraSmall = RoundedCornerShape(8.dp),
-    small = RoundedCornerShape(12.dp),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(24.dp),
-    extraLarge = RoundedCornerShape(32.dp)
-)
 
 private val DarkColorScheme = darkColorScheme(
-    // Lime is reserved for action/selection. Violet owns major branded surfaces.
-    primary = PhchatLime,
-    onPrimary = PhchatTextOnAccent,
-    primaryContainer = Color(0xFF3B401B),
-    onPrimaryContainer = Color(0xFFF0F2E0),
-    secondary = PhchatMint,
-    onSecondary = PhchatNavy950,
-    secondaryContainer = Color(0xFF183A37),
-    onSecondaryContainer = Color(0xFFB9FFF5),
-    tertiary = PhchatVioletStrong,
-    onTertiary = Color(0xFF0A0A0C),
-    tertiaryContainer = Color(0xFFEDE8FF),
-    onTertiaryContainer = Color(0xFF0A0A0C),
-    background = PhchatNavy950,
-    onBackground = PhchatTextOnDark,
-    surface = PhchatNavy900,
-    onSurface = PhchatTextOnDark,
-    surfaceVariant = PhchatNavy800,
-    onSurfaceVariant = PhchatTextMutedDark,
-    outline = PhchatNavy600,
-    outlineVariant = PhchatNavy700,
-    inverseSurface = PhchatLavender100,
-    inverseOnSurface = PhchatTextOnLight,
-    error = PhchatDanger,
-    onError = Color(0xFF2B0710),
-    errorContainer = PhchatDangerContainer,
-    onErrorContainer = Color(0xFFFFD9DE)
+    primary = PhAcidLime,
+    onPrimary = PhBlack,
+    primaryContainer = PhAcidLime.copy(alpha = 0.18f),
+    onPrimaryContainer = PhAcidLime,
+    secondary = PhLavender,
+    onSecondary = PhBlack,
+    secondaryContainer = PhLavender.copy(alpha = 0.18f),
+    onSecondaryContainer = PhText,
+    tertiary = PhMint,
+    onTertiary = PhBlack,
+    tertiaryContainer = PhMint.copy(alpha = 0.18f),
+    onTertiaryContainer = PhText,
+    background = PhGraphite,
+    onBackground = PhText,
+    surface = PhSurface,
+    onSurface = PhText,
+    surfaceVariant = PhSurfaceRaised,
+    onSurfaceVariant = PhTextSecondary,
+    outline = PhHairline,
+    error = PhRed,
+    onError = PhBlack,
+    errorContainer = PhRedSoft,
+    onErrorContainer = Color(0xFFFFD9DC)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = PhchatVioletStrong,
-    onPrimary = Color.White,
-    primaryContainer = Color(0xFFE5DEFF),
-    onPrimaryContainer = Color(0xFF24134F),
-    secondary = PhchatMint,
-    onSecondary = PhchatNavy950,
-    secondaryContainer = Color(0xFFD8F8F3),
-    onSecondaryContainer = Color(0xFF123A35),
-    tertiary = PhchatLimeSoft,
-    onTertiary = PhchatTextOnAccent,
-    tertiaryContainer = Color(0xFFEAF7B8),
-    onTertiaryContainer = Color(0xFF20270B),
-    background = PhchatLavender50,
-    onBackground = PhchatTextOnLight,
+    primary = Color(0xFF657A00),
+    onPrimary = PhBlack,
+    primaryContainer = Color(0xFFE8F39D),
+    onPrimaryContainer = PhBlack,
+    secondary = Color(0xFF6548C5),
+    onSecondary = PhBlack,
+    secondaryContainer = Color(0xFFE9E2FF),
+    onSecondaryContainer = Color(0xFF24194B),
+    tertiary = Color(0xFF14784F),
+    onTertiary = PhBlack,
+    tertiaryContainer = Color(0xFFD9F7E8),
+    onTertiaryContainer = Color(0xFF063B24),
+    background = SurfaceLight,
+    onBackground = OnSurfaceLight,
     surface = Color.White,
-    onSurface = PhchatTextOnLight,
-    surfaceVariant = PhchatLavender100,
-    onSurfaceVariant = PhchatTextMutedLight,
-    outline = PhchatLavender300,
-    outlineVariant = PhchatLavender200,
-    inverseSurface = PhchatNavy900,
-    inverseOnSurface = PhchatTextOnDark,
-    error = PhchatDanger,
+    onSurface = OnSurfaceLight,
+    surfaceVariant = SurfaceVariantLight,
+    onSurfaceVariant = Color(0xFF5F6068),
+    outline = OutlineLight,
+    error = Color(0xFFB4232E),
     onError = Color.White,
-    errorContainer = PhchatDangerContainer,
-    onErrorContainer = Color(0xFFFFD9DE)
+    errorContainer = Color(0xFFFFE2E4),
+    onErrorContainer = Color(0xFF5F1017)
 )
 
 @Composable
 fun PhchatTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = androidx.compose.foundation.isSystemInDarkTheme(),
     dynamicColor: Boolean = false,
-    themeMode: PhchatThemeMode? = null,
     content: @Composable () -> Unit
 ) {
-    // Dynamic Android colors stay disabled: the brand must remain consistent across devices.
-    val resolvedDark = when (themeMode) {
-        PhchatThemeMode.Dark -> true
-        PhchatThemeMode.Light -> false
-        PhchatThemeMode.System, null -> darkTheme
-    }
-    val colorScheme = if (resolvedDark) DarkColorScheme else LightColorScheme
+    val colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
-        shapes = PhchatShapes,
         content = content
     )
 }

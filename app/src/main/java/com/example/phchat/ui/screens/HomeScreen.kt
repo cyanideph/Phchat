@@ -54,19 +54,25 @@ fun HomeScreen(
             TopAppBar(
                 title = {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        PhchatMark(
-                            size = 30.dp,
-                            backgroundColor = PhchatLime,
-                            foregroundColor = Color(0xFF10110D),
-                            contentDescription = "Phchat"
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
                         Text(
                             text = "Phchat",
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Surface(
+                            color = PhAcidLime,
+                            shape = RoundedCornerShape(10.dp)
+                        ) {
+                            Text(
+                                text = "PINOY",
+                                color = Color.White,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
                     }
                 },
                 actions = {
@@ -89,8 +95,8 @@ fun HomeScreen(
                         BadgedBox(
                             badge = {
                                 if (unreadCount > 0) {
-                                    Badge(containerColor = PhRedSecondary) {
-                                        Text("$unreadCount")
+                                    Badge(containerColor = PhAcidLime) {
+                                        Text("$unreadCount", color = PhBlack)
                                     }
                                 }
                             }
@@ -110,41 +116,41 @@ fun HomeScreen(
         bottomBar = {
             NavigationBar(
                 containerColor = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                tonalElevation = 2.dp
             ) {
                 NavigationBarItem(
                     selected = selectedTab == 0,
                     onClick = { selectedTab = 0 },
-                    icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Rooms") },
-                    label = { Text("Rooms", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_rooms")
+                    icon = { Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Tambayan") },
+                    label = { Text("Tambayan", fontWeight = if (selectedTab == 0) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_tambayan")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 1,
                     onClick = { selectedTab = 1 },
-                    icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Messages") },
-                    label = { Text("Messages", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_messages")
+                    icon = { Icon(Icons.Default.QuestionAnswer, contentDescription = "Chika") },
+                    label = { Text("Chika", fontWeight = if (selectedTab == 1) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_chika")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 2,
                     onClick = { selectedTab = 2 },
-                    icon = { Icon(Icons.Default.Campaign, contentDescription = "Feed") },
-                    label = { Text("Feed", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_feed")
+                    icon = { Icon(Icons.Default.Campaign, contentDescription = "Plaza") },
+                    label = { Text("Plaza", fontWeight = if (selectedTab == 2) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_plaza")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 3,
                     onClick = { selectedTab = 3 },
-                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Highlights") },
-                    label = { Text("Highlights", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
-                    modifier = Modifier.testTag("tab_highlights")
+                    icon = { Icon(Icons.Default.EmojiEvents, contentDescription = "Dangal") },
+                    label = { Text("Dangal", fontWeight = if (selectedTab == 3) FontWeight.Bold else FontWeight.Normal) },
+                    modifier = Modifier.testTag("tab_dangal")
                 )
                 NavigationBarItem(
                     selected = selectedTab == 4,
                     onClick = { selectedTab = 4 },
-                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Profile") },
-                    label = { Text("Profile", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
+                    icon = { Icon(Icons.Default.AccountCircle, contentDescription = "Ako") },
+                    label = { Text("Ako", fontWeight = if (selectedTab == 4) FontWeight.Bold else FontWeight.Normal) },
                     modifier = Modifier.testTag("tab_profile")
                 )
             }
@@ -154,20 +160,20 @@ fun HomeScreen(
                 0 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreateRoomDialog = true },
-                        icon = { Icon(Icons.Default.Add, contentDescription = "Create room") },
-                        text = { Text("Create room", fontWeight = FontWeight.Bold) },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        icon = { Icon(Icons.Default.Add, contentDescription = "Gawa ng Tambayan") },
+                        text = { Text("Tayo Na! Gawa ng Tambayan", fontWeight = FontWeight.Bold) },
+                        containerColor = PhAcidLime,
+                        contentColor = PhBlack,
                         modifier = Modifier.testTag("create_room_fab")
                     )
                 }
                 2 -> {
                     ExtendedFloatingActionButton(
                         onClick = { showCreatePostDialog = true },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
-                        text = { Text("Create post", fontWeight = FontWeight.Bold) },
-                        containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary,
+                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Plaza") },
+                        text = { Text("Mag-Post sa Plaza", fontWeight = FontWeight.Bold) },
+                        containerColor = PhLavender,
+                        contentColor = PhBlack,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
@@ -179,13 +185,9 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
         ) {
-            PhchatBackdrop(
-                modifier = Modifier.fillMaxSize(),
-                intensity = if (selectedTab == 0) 0.8f else 0.45f
-            )
             when (selectedTab) {
-                0 -> RoomsTab(viewModel = viewModel)
-                1 -> MessagesTab(viewModel = viewModel)
+                0 -> TambayanTab(viewModel = viewModel)
+                1 -> ChikaTab(viewModel = viewModel)
                 2 -> CommunityTab(viewModel = viewModel)
                 3 -> TambayHallTab(viewModel = viewModel)
                 4 -> MyProfileTab(viewModel = viewModel)
@@ -216,16 +218,16 @@ fun HomeScreen(
     }
 }
 
-// ---------------- TAB 0: Rooms (Rooms) ----------------
+// ---------------- TAB 0: Tambayan (Rooms) ----------------
 @Composable
-fun RoomsTab(viewModel: PhchatViewModel) {
+fun TambayanTab(viewModel: PhchatViewModel) {
     val rooms by viewModel.filteredRooms.collectAsState()
     val selectedProvince by viewModel.selectedProvinceFilter.collectAsState()
     var searchInput by remember { mutableStateOf("") }
     var showRegionExplorer by remember { mutableStateOf(false) }
 
     val provinces = listOf(
-        "ALL" to "All provinces",
+        "ALL" to "Lahat ng Probinsya",
         "NCR" to "Metro Manila (NCR)",
         "CEB" to "Cebu (Sugbo)",
         "DVO" to "Davao Region",
@@ -240,62 +242,77 @@ fun RoomsTab(viewModel: PhchatViewModel) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Signature room field: image-free, lightweight, and unmistakably PHchat.
+        // Hero Banner Art
         item {
-            Box(
+            Card(
+                shape = RoundedCornerShape(20.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(188.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .testTag("hero_banner_card")
+                    .testTag("hero_banner_card"),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
             ) {
-                PhchatBackdrop(modifier = Modifier.fillMaxSize(), intensity = 1.15f)
-                Column(
+                Box(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(22.dp),
-                    verticalArrangement = Arrangement.SpaceBetween
+                        .fillMaxWidth()
+                        .height(160.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.Top
+                    Image(
+                        painter = painterResource(id = R.drawable.img_tambayan_hero),
+                        contentDescription = "Pambansang Tambayan Banner",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
+                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Brush.verticalGradient(
+                                    colors = listOf(
+                                        Color.Transparent,
+                                        Color(0x6607352B),
+                                        Color(0xF207352B)
+                                    )
+                                )
+                            )
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalArrangement = Arrangement.Bottom
                     ) {
+                        Surface(
+                            color = PhYellowSun,
+                            shape = RoundedCornerShape(6.dp)
+                        ) {
+                            Text(
+                                text = "PAMBANSANG TAMBAYAN",
+                                color = PhOnGoldContainer,
+                                fontSize = 10.sp,
+                                fontWeight = FontWeight.Black,
+                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                            )
+                        }
+                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "COMMUNITY ROOMS",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp,
+                            text = "Usapang Pinoy, Bawat Probinsya",
+                            color = Color.White,
+                            fontSize = 18.sp,
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "01",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                    Column {
-                        Text(
-                            text = "Find your people.",
-                            color = MaterialTheme.colorScheme.onSurface,
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.Black,
-                            lineHeight = 30.sp
-                        )
-                        Spacer(modifier = Modifier.height(5.dp))
-                        Text(
-                            text = "Live conversations, local communities, and direct connections.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontSize = 13.sp
+                            text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
+                            color = Color(0xFFDCE6F5),
+                            fontSize = 11.sp
                         )
                     }
                 }
             }
         }
 
-        // Live activity strip
+        // Live Ticker Ribbon
         item {
-            PhchatLiveStrip(
+            UzzapRetroTicker(
                 roomCount = rooms.size,
                 onlineCount = 28
             )
@@ -310,14 +327,14 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     .fillMaxWidth()
                     .testTag("open_region_explorer_btn"),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = PhchatVioletDeep.copy(alpha = 0.18f),
-                    contentColor = MaterialTheme.colorScheme.onSurface
+                    containerColor = PhBlueContainer,
+                    contentColor = PhOnBlueContainer
                 )
             ) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "Explore regions and provinces",
+                    text = "17 Rehiyon & 81 Lalawigan Explorer",
                     fontWeight = FontWeight.Black,
                     fontSize = 13.sp
                 )
@@ -326,18 +343,19 @@ fun RoomsTab(viewModel: PhchatViewModel) {
 
         item {
             // Search field
-            PhchatSearchField(
+            OutlinedTextField(
                 value = searchInput,
                 onValueChange = {
                     searchInput = it
                     viewModel.searchQuery.value = it
                 },
-                placeholder = "Search rooms, regions, or topics...",
-                onClear = {
-                    searchInput = ""
-                    viewModel.searchQuery.value = ""
-                },
-                modifier = Modifier.testTag("search_rooms_input")
+                placeholder = { Text("Hanapin ang tambayan, probinsya, o paksa...") },
+                leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .testTag("search_rooms_input"),
+                shape = RoundedCornerShape(14.dp),
+                singleLine = true
             )
         }
 
@@ -348,10 +366,18 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                 modifier = Modifier.fillMaxWidth()
             ) {
                 items(provinces) { (code, label) ->
-                    PhchatFilterChip(
+                    FilterChip(
                         selected = selectedProvince == code,
                         onClick = { viewModel.selectedProvinceFilter.value = code },
-                        label = label
+                        label = {
+                            Text(
+                                text = label,
+                                fontWeight = if (selectedProvince == code) FontWeight.Bold else FontWeight.Normal
+                            )
+                        },
+                        leadingIcon = if (selectedProvince == code) {
+                            { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
+                        } else null
                     )
                 }
             }
@@ -364,13 +390,13 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Active rooms (${rooms.size})",
+                    text = "Mga Aktibong Tambayan (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = PhBluePrimary
                 )
                 Text(
-                    text = if (selectedProvince == "ALL") "All" else selectedProvince,
+                    text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
@@ -392,17 +418,17 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                             .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "No rooms", fontSize = 0.sp)
+                        Text(text = "🇵🇭", fontSize = 48.sp)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = "No rooms here yet.",
+                            text = "Walang tambayan pa rito!",
                             fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
-                            color = PhchatVioletDeep
+                            color = PhBluePrimary
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "No rooms here yet. Create the first room for this community.",
+                            text = "Ikaw ang unang mag-bukas ng tambayan sa probinsyang ito para sa iyong mga kababayan.",
                             fontSize = 13.sp,
                             textAlign = TextAlign.Center,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -432,10 +458,10 @@ fun RoomsTab(viewModel: PhchatViewModel) {
             },
             onCreateRoomInProvince = { prov ->
                 viewModel.createRoom(
-                    name = "${prov.name} Rooms",
+                    name = "${prov.name} Tambayan",
                     provinceCode = prov.code,
                     provinceName = prov.name,
-                    announcement = "Welcome to the ${prov.name} community room."
+                    announcement = "Maligayang pagdating sa tambayan ng mga taga-${prov.name}!"
                 )
                 showRegionExplorer = false
             }
@@ -456,7 +482,7 @@ fun RoomCard(
         "DVO" -> RegionMindanao
         "PAM", "BAG" -> RegionLuzon
         "ALB" -> RegionBicol
-        else -> PhchatVioletDeep
+        else -> PhBluePrimary
     }
 
     Card(
@@ -514,7 +540,7 @@ fun RoomCard(
                                     text = room.name,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = PhchatVioletDeep,
+                                    color = PhBluePrimary,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -593,7 +619,7 @@ fun RoomCard(
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PhchatVioletDeep,
+                            containerColor = PhBluePrimary,
                             contentColor = Color.White
                         )
                     ) {
@@ -609,9 +635,9 @@ fun RoomCard(
     }
 }
 
-// ---------------- TAB 1: Messages (DMs & Barkada) ----------------
+// ---------------- TAB 1: Chika (DMs & Barkada) ----------------
 @Composable
-fun MessagesTab(viewModel: PhchatViewModel) {
+fun ChikaTab(viewModel: PhchatViewModel) {
     val conversations by viewModel.conversations.collectAsState()
     val profiles by viewModel.profiles.collectAsState()
     var selectedSubTab by remember { mutableStateOf(0) } // 0: Usapan, 1: Barkada
@@ -620,7 +646,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
         TabRow(
             selectedTabIndex = selectedSubTab,
             containerColor = MaterialTheme.colorScheme.surface,
-            contentColor = PhchatVioletDeep
+            contentColor = PhBluePrimary
         ) {
             Tab(
                 selected = selectedSubTab == 0,
@@ -642,10 +668,10 @@ fun MessagesTab(viewModel: PhchatViewModel) {
             ) {
                 item {
                     Text(
-                        text = "Active now",
+                        text = "Aktibong Tambay Ngayon",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhchatVioletDeep
+                        color = PhBluePrimary
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LazyRow(
@@ -682,7 +708,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
                         text = "Pribadong Mensahe",
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = PhchatVioletDeep
+                        color = PhBluePrimary
                     )
                 }
 
@@ -800,7 +826,7 @@ fun MessagesTab(viewModel: PhchatViewModel) {
                                 onClick = { viewModel.startConversationWithUser(buddy) },
                                 shape = RoundedCornerShape(16.dp),
                                 contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp),
-                                colors = ButtonDefaults.buttonColors(containerColor = PhchatVioletDeep)
+                                colors = ButtonDefaults.buttonColors(containerColor = PhBluePrimary)
                             ) {
                                 Text("Bulong ➜", fontSize = 11.sp, fontWeight = FontWeight.Bold)
                             }
@@ -910,7 +936,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                         onClick = { viewModel.votePoll(post.id, option.id) },
                                         shape = RoundedCornerShape(8.dp),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = if (isSelected) PhchatVioletDeep.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surface
+                                            containerColor = if (isSelected) PhBlueContainer else MaterialTheme.colorScheme.surface
                                         ),
                                         modifier = Modifier
                                             .fillMaxWidth()
@@ -936,7 +962,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                             LinearProgressIndicator(
                                                 progress = { if (post.poll.totalVotes > 0) option.votes.toFloat() / post.poll.totalVotes else 0f },
                                                 modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
-                                                color = if (isSelected) PhchatVioletDeep else PhYellowSun,
+                                                color = if (isSelected) PhBluePrimary else PhYellowSun,
                                             )
                                         }
                                     }
@@ -989,7 +1015,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                             Icon(
                                 imageVector = if (post.isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
                                 contentDescription = "Save",
-                                tint = if (post.isSaved) PhchatVioletDeep else MaterialTheme.colorScheme.outline
+                                tint = if (post.isSaved) PhBluePrimary else MaterialTheme.colorScheme.outline
                             )
                         }
                     }
@@ -1094,7 +1120,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                 onClick = { viewModel.openProfile(p.id) },
                 shape = RoundedCornerShape(12.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (p.id == currentUser.id) PhchatVioletDeep.copy(alpha = 0.18f) else MaterialTheme.colorScheme.surface
+                    containerColor = if (p.id == currentUser.id) PhBlueContainer else MaterialTheme.colorScheme.surface
                 ),
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -1133,7 +1159,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                                     text = "(You)",
                                     fontSize = 11.sp,
                                     fontWeight = FontWeight.Bold,
-                                    color = PhchatVioletDeep
+                                    color = PhBluePrimary
                                 )
                             }
                         }
@@ -1151,7 +1177,7 @@ fun TambayHallTab(viewModel: PhchatViewModel) {
                             text = "${p.points} pts",
                             fontWeight = FontWeight.Bold,
                             fontSize = 14.sp,
-                            color = PhchatVioletDeep
+                            color = PhBluePrimary
                         )
                         Text(
                             text = "${p.streak} days",
@@ -1333,7 +1359,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                     modifier = Modifier
                         .size(48.dp)
                         .clip(CircleShape)
-                        .background(PhchatVioletDeep)
+                        .background(PhBluePrimary)
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
@@ -1375,7 +1401,7 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
                                 Icon(
                                     imageVector = Icons.Default.ThumbUp,
                                     contentDescription = "Upvote",
-                                    tint = if (comment.userVote == 1) PhchatVioletDeep else MaterialTheme.colorScheme.outline,
+                                    tint = if (comment.userVote == 1) PhBluePrimary else MaterialTheme.colorScheme.outline,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -1414,14 +1440,14 @@ fun MyProfileTab(viewModel: PhchatViewModel) {
         val statusPresets = listOf(
             "Online & Tambay ☕",
             "Kape Muna Tayo ☕",
-            "Messages Time 👀",
+            "Chika Time 👀",
             "Busy sa Work 💻",
             "Kumakain ng Lechon 🐷",
-            "Looking for Tambay Friends "
+            "Looking for Tambay Friends 🇵🇭"
         )
         AlertDialog(
             onDismissRequest = { showEditStatusDialog = false },
-            title = { Text("Update your status") },
+            title = { Text("Update Tambay Status") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedTextField(
@@ -1487,7 +1513,7 @@ fun CreateRoomDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Create room") },
+        title = { Text("Create Tambayan Room") },
         text = {
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 OutlinedTextField(
@@ -1569,7 +1595,7 @@ fun CreatePostDialog(
                     FilterChip(
                         selected = isPoll,
                         onClick = { isPoll = true },
-                        label = { Text("Poll") }
+                        label = { Text("📊 Poll") }
                     )
                 }
 
