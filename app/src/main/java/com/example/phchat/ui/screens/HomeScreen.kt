@@ -55,12 +55,12 @@ fun HomeScreen(
                 color = MaterialTheme.colorScheme.surface,
                 tonalElevation = 0.dp,
                 shadowElevation = 0.dp,
-                shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                shape = MaterialTheme.shapes.large
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(start = 20.dp, end = 12.dp, top = 10.dp, bottom = 10.dp),
+                        .padding(horizontal = PhchatSpacing.lg, vertical = PhchatSpacing.sm),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
@@ -68,7 +68,7 @@ fun HomeScreen(
                             Text(
                                 text = "Phchat",
                                 fontWeight = FontWeight.Black,
-                                fontSize = 22.sp,
+                                fontSize = 24.sp,
                                 color = MaterialTheme.colorScheme.onSurface
                             )
                             Spacer(modifier = Modifier.width(7.dp))
@@ -80,8 +80,8 @@ fun HomeScreen(
                             )
                         }
                         Text(
-                            text = "Bayanihan, chika, at tambayan",
-                            fontSize = 11.sp,
+                            text = "Real people. Real conversations.",
+                            style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -267,13 +267,13 @@ fun TambayanTab(viewModel: PhchatViewModel) {
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp)
+        contentPadding = PaddingValues(horizontal = PhchatSpacing.lg, vertical = PhchatSpacing.md),
+        verticalArrangement = Arrangement.spacedBy(PhchatSpacing.lg)
     ) {
         // Hero Banner Art
         item {
             Card(
-                shape = RoundedCornerShape(20.dp),
+                shape = MaterialTheme.shapes.large,
                 modifier = Modifier
                     .fillMaxWidth()
                     .testTag("hero_banner_card"),
@@ -282,7 +282,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(160.dp)
+                        .height(136.dp)
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.img_tambayan_hero),
@@ -314,7 +314,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             shape = RoundedCornerShape(6.dp)
                         ) {
                             Text(
-                                text = "☀️ PAMBANSANG TAMBAYAN",
+                                text = "PAMBANSANG TAMBAYAN",
                                 color = PhOnGoldContainer,
                                 fontSize = 10.sp,
                                 fontWeight = FontWeight.Black,
@@ -329,7 +329,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "Konektado sa 81 Lalawigan • Nostalgic Retro Mobile Chat",
+                            text = "Mga tunay na tao. Mga tunay na usapan.",
                             color = Color(0xFFDCE6F5),
                             fontSize = 11.sp
                         )
@@ -362,7 +362,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = "🗺️ 17 Rehiyon & 81 Lalawigan Explorer ➜",
+                    text = "Explore communities",
                     fontWeight = FontWeight.Black,
                     fontSize = 13.sp
                 )
@@ -418,10 +418,10 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Mga Aktibong Tambayan (${rooms.size})",
+                    text = "Active tambayan",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = PhBluePrimary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "Lahat" else selectedProvince,
@@ -445,7 +445,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             .padding(28.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(text = "🇵🇭", fontSize = 48.sp)
+                        Text(text = "No rooms yet", style = MaterialTheme.typography.titleMedium)
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = "Walang tambayan pa rito!",
