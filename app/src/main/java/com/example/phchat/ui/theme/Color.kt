@@ -2,46 +2,46 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// PHchat Soft Pro: BLACK + WHITE + GREEN.
-// No blue cast in either mode. Philippine accents stay secondary.
+// PHchat Premium Social: black-first, warm-neutral light mode, restrained gold accent.
+// Keep the existing semantic names so screen code remains source-compatible.
 
-val PhBluePrimary = Color(0xFF00A94F)      // Brand green
-val PhBlueDark = Color(0xFF050505)         // Pure near-black header/dark background
-val PhBlueLight = Color(0xFF16C96A)        // Active green
-val PhBlueContainer = Color(0xFFE8F8EF)    // Pale green selection
-val PhOnBlueContainer = Color(0xFF06351E)
+val PhBluePrimary = Color(0xFF0A0A0D)      // Primary action / black
+val PhBlueDark = Color(0xFF050505)         // Near-black foundation
+val PhBlueLight = Color(0xFF17171A)        // Elevated dark action
+val PhBlueContainer = Color(0xFFECECE9)    // Soft neutral selection
+val PhOnBlueContainer = Color(0xFF0A0A0D)
 
-val PhRedSecondary = Color(0xFFD84B4B)
-val PhRedContainer = Color(0xFFFBE9E9)
-val PhOnRedContainer = Color(0xFF641B1B)
+val PhRedSecondary = Color(0xFFC84B4B)
+val PhRedContainer = Color(0xFFF7E9E9)
+val PhOnRedContainer = Color(0xFF5D1818)
 
-val PhYellowSun = Color(0xFFF4C84B)
-val PhGoldContainer = Color(0xFFFFF5CF)
-val PhOnGoldContainer = Color(0xFF4D3B00)
+val PhYellowSun = Color(0xFFF5AD2A)        // Restrained warm gold
+val PhGoldContainer = Color(0xFFFFF2D6)
+val PhOnGoldContainer = Color(0xFF4A3000)
 
-val SurfaceLight = Color(0xFFF7F7F5)       // Warm soft-white
-val SurfaceVariantLight = Color(0xFFEEEEEB) // Soft neutral input/chip surface
-val OnSurfaceLight = Color(0xFF111111)     // Black text
-val OutlineLight = Color(0xFFD8D8D4)       // Neutral border
+val SurfaceLight = Color(0xFFF7F7F5)       // Warm near-white canvas
+val SurfaceVariantLight = Color(0xFFEEEEEB) // Soft neutral card/input surface
+val OnSurfaceLight = Color(0xFF0A0A0D)     // Near-black text
+val OutlineLight = Color(0xFFDCDCD8)       // Quiet neutral border
 
-val SurfaceDark = Color(0xFF050505)        // BLACK
-val SurfaceVariantDark = Color(0xFF111111) // Elevated black card
-val OnSurfaceDark = Color(0xFFF7F7F5)      // White text
-val OutlineDark = Color(0xFF2A2A2A)        // Neutral black-mode border
+val SurfaceDark = Color(0xFF050505)        // Near-black foundation
+val SurfaceVariantDark = Color(0xFF17171A) // Elevated charcoal surface
+val OnSurfaceDark = Color(0xFFF7F7F5)      // Soft white text
+val OutlineDark = Color(0xFF2A2A2D)        // Subtle dark border
 
-val StatusOnline = Color(0xFF20D56F)
-val StatusBusy = Color(0xFFD84B4B)
-val StatusAway = Color(0xFFF0B83D)
+val StatusOnline = Color(0xFF32C776)
+val StatusBusy = Color(0xFFC84B4B)
+val StatusAway = Color(0xFFE7A83B)
 
-// Regional accents are intentionally restrained and do not define the theme.
-val RegionNcr = Color(0xFF2476A8)
+// Regional accents stay secondary and never define the core theme.
+val RegionNcr = Color(0xFF5C7A91)
 val RegionVisayas = Color(0xFFB87924)
-val RegionMindanao = Color(0xFF008C68)
-val RegionLuzon = Color(0xFF765A91)
-val RegionBicol = Color(0xFFD84B4B)
+val RegionMindanao = Color(0xFF4B8C78)
+val RegionLuzon = Color(0xFF766A86)
+val RegionBicol = Color(0xFFC84B4B)
 
 // Roles
-val RoleOwner = Color(0xFFD84B4B)
-val RoleAdmin = Color(0xFF00A94F)
-val RoleMod = Color(0xFF008C68)
+val RoleOwner = Color(0xFFC84B4B)
+val RoleAdmin = Color(0xFF5B6B7A)
+val RoleMod = Color(0xFF6D8B7D)
 val RoleMember = Color(0xFF666666)
