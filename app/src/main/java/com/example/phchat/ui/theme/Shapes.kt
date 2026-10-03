@@ -9,6 +9,8 @@ object PhchatShapes {
     val compact = RoundedCornerShape(12.dp)
     val medium = RoundedCornerShape(16.dp)
     val large = RoundedCornerShape(20.dp)
+    val pill = RoundedCornerShape(percent = 50)
+    val bottomSheet = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp)
 
     fun material() = Shapes(
         extraSmall = small,
