@@ -353,10 +353,6 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                         onClick = { viewModel.selectedProvinceFilter.value = code },
                         label = label
                     )
-                        },
-                        leadingIcon = if (selectedProvince == code) {
-                            { Icon(Icons.Default.Check, contentDescription = null, modifier = Modifier.size(16.dp)) }
-                        } else null
                     )
                 }
             }
