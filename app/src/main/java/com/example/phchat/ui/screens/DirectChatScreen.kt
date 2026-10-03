@@ -26,6 +26,7 @@ import com.example.phchat.model.MessageKind
 import com.example.phchat.ui.components.StickerPickerSheet
 import com.example.phchat.ui.components.UserAvatar
 import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhBlueDark
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
 
@@ -186,12 +187,12 @@ fun DirectChatScreen(
                             }
                             Text(
                                 text = msg.body,
-                                color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isMe) PhBlueDark else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = msg.timestamp,
-                                color = if (isMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.outline,
+                                color = if (isMe) PhBlueDark.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
