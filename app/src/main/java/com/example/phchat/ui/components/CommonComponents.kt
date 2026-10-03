@@ -49,7 +49,7 @@ fun UserAvatar(
             text = initial.take(1).uppercase(),
             color = Color.White,
             fontWeight = FontWeight.Bold,
-            fontSize = (size.value * 0.42f).sp
+            fontSize = MaterialTheme.typography.titleLarge.fontSize
         )
 
         if (isActive != null) {
@@ -84,7 +84,7 @@ fun RoleBadge(role: MemberRole, modifier: Modifier = Modifier) {
         Text(
             text = label,
             color = fg,
-            fontSize = 9.sp,
+            fontSize = MaterialTheme.typography.labelSmall.fontSize,
             fontWeight = FontWeight.Black,
             modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
         )
