@@ -103,7 +103,7 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
         "ILO", "NEG" -> Triple("",  RegionVisayas.copy(alpha = 0.15f), RegionVisayas)
         "BAG", "BEN" -> Triple("",  RegionMindanao.copy(alpha = 0.15f), RegionMindanao)
         "ALB", "CAM" -> Triple("",  RegionBicol.copy(alpha = 0.15f), RegionBicol)
-        else -> Triple("",  PhBlueContainer, PhOnBlueContainer)
+        else -> Triple("",  PhAcidLime.copy(alpha = 0.16f), PhBlack)
     }
 
     Surface(
@@ -126,13 +126,13 @@ fun ProvinceBadge(code: String, name: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun UzzapRetroTicker(
+fun PhchatLiveStrip(
     roomCount: Int,
     onlineCount: Int = 18,
     modifier: Modifier = Modifier
 ) {
     Surface(
-        color = PhBlueDark,
+        color = PhGraphite,
         shape = RoundedCornerShape(14.dp),
         modifier = modifier.fillMaxWidth()
     ) {
@@ -153,7 +153,7 @@ fun UzzapRetroTicker(
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = "PILIPINAS LIVE",
-                    color = PhYellowSun,
+                    color = PhAcidLime,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Black
                 )
@@ -190,7 +190,7 @@ fun StreakPointsCard(
             .testTag("streak_card"),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(
-            containerColor = PhBluePrimary
+            containerColor = PhAcidLime
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 3.dp)
     ) {
@@ -206,13 +206,13 @@ fun StreakPointsCard(
                     modifier = Modifier
                         .size(50.dp)
                         .clip(CircleShape)
-                        .background(PhYellowSun),
+                        .background(PhAcidLime),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Default.LocalFireDepartment,
                         contentDescription = "Streak",
-                        tint = PhRedSecondary,
+                        tint = PhRed,
                         modifier = Modifier.size(30.dp)
                     )
                 }
@@ -228,14 +228,14 @@ fun StreakPointsCard(
                         Icon(
                             imageVector = Icons.Default.Stars,
                             contentDescription = "Points",
-                            tint = PhYellowSun,
+                            tint = PhAcidLime,
                             modifier = Modifier.size(15.dp)
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text(
                             text = "$points Tambay Points",
                             fontSize = 13.sp,
-                            color = PhGoldContainer,
+                            color = PhAcidLimeBright,
                             fontWeight = FontWeight.Medium
                         )
                     }
@@ -246,7 +246,7 @@ fun StreakPointsCard(
                 onClick = onCheckInClick,
                 enabled = !hasCheckedIn,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = PhYellowSun,
+                    containerColor = PhAcidLime,
                     contentColor = Color(0xFF4A3800),
                     disabledContainerColor = Color.White.copy(alpha = 0.25f),
                     disabledContentColor = Color.White.copy(alpha = 0.7f)
@@ -289,7 +289,7 @@ fun PinoyStickerDrawer(
                         text = "Pinoy Chat Stickers",
                         fontWeight = FontWeight.Bold,
                         fontSize = 16.sp,
-                        color = PhBluePrimary
+                        color = PhAcidLime
                     )
                 }
                 IconButton(onClick = onDismiss) {
