@@ -246,75 +246,60 @@ fun RoomsTab(viewModel: PhchatViewModel) {
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        // Hero Banner Art
+        // Signature room field: image-free, lightweight, and unmistakably PHchat.
         item {
-            Card(
-                shape = RoundedCornerShape(20.dp),
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .testTag("hero_banner_card"),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                    .height(188.dp)
+                    .clip(RoundedCornerShape(24.dp))
+                    .testTag("hero_banner_card")
             ) {
-                Box(
+                PhchatBackdrop(modifier = Modifier.fillMaxSize(), intensity = 1.15f)
+                Column(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(160.dp)
+                        .fillMaxSize()
+                        .padding(22.dp),
+                    verticalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Image(
-                        painter = painterResource(id = R.drawable.img_tambayan_hero),
-                        contentDescription = "Pambansang Rooms Banner",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(
-                                Brush.verticalGradient(
-                                    colors = listOf(
-                                        Color.Transparent,
-                                        Color(0x6607352B),
-                                        Color(0xF207352B)
-                                    )
-                                )
-                            )
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.Bottom
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.Top
                     ) {
-                        Surface(
-                            color = PhYellowSun,
-                            shape = RoundedCornerShape(6.dp)
-                        ) {
-                            Text(
-                                text = "☀️ COMMUNITY ROOMS",
-                                color = PhOnGoldContainer,
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Black,
-                                modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(4.dp))
                         Text(
-                            text = "Conversations across communities",
-                            color = Color.White,
-                            fontSize = 18.sp,
+                            text = "COMMUNITY ROOMS",
+                            color = MaterialTheme.colorScheme.primary,
+                            fontSize = 11.sp,
                             fontWeight = FontWeight.Black
                         )
                         Text(
-                            text = "Discover active rooms and people",
-                            color = Color(0xFFDCE6F5),
-                            fontSize = 11.sp
+                            text = "01",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                    Column {
+                        Text(
+                            text = "Find your people.",
+                            color = MaterialTheme.colorScheme.onSurface,
+                            fontSize = 26.sp,
+                            fontWeight = FontWeight.Black,
+                            lineHeight = 30.sp
+                        )
+                        Spacer(modifier = Modifier.height(5.dp))
+                        Text(
+                            text = "Live conversations, local communities, and direct connections.",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontSize = 13.sp
                         )
                     }
                 }
             }
         }
 
-        // Live Ticker Ribbon
+        // Live activity strip
         item {
             UzzapRetroTicker(
                 roomCount = rooms.size,
