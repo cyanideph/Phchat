@@ -23,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import com.example.phchat.ui.components.UserAvatar
 import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhchatShapes
-import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.ui.theme.PhMint
 import com.example.phchat.ui.theme.PhRedSecondary
