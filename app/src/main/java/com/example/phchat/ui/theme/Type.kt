@@ -5,6 +5,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.dp
 
 val Typography = Typography(
     displayLarge = TextStyle(
@@ -73,3 +74,15 @@ val Typography = Typography(
         letterSpacing = 0.1.sp
     )
 )
+
+
+// Shared spacing rhythm used by existing components and screens.
+object PhchatSpacing {
+    val xs = 4.dp
+    val sm = 8.dp
+    val md = 12.dp
+    val lg = 16.dp
+    val xl = 24.dp
+    val xxl = 32.dp
+    val display = 48.dp
+}
