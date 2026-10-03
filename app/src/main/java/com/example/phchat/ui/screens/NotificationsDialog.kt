@@ -17,7 +17,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhchatVioletDeep
 import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
@@ -100,7 +100,7 @@ fun NotificationsSheet(
                                     else -> Icons.Default.Notifications
                                 }
                                 val iconColor = when (notif.type) {
-                                    "mention" -> PhBluePrimary
+                                    "mention" -> PhchatVioletDeep
                                     "checkin" -> PhRedSecondary
                                     else -> MaterialTheme.colorScheme.primary
                                 }
