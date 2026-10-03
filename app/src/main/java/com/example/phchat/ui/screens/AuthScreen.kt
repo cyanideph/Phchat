@@ -80,7 +80,7 @@ fun AuthScreen(
                 color = PhBluePrimary
             )
             Text(
-                text = "Ang Pambansang Communityan ng Pilipinas",
+                text = "A community built for connection",
                 fontSize = 13.sp,
                 color = MaterialTheme.colorScheme.outline
             )
@@ -221,7 +221,7 @@ fun AuthScreen(
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(22.dp))
                 } else {
                     Text(
-                        text = if (isRegisterMode) "Create account (Sign Up)" else "Pumasok sa Communityan (Sign In)",
+                        text = if (isRegisterMode) "Create account" else "Sign in",
                         fontWeight = FontWeight.Bold,
                         fontSize = 15.sp
                     )
