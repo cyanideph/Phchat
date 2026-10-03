@@ -709,12 +709,12 @@ fun RoomMessageBubble(
                             text = message.body,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (isMe) PhBlueDark else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "🇵🇭 Pinoy Sticker",
                             fontSize = 9.sp,
-                            color = if (isMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.outline
+                            color = if (isMe) PhBlueDark.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline
                         )
                     }
                 } else {
@@ -723,7 +723,7 @@ fun RoomMessageBubble(
                             text = message.body,
                             color = when {
                                 message.isDeleted -> MaterialTheme.colorScheme.outline
-                                isMe -> Color.White
+                                isMe -> PhBlueDark
                                 else -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             fontSize = 14.sp
@@ -731,7 +731,7 @@ fun RoomMessageBubble(
                         if (isMe) {
                             Text(
                                 text = message.timestamp,
-                                color = Color.White.copy(alpha = 0.7f),
+                                color = PhBlueDark.copy(alpha = 0.72f),
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
