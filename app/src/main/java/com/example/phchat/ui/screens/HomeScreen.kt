@@ -196,12 +196,12 @@ fun HomeScreen(
                     )
                 }
                 2 -> {
-                    ExtendedFloatingActionButton(
+                    FloatingActionButton(
                         onClick = { showCreatePostDialog = true },
-                        icon = { Icon(Icons.Default.Edit, contentDescription = "Post sa Plaza") },
-                        text = { Text("Mag-Post sa Plaza", fontWeight = FontWeight.Bold) },
-                        containerColor = PhBluePrimary,
-                        contentColor = Color.White,
+                        content = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
+                        
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
