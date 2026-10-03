@@ -23,9 +23,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.ui.components.UserAvatar
-import com.example.phchat.ui.theme.PhchatLime
-import com.example.phchat.ui.theme.PhchatNavy950
-import com.example.phchat.ui.theme.PhchatVioletDeep
+import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhAcidLime
+import com.example.phchat.ui.theme.PhBlack
+import com.example.phchat.ui.theme.PhMint
+import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,7 +67,7 @@ fun ProfileScreen(
                         Icon(
                             imageVector = if (profile.isBlocked) Icons.Default.Block else Icons.Default.Shield,
                             contentDescription = "Block",
-                            tint = if (profile.isBlocked) PhchatVioletDeep else MaterialTheme.colorScheme.onSurface
+                            tint = if (profile.isBlocked) PhRedSecondary else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },
@@ -103,7 +105,7 @@ fun ProfileScreen(
                             fontSize = 18.sp
                         )
                         Text(
-                            text = "@${profile.username} · ${profile.province}",
+                            text = "@${profile.username} • ${profile.province}",
                             fontSize = 13.sp,
                             color = MaterialTheme.colorScheme.outline
                         )
@@ -139,8 +141,8 @@ fun ProfileScreen(
                                 onClick = { viewModel.toggleFollowUser(profile.id) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.primary,
-                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else MaterialTheme.colorScheme.onPrimary
+                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else PhBluePrimary,
+                                    contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else PhBlack
                                 )
                             ) {
                                 Text(if (profile.isFollowed) "Following ✓" else "Follow")
@@ -150,13 +152,13 @@ fun ProfileScreen(
                                 onClick = { viewModel.startConversationWithUser(profile) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = MaterialTheme.colorScheme.primary,
-                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                    containerColor = PhMint,
+                                    contentColor = PhBlack
                                 )
                             ) {
                                 Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = null, modifier = Modifier.size(16.dp))
                                 Spacer(modifier = Modifier.width(6.dp))
-                                Text("Message")
+                                Text("Chika (DM)")
                             }
                         }
 
@@ -184,7 +186,7 @@ fun ProfileScreen(
 
             item {
                 Text(
-                    text = "Leave a message on ${profile.displayName.split(" ").first()}'s posts",
+                    text = "Leave a message on ${profile.displayName.split(" ").first()}'s wall",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
@@ -198,7 +200,7 @@ fun ProfileScreen(
                     OutlinedTextField(
                         value = commentText,
                         onValueChange = { commentText = it },
-                        placeholder = { Text("Write a post...") },
+                        placeholder = { Text("Write on wall...") },
                         modifier = Modifier.weight(1f),
                         shape = RoundedCornerShape(12.dp)
                     )
@@ -213,9 +215,9 @@ fun ProfileScreen(
                         modifier = Modifier
                             .size(48.dp)
                             .clip(CircleShape)
-                              .background(MaterialTheme.colorScheme.primary)
+                            .background(PhAcidLime)
                     ) {
-                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = MaterialTheme.colorScheme.onPrimary)
+                        Icon(imageVector = Icons.AutoMirrored.Filled.Send, contentDescription = "Post", tint = PhBlack)
                     }
                 }
             }
@@ -249,7 +251,7 @@ fun ProfileScreen(
                                     Icon(
                                         imageVector = Icons.Default.ThumbUp,
                                         contentDescription = "Upvote",
-                                        tint = if (comment.userVote == 1) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline,
+                                        tint = if (comment.userVote == 1) PhBluePrimary else MaterialTheme.colorScheme.outline,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
@@ -266,7 +268,7 @@ fun ProfileScreen(
                                     Icon(
                                         imageVector = Icons.Default.ThumbDown,
                                         contentDescription = "Downvote",
-                                        tint = if (comment.userVote == -1) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.outline,
+                                        tint = if (comment.userVote == -1) PhRedSecondary else MaterialTheme.colorScheme.outline,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
