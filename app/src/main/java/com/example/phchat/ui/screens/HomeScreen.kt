@@ -167,7 +167,7 @@ fun HomeScreen(
                         icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
                         text = { Text("Create post", fontWeight = FontWeight.Bold) },
                         containerColor = PhchatVioletDeep,
-                        contentColor = PhchatNavy950,
+                        contentColor = Color.White,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
@@ -263,7 +263,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     ) {
                         Text(
                             text = "COMMUNITY ROOMS",
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Black
                         )
@@ -295,7 +295,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
 
         // Live activity strip
         item {
-            UzzapRetroTicker(
+            PhchatLiveStrip(
                 roomCount = rooms.size,
                 onlineCount = 28
             )
@@ -311,7 +311,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     .testTag("open_region_explorer_btn"),
                 colors = ButtonDefaults.filledTonalButtonColors(
                     containerColor = PhchatVioletDeep.copy(alpha = 0.18f),
-                    contentColor = PhOnBlueContainer
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -367,7 +367,7 @@ fun RoomsTab(viewModel: PhchatViewModel) {
                     text = "Active rooms (${rooms.size})",
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Black,
-                    color = PhchatVioletDeep
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = if (selectedProvince == "ALL") "All" else selectedProvince,
