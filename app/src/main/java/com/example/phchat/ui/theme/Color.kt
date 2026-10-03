@@ -2,46 +2,69 @@ package com.example.phchat.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// PHchat Soft Pro: BLACK + WHITE + GREEN.
-// No blue cast in either mode. Philippine accents stay secondary.
+// Phchat Premium Editorial palette.
+// Legacy PhBlue* names remain compatibility aliases for existing screens.
 
-val PhBluePrimary = Color(0xFF00A94F)      // Brand green
-val PhBlueDark = Color(0xFF050505)         // Pure near-black header/dark background
-val PhBlueLight = Color(0xFF16C96A)        // Active green
-val PhBlueContainer = Color(0xFFE8F8EF)    // Pale green selection
-val PhOnBlueContainer = Color(0xFF06351E)
+val PhAcidLime = Color(0xFFD7F542)
+val PhAcidLimeBright = Color(0xFFCCF52C)
+val PhAcidLimePressed = Color(0xFFB7D82E)
+val PhBlack = Color(0xFF0A0A0C)
 
-val PhRedSecondary = Color(0xFFD84B4B)
-val PhRedContainer = Color(0xFFFBE9E9)
-val PhOnRedContainer = Color(0xFF641B1B)
+val PhGraphite = Color(0xFF16161A)
+val PhSurface = Color(0xFF1C1C20)
+val PhSurfaceRaised = Color(0xFF24242A)
+val PhSurfaceSoft = Color(0xFF2B2B32)
+val PhHairline = Color(0xFF34343B)
 
-val PhYellowSun = Color(0xFFF4C84B)
-val PhGoldContainer = Color(0xFFFFF5CF)
-val PhOnGoldContainer = Color(0xFF4D3B00)
+val PhLavender = Color(0xFFA78BFA)
+val PhPeriwinkle = Color(0xFF8B7CF6)
+val PhMint = Color(0xFF3ECF8E)
+val PhTeal = Color(0xFF2FD6A3)
 
-val SurfaceLight = Color(0xFFF7F7F5)       // Warm soft-white
-val SurfaceVariantLight = Color(0xFFEEEEEB) // Soft neutral input/chip surface
-val OnSurfaceLight = Color(0xFF111111)     // Black text
-val OutlineLight = Color(0xFFD8D8D4)       // Neutral border
+val PhText = Color(0xFFF2F2F5)
+val PhTextMuted = Color(0xFFB0B0B8)
+val PhTextSecondary = Color(0xFF8A8A93)
 
-val SurfaceDark = Color(0xFF050505)        // BLACK
-val SurfaceVariantDark = Color(0xFF111111) // Elevated black card
-val OnSurfaceDark = Color(0xFFF7F7F5)      // White text
-val OutlineDark = Color(0xFF2A2A2A)        // Neutral black-mode border
+val PhRed = Color(0xFFFF6B6B)
+val PhRedSoft = Color(0xFF3A2024)
+val PhAmber = Color(0xFFF5C451)
 
-val StatusOnline = Color(0xFF20D56F)
-val StatusBusy = Color(0xFFD84B4B)
-val StatusAway = Color(0xFFF0B83D)
+val StatusOnline = PhMint
+val StatusBusy = PhRed
+val StatusAway = PhAmber
 
-// Regional accents are intentionally restrained and do not define the theme.
-val RegionNcr = Color(0xFF2476A8)
-val RegionVisayas = Color(0xFFB87924)
-val RegionMindanao = Color(0xFF008C68)
-val RegionLuzon = Color(0xFF765A91)
-val RegionBicol = Color(0xFFD84B4B)
+val RoleOwner = PhRed
+val RoleAdmin = PhAcidLime
+val RoleMod = PhLavender
+val RoleMember = PhTextSecondary
 
-// Roles
-val RoleOwner = Color(0xFFD84B4B)
-val RoleAdmin = Color(0xFF00A94F)
-val RoleMod = Color(0xFF008C68)
-val RoleMember = Color(0xFF666666)
+val RegionNcr = PhLavender
+val RegionVisayas = PhMint
+val RegionMindanao = PhTeal
+val RegionLuzon = PhPeriwinkle
+val RegionBicol = PhRed
+
+// Compatibility aliases.
+val PhBluePrimary = PhAcidLime
+val PhBlueDark = PhGraphite
+val PhBlueLight = PhAcidLimeBright
+val PhBlueContainer = PhAcidLime.copy(alpha = 0.16f)
+val PhOnBlueContainer = PhBlack
+
+val PhRedSecondary = PhRed
+val PhRedContainer = PhRedSoft
+val PhOnRedContainer = Color(0xFFFFD9DC)
+
+val PhYellowSun = PhAcidLime
+val PhGoldContainer = Color(0xFFEEF8A8)
+val PhOnGoldContainer = PhBlack
+
+val SurfaceLight = Color(0xFFF5F5F2)
+val SurfaceVariantLight = Color(0xFFE8E8E4)
+val OnSurfaceLight = Color(0xFF101014)
+val OutlineLight = Color(0xFFD0D0CC)
+
+val SurfaceDark = PhGraphite
+val SurfaceVariantDark = PhSurface
+val OnSurfaceDark = PhText
+val OutlineDark = PhHairline
