@@ -341,13 +341,13 @@ fun RoomChatScreen(
                         modifier = Modifier
                             .size(46.dp)
                             .clip(CircleShape)
-                            .background(if (inputText.isNotBlank()) PhchatLime else MaterialTheme.colorScheme.surfaceVariant)
+                             .background(if (inputText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                             .testTag("send_button")
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.Send,
                             contentDescription = "Send",
-                            tint = if (inputText.isNotBlank()) Color.White else MaterialTheme.colorScheme.outline
+                            tint = if (inputText.isNotBlank()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline
                         )
                     }
                 }
@@ -686,7 +686,7 @@ fun RoomMessageBubble(
             Surface(
                 color = when {
                     message.isDeleted -> MaterialTheme.colorScheme.surfaceVariant
-                    isMe -> PhchatLime
+                    isMe -> MaterialTheme.colorScheme.primaryContainer
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
                 shape = RoundedCornerShape(
@@ -709,12 +709,12 @@ fun RoomMessageBubble(
                             text = message.body,
                             fontWeight = FontWeight.Bold,
                             fontSize = 13.sp,
-                            color = if (isMe) PhchatNavy950 else MaterialTheme.colorScheme.onSurfaceVariant
+                            color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant
                         )
                         Text(
                             text = "Chat sticker",
                             fontSize = 9.sp,
-                            color = if (isMe) PhchatNavy950.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline
+                            color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline
                         )
                     }
                 } else {
@@ -723,7 +723,7 @@ fun RoomMessageBubble(
                             text = message.body,
                             color = when {
                                 message.isDeleted -> MaterialTheme.colorScheme.outline
-                                isMe -> PhchatNavy950
+                                isMe -> MaterialTheme.colorScheme.onPrimaryContainer
                                 else -> MaterialTheme.colorScheme.onSurfaceVariant
                             },
                             fontSize = 14.sp
@@ -731,7 +731,7 @@ fun RoomMessageBubble(
                         if (isMe) {
                             Text(
                                 text = message.timestamp,
-                                color = PhchatNavy950.copy(alpha = 0.72f),
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f),
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
