@@ -6,53 +6,17 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 
+/** Phchat semantic type scale. Avoid one-off text sizes in screens. */
 val Typography = Typography(
-    headlineLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 28.sp,
-        lineHeight = 34.sp
-    ),
-    headlineMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 22.sp,
-        lineHeight = 28.sp
-    ),
-    titleLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 18.sp,
-        lineHeight = 24.sp
-    ),
-    titleMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 16.sp,
-        lineHeight = 22.sp
-    ),
-    bodyLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
-        lineHeight = 22.sp
-    ),
-    bodyMedium = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 13.sp,
-        lineHeight = 18.sp
-    ),
-    labelLarge = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Medium,
-        fontSize = 13.sp,
-        lineHeight = 18.sp
-    ),
-    labelSmall = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
-        fontSize = 11.sp,
-        lineHeight = 14.sp
-    )
+    displaySmall = TextStyle(FontFamily.Default, FontWeight.Black, 32.sp, 38.sp, letterSpacing = (-0.5).sp),
+    headlineLarge = TextStyle(FontFamily.Default, FontWeight.Bold, 28.sp, 34.sp, letterSpacing = (-0.2).sp),
+    headlineMedium = TextStyle(FontFamily.Default, FontWeight.Bold, 24.sp, 30.sp),
+    headlineSmall = TextStyle(FontFamily.Default, FontWeight.SemiBold, 20.sp, 26.sp),
+    titleLarge = TextStyle(FontFamily.Default, FontWeight.SemiBold, 18.sp, 24.sp),
+    titleMedium = TextStyle(FontFamily.Default, FontWeight.SemiBold, 16.sp, 22.sp),
+    bodyLarge = TextStyle(FontFamily.Default, FontWeight.Normal, 16.sp, 24.sp),
+    bodyMedium = TextStyle(FontFamily.Default, FontWeight.Normal, 14.sp, 20.sp),
+    labelLarge = TextStyle(FontFamily.Default, FontWeight.SemiBold, 13.sp, 18.sp),
+    labelMedium = TextStyle(FontFamily.Default, FontWeight.Medium, 12.sp, 16.sp),
+    labelSmall = TextStyle(FontFamily.Default, FontWeight.Medium, 11.sp, 14.sp)
 )
