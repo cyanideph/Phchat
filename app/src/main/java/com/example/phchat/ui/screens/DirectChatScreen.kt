@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.EmojiEmotions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -114,7 +115,7 @@ fun DirectChatScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { showStickerSheet = true }) {
-                    Text(text = "🇵🇭", fontSize = 22.sp)
+                    Icon(Icons.Default.EmojiEmotions, contentDescription = "Stickers", tint = MaterialTheme.colorScheme.onSurfaceVariant)
                 }
 
                 OutlinedTextField(
@@ -149,7 +150,7 @@ fun DirectChatScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) Color.White else MaterialTheme.colorScheme.outline
+                        tint = if (inputText.isNotBlank()) PhBlack else MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -186,12 +187,12 @@ fun DirectChatScreen(
                             }
                             Text(
                                 text = msg.body,
-                                color = if (isMe) Color.White else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isMe) PhBlack else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = msg.timestamp,
-                                color = if (isMe) Color.White.copy(alpha = 0.7f) else MaterialTheme.colorScheme.outline,
+                                color = if (isMe) PhBlack.copy(alpha = 0.62f) else MaterialTheme.colorScheme.outline,
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
