@@ -177,8 +177,8 @@ fun StreakPointsCard(streak: Int, points: Int, hasCheckedIn: Boolean, onCheckInC
                 }
             }
             Button(onClick = onCheckInClick, enabled = !hasCheckedIn,
-                colors = ButtonDefaults.buttonColors(containerColor = PhchatLime, contentColor = PhchatNavy950,
-                    disabledContainerColor = Color.White.copy(alpha = 0.25f), disabledContentColor = Color.White.copy(alpha = 0.7f)),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = MaterialTheme.colorScheme.onPrimary,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceVariant, disabledContentColor = MaterialTheme.colorScheme.onSurfaceVariant),
                 shape = MaterialTheme.shapes.small, modifier = Modifier.testTag("checkin_button")) {
                 Text(if (hasCheckedIn) "Checked in" else "Check in +50", fontWeight = FontWeight.ExtraBold, fontSize = 11.sp)
             }
