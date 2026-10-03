@@ -687,12 +687,7 @@ fun RoomMessageBubble(
                     isMe -> PhAcidLime
                     else -> MaterialTheme.colorScheme.surfaceVariant
                 },
-                shape = RoundedCornerShape(
-                    topStart = 16.dp,
-                    topEnd = 16.dp,
-                    bottomStart = if (isMe) 16.dp else 4.dp,
-                    bottomEnd = if (isMe) 4.dp else 16.dp
-                ),
+                shape = PhchatShapes.messageBubble(isMe),
                 shadowElevation = 1.dp,
                 modifier = Modifier.clickable { onClick() }
             ) {
