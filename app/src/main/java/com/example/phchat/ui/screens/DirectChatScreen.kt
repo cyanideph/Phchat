@@ -145,13 +145,13 @@ fun DirectChatScreen(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
-                        .background(if (inputText.isNotBlank()) PhchatLime else MaterialTheme.colorScheme.surfaceVariant)
+                         .background(if (inputText.isNotBlank()) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant)
                         .testTag("dm_send_button")
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Send,
                         contentDescription = "Send",
-                        tint = if (inputText.isNotBlank()) PhchatNavy950 else MaterialTheme.colorScheme.outline
+                        tint = if (inputText.isNotBlank()) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.outline
                     )
                 }
             }
@@ -172,7 +172,7 @@ fun DirectChatScreen(
                     horizontalArrangement = if (isMe) Arrangement.End else Arrangement.Start
                 ) {
                     Surface(
-                        color = if (isMe) PhchatLime else MaterialTheme.colorScheme.surfaceVariant,
+                        color = if (isMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surfaceVariant,
                         shape = RoundedCornerShape(
                             topStart = 16.dp,
                             topEnd = 16.dp,
@@ -188,12 +188,12 @@ fun DirectChatScreen(
                             }
                             Text(
                                 text = msg.body,
-                                color = if (isMe) PhchatNavy950 else MaterialTheme.colorScheme.onSurfaceVariant,
+                                color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer else MaterialTheme.colorScheme.onSurfaceVariant,
                                 fontSize = 14.sp
                             )
                             Text(
                                 text = msg.timestamp,
-                                color = if (isMe) PhchatNavy950.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
+                                color = if (isMe) MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.72f) else MaterialTheme.colorScheme.outline,
                                 fontSize = 9.sp,
                                 modifier = Modifier.align(Alignment.End)
                             )
