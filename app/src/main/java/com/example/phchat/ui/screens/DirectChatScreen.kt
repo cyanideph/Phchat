@@ -115,7 +115,7 @@ fun DirectChatScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = { showStickerSheet = true }) {
-                    Icon(imageVector = Icons.Default.Star, contentDescription = "Stickers")
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Stickers")
                 }
 
                 OutlinedTextField(
