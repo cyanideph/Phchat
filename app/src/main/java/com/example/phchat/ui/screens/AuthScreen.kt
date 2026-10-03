@@ -20,6 +20,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.data.AuthState
+import com.example.phchat.ui.components.PhchatMark
 import com.example.phchat.ui.theme.PhBluePrimary
 import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
@@ -60,16 +61,13 @@ fun AuthScreen(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            // Retro Uzzap / Phchat Header
-            Surface(
-                color = PhBluePrimary,
-                shape = RoundedCornerShape(20.dp),
-                modifier = Modifier.size(72.dp)
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Text(text = "", fontSize = 38.sp)
-                }
-            }
+            // Phchat brand mark
+            PhchatMark(
+                size = 72.dp,
+                backgroundColor = PhBluePrimary,
+                foregroundColor = Color(0xFF10110D),
+                contentDescription = "Phchat"
+            )
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -95,12 +93,12 @@ fun AuthScreen(
                 Tab(
                     selected = !isRegisterMode,
                     onClick = { isRegisterMode = false; userMessage = null },
-                    text = { Text("Pumasok (Sign In)") }
+                    text = { Text("Sign in") }
                 )
                 Tab(
                     selected = isRegisterMode,
                     onClick = { isRegisterMode = true; userMessage = null },
-                    text = { Text("Mag-rehistro (Register)") }
+                    text = { Text("Create account") }
                 )
             }
 
@@ -186,7 +184,7 @@ fun AuthScreen(
             Button(
                 onClick = {
                     if (email.isBlank() || password.isBlank()) {
-                        userMessage = "Pakilagay ang email at password."
+                        userMessage = "Enter your email and password."
                         return@Button
                     }
                     isSubmitting = true
@@ -231,7 +229,7 @@ fun AuthScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Konektado sa Supabase ap-northeast-1 (Tokyo)",
+                text = "Community messaging",
                 fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.outline
             )
