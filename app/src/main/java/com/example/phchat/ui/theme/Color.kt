@@ -6,33 +6,33 @@ import androidx.compose.ui.graphics.Color
 // Screens should consume MaterialTheme.colorScheme or these semantic roles.
 val PhAcidLime = Color(0xFFD7F542)
 val PhAcidLimeBright = Color(0xFFCCF52C)
-val PhAcidLimePressed = Color(0xFFB7D82E)
+val PhAcidLimePressed = Color(0xFFB8D92E)
 val PhAcidLimeContainer = PhAcidLime.copy(alpha = 0.16f)
 val PhBlack = Color(0xFF0A0A0C)
 
 val PhGraphite = Color(0xFF16161A)
-val PhSurface = Color(0xFF1C1C20)
-val PhSurfaceRaised = Color(0xFF24242A)
-val PhSurfaceSoft = Color(0xFF2B2B32)
-val PhHairline = Color(0xFF34343B)
+val PhSurface = Color(0xFF202024)
+val PhSurfaceRaised = Color(0xFF28282D)
+val PhSurfaceSoft = Color(0xFF303037)
+val PhHairline = Color(0xFF393940)
 
 val PhLavender = Color(0xFFA78BFA)
 val PhPeriwinkle = Color(0xFF8B7CF6)
 val PhMint = Color(0xFF3ECF8E)
 val PhTeal = Color(0xFF2FD6A3)
 
-val PhText = Color(0xFFF2F2F5)
+val PhText = Color(0xFFF4F4F0)
 val PhTextMuted = Color(0xFFB0B0B8)
-val PhTextSecondary = Color(0xFF8A8A93)
+val PhTextSecondary = Color(0xFF96969F)
 
 val PhRed = Color(0xFFFF6B6B)
 val PhRedSoft = Color(0xFF3A2024)
 val PhAmber = Color(0xFFF5C451)
 
-val PhLightBackground = Color(0xFFF5F5F2)
+val PhLightBackground = Color(0xFFF7F7F4)
 val PhLightSurface = Color.White
 val PhLightSurfaceVariant = Color(0xFFE8E8E4)
-val PhLightText = Color(0xFF101014)
+val PhLightText = Color(0xFF111114)
 val PhLightTextSecondary = Color(0xFF5F6068)
 val PhLightOutline = Color(0xFFD0D0CC)
 val PhLightPrimary = Color(0xFF657A00)
