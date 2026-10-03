@@ -45,3 +45,12 @@ val RoleOwner = Color(0xFFD84B4B)
 val RoleAdmin = Color(0xFF00A94F)
 val RoleMod = Color(0xFF008C68)
 val RoleMember = Color(0xFF666666)
+
+// Semantic aliases: UI code should describe intent, not implementation-era color names.
+val PhchatAccent = PhBluePrimary
+val PhchatAccentStrong = PhBlueLight
+val PhchatInk = OnSurfaceLight
+val PhchatCanvas = SurfaceLight
+val PhchatSurface = Color.White
+val PhchatGold = PhYellowSun
+val PhchatDanger = PhRedSecondary
