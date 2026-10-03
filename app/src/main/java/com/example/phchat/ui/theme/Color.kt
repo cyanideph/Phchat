@@ -66,7 +66,7 @@ val StatusAway = PhchatWarning
 val RegionNcr = PhchatMint
 val RegionVisayas = PhchatViolet
 val RegionMindanao = PhchatMint
-val RegionLuzon = PhchatLime
+val RegionLuzon = PhchatViolet
 val RegionBicol = PhchatDanger
 
 val RoleOwner = PhchatDanger
@@ -74,14 +74,14 @@ val RoleAdmin = PhchatMint
 val RoleMod = PhchatMint
 val RoleMember = PhchatTextMutedLight
 
-val PhchatAccent = PhchatLime
-val PhchatAccentStrong = PhchatLimeSoft
+val PhchatAccent = PhchatVioletStrong
+val PhchatAccentStrong = PhchatViolet
 val PhchatInk = PhchatTextOnLight
 val PhchatCanvas = SurfaceLight
 val PhchatSurface = Color.White
 val PhchatGold = PhchatWarning
 val PhchatTextPrimary = PhchatTextOnLight
 val PhchatTextSecondary = PhchatTextMutedLight
-val PhchatTextOnAccent = PhchatNavy950
+val PhchatTextOnAccent = Color.White
 val PhchatDividerLight = PhchatLavender200
 val PhchatDividerDark = PhchatNavy600
