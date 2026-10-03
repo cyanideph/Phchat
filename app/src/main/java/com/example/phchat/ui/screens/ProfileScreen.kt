@@ -23,7 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.ui.components.UserAvatar
-import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhAcidLime
 import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.ui.theme.PhMint
@@ -141,7 +141,7 @@ fun ProfileScreen(
                                 onClick = { viewModel.toggleFollowUser(profile.id) },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else PhBluePrimary,
+                                    containerColor = if (profile.isFollowed) MaterialTheme.colorScheme.surfaceVariant else PhAcidLime,
                                     contentColor = if (profile.isFollowed) MaterialTheme.colorScheme.onSurfaceVariant else PhBlack
                                 )
                             ) {
@@ -251,7 +251,7 @@ fun ProfileScreen(
                                     Icon(
                                         imageVector = Icons.Default.ThumbUp,
                                         contentDescription = "Upvote",
-                                        tint = if (comment.userVote == 1) PhBluePrimary else MaterialTheme.colorScheme.outline,
+                                        tint = if (comment.userVote == 1) PhAcidLime else MaterialTheme.colorScheme.outline,
                                         modifier = Modifier.size(16.dp)
                                     )
                                 }
