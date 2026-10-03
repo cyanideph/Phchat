@@ -526,7 +526,6 @@ suspend fun getConversations(): Result<List<Conversation>> = withContext(Dispatc
                 put("p_kind", "private")
                 put("p_title", JSONObject.NULL)
                 put("p_member_ids", JSONArray().apply {
-                    put(userId)
                     put(targetUserId)
                 })
             })
