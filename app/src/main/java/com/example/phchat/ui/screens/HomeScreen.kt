@@ -324,7 +324,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
                             text = "Usapang Pinoy, Bawat Probinsya",
-                            color = Color.White,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Black
                         )
@@ -355,8 +355,8 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                     .fillMaxWidth()
                     .testTag("open_region_explorer_btn"),
                 colors = ButtonDefaults.filledTonalButtonColors(
-                    containerColor = PhBlueContainer,
-                    contentColor = PhOnBlueContainer
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    contentColor = MaterialTheme.colorScheme.onSurface
                 )
             ) {
                 Icon(Icons.Default.Map, contentDescription = null, modifier = Modifier.size(18.dp))
@@ -451,7 +451,7 @@ fun TambayanTab(viewModel: PhchatViewModel) {
                             text = "Walang tambayan pa rito!",
                             fontWeight = FontWeight.Black,
                             fontSize = 17.sp,
-                            color = PhBluePrimary
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(modifier = Modifier.height(4.dp))
                         Text(
@@ -503,14 +503,7 @@ fun RoomCard(
     onTogglePin: () -> Unit,
     onToggleJoin: () -> Unit
 ) {
-    val regionalAccent = when (room.provinceCode.uppercase()) {
-        "NCR", "MNL" -> RegionNcr
-        "CEB", "ILO" -> RegionVisayas
-        "DVO" -> RegionMindanao
-        "PAM", "BAG" -> RegionLuzon
-        "ALB" -> RegionBicol
-        else -> PhBluePrimary
-    }
+    val regionalAccent = MaterialTheme.colorScheme.primary
 
     Card(
         onClick = onClick,
@@ -529,7 +522,7 @@ fun RoomCard(
                 modifier = Modifier
                     .width(7.dp)
                     .fillMaxHeight()
-                    .background(regionalAccent)
+                    .background(MaterialTheme.colorScheme.primary)
             )
 
             Column(
@@ -567,7 +560,7 @@ fun RoomCard(
                                     text = room.name,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = PhBluePrimary,
+                                    color = MaterialTheme.colorScheme.onSurface,
                                     maxLines = 1,
                                     overflow = TextOverflow.Ellipsis
                                 )
@@ -646,8 +639,8 @@ fun RoomCard(
                         shape = RoundedCornerShape(16.dp),
                         contentPadding = PaddingValues(horizontal = 14.dp, vertical = 6.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = PhBluePrimary,
-                            contentColor = Color.White
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
                         )
                     ) {
                         Text(
