@@ -25,6 +25,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import com.example.phchat.model.ChatSticker
 import com.example.phchat.model.MemberRole
 import com.example.phchat.model.StickerPacks
@@ -68,6 +70,66 @@ fun PhchatBackdrop(
                 strokeWidth = 1.dp.toPx()
             )
             x += step
+        }
+    }
+}
+
+@Composable
+fun PhchatMark(
+    modifier: Modifier = Modifier,
+    size: Dp = 56.dp,
+    backgroundColor: Color = PhBlueLight,
+    foregroundColor: Color = Color(0xFF10110D),
+    contentDescription: String = "Phchat"
+) {
+    Box(
+        modifier = modifier
+            .size(size)
+            .clip(RoundedCornerShape(size * 0.28f))
+            .background(backgroundColor)
+            .semantics { this.contentDescription = contentDescription },
+        contentAlignment = Alignment.Center
+    ) {
+        androidx.compose.foundation.Canvas(modifier = Modifier.fillMaxSize().padding(size * 0.19f)) {
+            val stroke = size.minDimension * 0.095f
+            val bubble = androidx.compose.ui.geometry.RoundRect(
+                left = size.minDimension * 0.06f,
+                top = size.minDimension * 0.06f,
+                right = size.minDimension * 0.94f,
+                bottom = size.minDimension * 0.78f,
+                radiusX = size.minDimension * 0.18f,
+                radiusY = size.minDimension * 0.18f
+            )
+            drawRoundRect(
+                color = foregroundColor,
+                topLeft = androidx.compose.ui.geometry.Offset(bubble.left, bubble.top),
+                size = androidx.compose.ui.geometry.Size(bubble.width, bubble.height),
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(bubble.radiusX, bubble.radiusY),
+                style = androidx.compose.ui.graphics.drawscope.Stroke(width = stroke)
+            )
+            val cy = size.minDimension * 0.42f
+            val leftNode = size.minDimension * 0.30f
+            val midNode = size.minDimension * 0.50f
+            val rightNode = size.minDimension * 0.70f
+            drawLine(
+                color = foregroundColor,
+                start = androidx.compose.ui.geometry.Offset(leftNode, cy),
+                end = androidx.compose.ui.geometry.Offset(rightNode, cy),
+                strokeWidth = stroke * 0.72f,
+                cap = androidx.compose.ui.graphics.StrokeCap.Round
+            )
+            drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(leftNode, cy))
+            drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(midNode, cy))
+            drawCircle(foregroundColor, radius = stroke * 0.72f, center = androidx.compose.ui.geometry.Offset(rightNode, cy))
+            val tailStart = androidx.compose.ui.geometry.Offset(size.minDimension * 0.30f, size.minDimension * 0.77f)
+            val tailEnd = androidx.compose.ui.geometry.Offset(size.minDimension * 0.24f, size.minDimension * 0.93f)
+            drawLine(
+                color = foregroundColor,
+                start = tailStart,
+                end = tailEnd,
+                strokeWidth = stroke,
+                cap = androidx.compose.ui.graphics.StrokeCap.Round
+            )
         }
     }
 }
