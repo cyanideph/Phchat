@@ -20,7 +20,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.phchat.data.AuthState
-import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhAcidLime
+import com.example.phchat.ui.theme.PhBlack
+import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.ui.theme.PhRedSecondary
 import com.example.phchat.viewmodel.PhchatViewModel
 
