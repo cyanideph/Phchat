@@ -156,8 +156,8 @@ fun HomeScreen(
                         onClick = { showCreateRoomDialog = true },
                         icon = { Icon(Icons.Default.Add, contentDescription = "Create room") },
                         text = { Text("Create room", fontWeight = FontWeight.Bold) },
-                        containerColor = PhYellowSun,
-                        contentColor = PhOnGoldContainer,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.testTag("create_room_fab")
                     )
                 }
@@ -166,8 +166,8 @@ fun HomeScreen(
                         onClick = { showCreatePostDialog = true },
                         icon = { Icon(Icons.Default.Edit, contentDescription = "Create post") },
                         text = { Text("Create post", fontWeight = FontWeight.Bold) },
-                        containerColor = PhchatVioletDeep,
-                        contentColor = Color.White,
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                         modifier = Modifier.testTag("create_post_fab")
                     )
                 }
