@@ -27,6 +27,7 @@ import com.example.phchat.model.MessageKind
 import com.example.phchat.ui.components.StickerPickerSheet
 import com.example.phchat.ui.components.UserAvatar
 import com.example.phchat.ui.theme.PhBluePrimary
+import com.example.phchat.ui.theme.PhBlack
 import com.example.phchat.viewmodel.PhchatViewModel
 import kotlinx.coroutines.launch
 
