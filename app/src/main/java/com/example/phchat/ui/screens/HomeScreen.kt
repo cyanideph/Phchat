@@ -488,7 +488,7 @@ fun RoomCard(
         modifier = Modifier
             .fillMaxWidth()
             .testTag("room_card_${room.id}"),
-        shape = RoundedCornerShape(18.dp),
+        shape = PhchatShapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),
@@ -959,7 +959,7 @@ fun CommunityTab(viewModel: PhchatViewModel) {
                                             Spacer(modifier = Modifier.height(4.dp))
                                             LinearProgressIndicator(
                                                 progress = { if (post.poll.totalVotes > 0) option.votes.toFloat() / post.poll.totalVotes else 0f },
-                                                modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)),
+                                                modifier = Modifier.fillMaxWidth().height(6.dp).clip(PhchatShapes.pill),
                                                 color = if (isSelected) PhAcidLime else PhYellowSun,
                                             )
                                         }
