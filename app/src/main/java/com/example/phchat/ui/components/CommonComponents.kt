@@ -186,7 +186,7 @@ fun StreakPointsCard(
         modifier = modifier
             .fillMaxWidth()
             .testTag("streak_card"),
-        shape = RoundedCornerShape(18.dp),
+        shape = PhchatShapes.medium,
         colors = CardDefaults.cardColors(
             containerColor = PhAcidLime
         ),
@@ -272,7 +272,7 @@ fun PinoyStickerDrawer(
             .fillMaxWidth()
             .height(280.dp)
             .testTag("sticker_drawer"),
-        shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+        shape = PhchatShapes.bottomSheet,
         color = MaterialTheme.colorScheme.surface,
         tonalElevation = 8.dp
     ) {
